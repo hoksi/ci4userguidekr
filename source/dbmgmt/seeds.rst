@@ -143,6 +143,6 @@ Faker를 프로젝트에 설치합니다.
 
 	> php spark make:seeder MySeeder -n Acme\Blog
 
-``Acme\Blog``\ 가 ``app/Blog`` 디렉토리에 매핑되면 이 명령은 시드 파일을 ``app/Blog/Database/Seeds/"\ 에 저장합니다.
+``Acme\Blog``\ 가 ``app/Blog`` 디렉토리에 매핑되면 이 명령은 시드 파일을 ``app/Blog/Database/Seeds/``\ 에 저장합니다.
 
 ``--force`` 옵션을 지정하면 대상에 있는 기존 파일을 덮어 씁니다.
