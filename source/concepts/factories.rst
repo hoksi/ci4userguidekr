@@ -1,0 +1,129 @@
+###################
+팩토리(Factories)
+###################
+
+.. contents::
+    :local:
+    :depth: 2
+
+소개
+============
+
+Like ``Services``, ``Factories`` are an extension of autoloading that helps keep your code concise yet optimal, without having to pass around object instances between classes.
+At its simplest, Factories provide a common way to create a class instance and access it from anywhere.
+This is a great way to reuse object states and reduce memory load from keeping multiple instances loaded across your app.
+
+Anything can be loaded by Factories, but the best examples are those classes that are used to work on or transmit common data.
+The framework itself uses Factories internally, e.g. to make sure the correct configuration is loaded when using the ``Config`` class. 
+
+Take a look at ``Models`` as an example.
+You can access the Factory specific to ``Models`` by using the magic static method of the Factories class, ``Factories::models()``.
+Because of the common path structure for namespaces and folders, Factories know that the model files and classes are found within **Models**, so you can request a model by its shorthand base name
+
+``서비스(Services)``\ 와 마찬가지로 ``팩토리(Factories)``\ 도 클래스 간에 객체 인스턴스를 전달할 필요 없이 코드를 간결하면서도 최적의 상태로 유지하도록 도와주는 자동 로딩의 확장입니다.
+가장 간단한 방법으로, 팩토리는 클래스 인스턴스를 만들고 어디에서나 액세스할 수 있는 일반적인 방법을 제공합니다.
+이는 객체 상태를 재사용하고 앱 전체에 여러 인스턴스를로드하여 메모리로드를 줄일 수있는 좋은 방법입니다.
+이렇게 하면 개체를 재사용하여 여러 인스턴스가 앱에 로드되지 않도록하여 메모리 로드를 줄일 수 있습니다.
+
+펙토리는 모든 항목을 로드할 수 있지만, 가장 좋은 예는 공통 데이터를 처리하거나 전송할 때 사용되는 클래스입니다.
+프레임워크는 ``Config`` 클래스를 사용할 때 올바른 구성이 로드되도록 하기 위해 내부적으로 팩토리를 사용합니다.
+
+``Models``\ 를 예로 들어 보겟습니다.
+팩토리 클래스의 매직 정적 메소드인 ``Factories::models()``\ 를 사용하여 ``Models``\ 의 특정 팩토리에 액세스할 수 있습니다.
+네임스페이스와 폴더가 공통 경로 구조를 갖기 때문에 팩토리는 모델 파일과 클래스가 **Models** \ 내에 있음을 알고 있으므로 축약형 기본 이름으로 모델을 요청할 수 있습니다.
+
+::
+
+	use CodeIgniter\Config\Factories;
+
+	$users = Factories::models('UserModel');
+
+또는 특정 클래스를 요청할 수도 있습니다.
+
+::
+
+	$widgets = Factories::models('Some\Namespace\Models\WidgetModel');
+
+다음 코드의 어느 위치에서나 동일한 클래스를 요청할 때 ``Factories``\ 는 이전과 같은 인스턴스를 다시 가져옵니다.
+
+::
+
+	class SomeOtherClass
+	{
+		$widgets = Factories::models('WidgetModel');
+		...
+	}
+
+팩토리 동작
+==================
+
+기본 동작이 모든 구성 요소에 대해 작동하지 않을 수 있습니다. 
+예를 들면, 구성 요소 이름과 해당 경로가 일치하지 않거나, 특정 유형의 클래스로 제한하여 반환해야 하거나, 구성 요소 클래스의 생성시 생성자에 추가 매개 변수(Parameters)가 필요한 경우입니다.
+이 섹션에서는 팩토리 구성 요소에 대한 동작 구성에 대해 설명합니다.
+
+팩토리 Parameters
+------------------
+
+기본적으로 ``Factories``\ 는 제공된 이름을 가진 구성요소의 공유 인스턴스를 찾으려 가정합니다.
+공유 인스턴스 스토리지를 사용하지 않고 클래스를 찾을 수 있는 ``Factories``\ 의 편의성이 바람직할 때도 있습니다.
+매직 정적 호출에 두 번째 매개 변수를 추가하면 ``Factories``\ 가 매번 새 인스턴스를 반환할지 아니면 공유 인스턴스를 반환할지 제어할 수 있습니다.
+
+::
+
+	$users = Factories::models('UserModel', true); // 기본값; 항상 동일한 인스턴스
+	$other = Factories::models('UserModel', false); // 항상 새 인스턴스를 만듭니다.
+
+또한 동시에 전달된 모든 매개 변수가 클래스 생성자에게 전달되므로 공유 인스턴스를 즉시 구성할 수 있습니다.
+예를 들어, 앱이 인증을 위해 별도의 데이터베이스를 사용하고 사용자 레코드에 액세스하려는 모든 시도가 항상 해당 연결을 통과하도록하고 싶다고 가정해 보겠습니다.
+
+::
+
+	$conn  = db_connect('AuthDatabase');
+	$users = Factories::models('UserModel', true, $conn);
+
+이제 ``UserModel``\ 이 ``Factories``\ 에서 로드될 때마다 대체 데이터베이스 연결을 사용하는 공유 인스턴스를 반환하게 됩니다.
+
+팩토리 구성
+---------------------
+
+한 구성 요소에 적용되는 작업이 모두 작동하지 않을 수 있습니다.
+``Factories``\ 는 구성을 통한 구성 요소 수준의 대체 동작을 지원합니다.
+구성은 설정으로 구성되며, 제공되지 않으면 기본값으로 대체됩니다.
+
+========== ============== ==================================================================================================================== ===================================================
+Key        Type           Description                                                                                                          Default
+========== ============== ==================================================================================================================== ===================================================
+component  string or null 정적 메서드와 다른 경우 구성 요소의 이름. 한 구성 요소와 다른 구성 요소의 별칭을 지정하는 데 사용할 수 있습니다.     ``null`` (defaults to the component name)
+path       string or null 클래스를 찾을 네임스페이스/폴더의 상대 경로                                                                          ``null`` (defaults to the component name)
+instanceOf string or null 반환된 인스턴스에서 일치하는 필수 클래스 이름                                                                        ``null`` (no filtering)
+prefersApp boolean        App 네임스페이스에서 기본 이름이 동일한 클래스가 다른 명시적 클래스 요청을 재정의하는지 여부                         ``true``
+========== ============== ==================================================================================================================== ===================================================
+
+구성은 구성 파일통하거나 런타임, 두 가지 방법 중 하나로 적용할 수 있습니다.
+파일을 사용하려면 **app/Config/Factory.php**\ 에 구성 이름과 일치하는 속성의 구성 설정으로 새 구성을 만듭니다.
+예를 들어 앱에서 사용하는 모든 필터가 실제로 유효한지 확인하기 위해 **Factories.php** 파일을 다음과 같이 구성할 수 있습니다.
+
+::
+
+	<?php namespace Config;
+
+	use CodeIgniter\Config\Factory as BaseFactory;
+	use CodeIgniter\Filters\FilterInterface;
+
+	class Factories extends BaseFactory
+	{
+		public $filters = [
+			'instanceOf' => FilterInterface::class,
+		];
+	}
+
+이렇게 하면 네임스페이스에 관련 없는 "Filters" 경로가 있는 관련 없는 타사 모듈의 충돌을 방지할 수 있습니다.
+
+런타임 구성은 훨씬 더 쉽습니다. ``setConfig()`` 메소드를 사용하여 원하는 구성 값을 ``Factories``\ 에 제공하기만 하면 다음 호출 시 기본값과 병합되어 저장됩니다.
+
+::
+
+	Factories::setConfig('filters', [
+		'instanceOf' => FilterInterface::class,
+		'prefersApp' => false,
+	]);
