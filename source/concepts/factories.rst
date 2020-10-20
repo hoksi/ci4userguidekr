@@ -9,17 +9,6 @@
 소개
 ============
 
-Like ``Services``, ``Factories`` are an extension of autoloading that helps keep your code concise yet optimal, without having to pass around object instances between classes.
-At its simplest, Factories provide a common way to create a class instance and access it from anywhere.
-This is a great way to reuse object states and reduce memory load from keeping multiple instances loaded across your app.
-
-Anything can be loaded by Factories, but the best examples are those classes that are used to work on or transmit common data.
-The framework itself uses Factories internally, e.g. to make sure the correct configuration is loaded when using the ``Config`` class. 
-
-Take a look at ``Models`` as an example.
-You can access the Factory specific to ``Models`` by using the magic static method of the Factories class, ``Factories::models()``.
-Because of the common path structure for namespaces and folders, Factories know that the model files and classes are found within **Models**, so you can request a model by its shorthand base name
-
 ``서비스(Services)``\ 와 마찬가지로 ``팩토리(Factories)``\ 도 클래스 간에 객체 인스턴스를 전달할 필요 없이 코드를 간결하면서도 최적의 상태로 유지하도록 도와주는 자동 로딩의 확장입니다.
 가장 간단한 방법으로, 팩토리는 클래스 인스턴스를 만들고 어디에서나 액세스할 수 있는 일반적인 방법을 제공합니다.
 이는 객체 상태를 재사용하고 앱 전체에 여러 인스턴스를로드하여 메모리로드를 줄일 수있는 좋은 방법입니다.
