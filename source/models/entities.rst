@@ -363,9 +363,9 @@ Array/Json 캐스팅은 직렬화된 배열 또는 JSON을 저장하는 필드�
     class User extends Entity
     {
         protected $casts = [
-            'options' => 'array',
+            'options'        => 'array',
             'options_object' => 'json',
-            'options_array' => 'json-array'
+            'options_array'  => 'json-array'
         ];
     }
 
@@ -376,6 +376,26 @@ Array/Json 캐스팅은 직렬화된 배열 또는 JSON을 저장하는 필드�
 
     $user->options = $options;
     $userModel->save($user);
+
+CSV 캐스팅
+-----------
+
+단순한 값으로 구성된 단순 배열을 직렬화하거나, JSON 문자열로 인코딩하는 것이 원래 구조보다 더 복잡해 질수 있습니다. 
+대안으로 CSV(쉼표로 구분된 값)로 캐스팅하면 공간을 적게 사용하고 사람이 더 쉽게 읽을 수 있는 문자열이 만들어집니다.
+
+::
+
+    class Widget extends Entity
+    {
+        protected $casts = [
+            'colors' => 'csv',
+        ];
+    }
+
+    $widget->colors = ['red', 'yellow', 'green']; // 데이터베이스에 저장되는 값 "red,yellow,green"
+
+.. note:: CSV로 캐스팅은 PHP의 내장 함수 ``implode``\ 와 ``explode`` 함수를 사용하며 모든 값이 쉼표가 없는 문자열이라고 가정합니다. 
+    더 복잡한 데이터를 캐스팅하려면 ``array`` 또는 ``json``\ 을 사용합니다.
 
 변경된 속성 확인
 -------------------------------
