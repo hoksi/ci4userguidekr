@@ -135,7 +135,7 @@ App Starter 저장소에는 현재 안정 릴리스와 프레임워크의 최신
 설정(Setup)
 ----------------
 
-``app``, ``public``, ``tests` 및 ``writable`` 폴더를 ``vendor/codeigniter4/framework``\ 에서 프로젝트 루트(root)로 복사
+``app``, ``public``, ``writable`` 폴더를 ``vendor/codeigniter4/framework``\ 에서 프로젝트 루트(root)로 복사
 
 ``env``, ``phpunit.xml.dist`` 및 ``spark`` 파일을 ``vendor/codeigniter4/framework``\ 에서 프로젝트 루트로 복사
 
