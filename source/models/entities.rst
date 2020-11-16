@@ -1,5 +1,5 @@
 #####################
-Entity 작업
+Entity 클래스 사용
 #####################
 
 CodeIgniter는 데이터베이스 계층에서 Entity 클래스를 1급 시민으로 지원하며, 완전히 선택적으로 사용할 수 있도록 유지합니다.
@@ -40,7 +40,9 @@ Entity 클래스 만들기
 
 ::
 
-    <?php namespace App\Entities;
+    <?php 
+    
+    namespace App\Entities;
 
     use CodeIgniter\Entity;
 
@@ -58,7 +60,9 @@ Entity 클래스 만들기
 
 ::
 
-    <?php namespace App\Models;
+    <?php 
+    
+    namespace App\Models;
 
     use CodeIgniter\Model;
 
@@ -156,7 +160,9 @@ The base Entity class implements some smart ``__get()`` and ``__set()`` methods 
 
 ::
 
-    <?php namespace App\Entities;
+    <?php 
+    
+    namespace App\Entities;
 
     use CodeIgniter\Entity;
     use CodeIgniter\I18n\Time;
@@ -222,7 +228,9 @@ The base Entity class implements some smart ``__get()`` and ``__set()`` methods 
 
 ::
 
-    <?php namespace App\Entities;
+    <?php 
+    
+    namespace App\Entities;
 
     use CodeIgniter\Entity;
 
@@ -248,7 +256,9 @@ The base Entity class implements some smart ``__get()`` and ``__set()`` methods 
 
 ::
 
-    <?php namespace App\Entities;
+    <?php 
+    
+    namespace App\Entities;
 
     use CodeIgniter\Entity;
 
@@ -264,7 +274,7 @@ The base Entity class implements some smart ``__get()`` and ``__set()`` methods 
         ];
 
         protected $datamap = [
-            'full_name' => 'name'
+            'full_name' => 'name',
         ],
     }
 
@@ -289,7 +299,9 @@ Time 클래스는 변하지 않고, 지역화된 방식으로 많은 유용한 �
 
 ::
 
-    <?php namespace App\Entities;
+    <?php 
+    
+    namespace App\Entities;
 
     use CodeIgniter\Entity;
 
@@ -325,7 +337,9 @@ For example, if you had a User entity with an **is_banned** property, you can ca
 
 ::
 
-    <?php namespace App\Entities;
+    <?php 
+    
+    namespace App\Entities;
 
     use CodeIgniter\Entity;
 
@@ -333,7 +347,7 @@ For example, if you had a User entity with an **is_banned** property, you can ca
     {
         protected $casts = [
             'is_banned' => 'boolean',
-            'is_banned_nullable' => '?boolean'
+            'is_banned_nullable' => '?boolean',
         ],
     }
 
@@ -356,7 +370,9 @@ Array/Json 캐스팅은 직렬화된 배열 또는 JSON을 저장하는 필드�
 
 ::
 
-    <?php namespace App\Entities;
+    <?php 
+    
+    namespace App\Entities;
 
     use CodeIgniter\Entity;
 
@@ -365,9 +381,11 @@ Array/Json 캐스팅은 직렬화된 배열 또는 JSON을 저장하는 필드�
         protected $casts = [
             'options'        => 'array',
             'options_object' => 'json',
-            'options_array'  => 'json-array'
+            'options_array'  => 'json-array',
         ];
     }
+
+::
 
     $user    = $userModel->find(15);
     $options = $user->options;
@@ -385,6 +403,12 @@ CSV 캐스팅
 
 ::
 
+    <?php
+    
+    namespace App\Entities;
+
+    use CodeIgniter\Entity;
+
     class Widget extends Entity
     {
         protected $casts = [
@@ -392,7 +416,11 @@ CSV 캐스팅
         ];
     }
 
-    $widget->colors = ['red', 'yellow', 'green']; // 데이터베이스에 저장되는 값 "red,yellow,green"
+ 데이터베이스에 "red,yellow,green"\ 로 저장됨
+
+::
+
+    $widget->colors = ['red', 'yellow', 'green'];
 
 .. note:: CSV로 캐스팅은 PHP의 내장 함수 ``implode``\ 와 ``explode`` 함수를 사용하며 모든 값이 쉼표가 없는 문자열이라고 가정합니다. 
     더 복잡한 데이터를 캐스팅하려면 ``array`` 또는 ``json``\ 을 사용합니다.
@@ -405,13 +433,13 @@ CSV 캐스팅
 ::
 
     $user = new User();
-    $user->hasChanged('name');      // false
+    $user->hasChanged('name'); // false
 
     $user->name = 'Fred';
-    $user->hasChanged('name');      // true
+    $user->hasChanged('name'); // true
 
 전체 엔티티의 변경 여부를 확인하고 싶다면 매개 변수를 생략하십시오.
 
 ::
 
-    $user->hasChanged();            // true
+    $user->hasChanged();       // true
