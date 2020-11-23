@@ -82,8 +82,6 @@ Array 헬퍼
     :returns: 정렬 성공 여부.
     :rtype: boolean
 
-    This method sorts the elements of a multidimensonal array by the values of one or more keys in a hierarchical way.
-    Take the following array, that might be returned from, e.g., the ``find()`` function of a model
     이 메서드는 계층적 방식으로 하나 이상의 키 값을 기준으로 다차원 배열의 요소를 정렬합니다.
     아래 예시는 모델의 ``find()`` 함수에서 반환될 수 있는 다음 배열을 가져옵니다.
     
