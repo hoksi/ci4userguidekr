@@ -171,7 +171,7 @@ v4.1.5부터 ``_``\ 를 사용할 수 있습니다.
     app_forceGlobalSecureRequests = true
     app_CSPEnabled = true
 
-.. note:: *짧은 접두사(short prefix)*를 사용할 때 속성 이름은 여전히 클래스 정의 이름과 정확히 일치해야 합니다.
+.. note:: *짧은 접두사(short prefix)*\ 를 사용할 때 속성 이름은 여전히 클래스 정의 이름과 정확히 일치해야 합니다.
 
 데이터를 대체하는 환경 변수
 ============================

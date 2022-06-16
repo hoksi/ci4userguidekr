@@ -154,6 +154,9 @@ Test 헬퍼
 
 이제 ``$user = fake(UserModel::class);``\ 로 새 사용자를 생성하면 유효한 그룹의 속하게 됩니다.
 
+Methods
+-------
+
 ``Fabricator``\ 는 내부적으로 카운트를 처리하지만 이러한 정적 메소드에 액세스하여 카운트 사용을 지원할 수도 있습니다.
 
 getCount(string $table): int

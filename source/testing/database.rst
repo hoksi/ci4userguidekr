@@ -162,6 +162,6 @@ seeInDatabase($table, $criteria)
 seeNumRecords($expected, $table, $criteria)
 -------------------------------------------
 
-데이터베이스에서 ``$criteria``와 일치하는 여러 행이 발견되었는지 확인합니다.
+데이터베이스에서 ``$criteria``\ 와 일치하는 여러 행이 발견되었는지 확인합니다.
 
 .. literalinclude:: database/008.php

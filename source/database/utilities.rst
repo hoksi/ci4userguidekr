@@ -15,7 +15,7 @@
 getXMLFromResult()
 ==================
 
-이 메소드는 데이터베이스 결과를 xml로 리턴합니다. 
+이 메소드는 데이터베이스 결과를 xml로 리턴합니다.
 다음과 같이 하십시오.
 
 .. literalinclude:: utilities/001.php

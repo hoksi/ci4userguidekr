@@ -516,7 +516,7 @@ URI와 일치하는 정의된 경로가 없으면 시스템은 자동 라우팅�
 
     $routes->setAutoRoute(true);
 
-그리고 **app/Config/Feature.php**\ 의 ``$autoRoutesImproved`` 속성을 ``true``로 변경해야 합니다.
+그리고 **app/Config/Feature.php**\ 의 ``$autoRoutesImproved`` 속성을 ``true``\ 로 변경해야 합니다.
 
 ::
 
@@ -564,7 +564,7 @@ Model-View-Controller 접근 방식을 따르는 URL의 세그먼트는 일반�
 예를 들어 사용자가 **example.com/admin**\ 을 방문하면 **/app/Controllers/admin/Home.php** 컨트롤러가 사용됩니다.
 
 .. note:: 컨트롤러 이름으로 된 URI로 기본 컨트롤러에 액세스할 수 없습니다.
-    기본 컨트롤러가 ``Home``이면 **example.com/**\ 에 액세스할 수 있지만 **example.com/home**\ 는 액세스할 수 없습니다.
+    기본 컨트롤러가 ``Home``\ 이면 **example.com/**\ 에 액세스할 수 있지만 **example.com/home**\ 는 액세스할 수 없습니다.
 
 :ref:`Auto Routing in Controllers <controller-auto-routing-improved>`\ 에서 더 많은 정보를 확인하세요.
 
@@ -708,6 +708,6 @@ routes
 *Method*는 ``GET(auto)``\ 와 같습니다. *Route* 열의 ``/..``\ 는 하나의 세그먼트를 나타냅니다.
 ``[/..]``\ 는 선택 사항임을 나타냅니다.
 
-.. note:: 자동 라우팅이 활성화된 경우 ``home`` 경로가 있는 경우 ``Home``, ``hOme``, ``hoMe``, ``HOME``\ 등으로 액세스할 수 있습니다.  그러나 명령은 ``home``만 표시합니다.
+.. note:: 자동 라우팅이 활성화된 경우 ``home`` 경로가 있는 경우 ``Home``, ``hOme``, ``hoMe``, ``HOME``\ 등으로 액세스할 수 있습니다.  그러나 명령은 ``home``\ 만 표시합니다.
 
 .. important:: 시스템이 완벽하지 않습니다. 사용자 지정 자리 표시자를 사용하는 경우 *필터*\ 가 올바르지 않을 수 있습니다. 그러나 **app/Config/Routes.php**\ 에 정의된 필터는 항상 올바르게 표시됩니다.

@@ -166,14 +166,14 @@ Configuration
 
     :param	FilterInterface|string	$filter: 필터 인스턴스, 클래스 또는 별칭
     :param	string	$position: 실행할 필터 메소드, "before" 또는 "after"
-	:returns:	시뮬레이션된 필터 이벤트를 실행하기 위한 호출 가능한 메소드
-	:rtype:	Closure
-
+    :returns:	시뮬레이션된 필터 이벤트를 실행하기 위한 호출 가능한 메소드
+    :rtype:	Closure
+    
     Usage example
-
+    
     .. literalinclude:: controllers/014.php
-	
-	``Closure``\ 가 필터 메서드에 전달되는 입력 매개 변수를 어떻게 취할 수 있는지 확인하십시오.
+    
+    ``Closure``\ 가 필터 메서드에 전달되는 입력 매개 변수를 어떻게 취할 수 있는지 확인하십시오.
 
 Assertions
 ----------

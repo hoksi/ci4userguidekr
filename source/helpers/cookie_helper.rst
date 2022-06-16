@@ -30,7 +30,7 @@
     :param	string	$prefix: 쿠키 이름 접두사
     :param	bool	$secure: HTTPS를 통해서만 쿠키를 보낼지 여부
     :param	bool	$httpOnly: JavaScript에서 쿠키를 숨길 지 여부
-    :param  string    $sameSite: SameSite 쿠키 매개변수의 값입니다. ``null``인 경우 **app/Config/Cookie.php**\ 의 기본값이 사용됩니다.
+    :param  string    $sameSite: SameSite 쿠키 매개변수의 값입니다. ``null``\ 인 경우 **app/Config/Cookie.php**\ 의 기본값이 사용됩니다.
     :rtype:	void
 
     브라우저 쿠키를 설정하기 위한 보다 친근한 구문을 제공합니다.
@@ -65,7 +65,7 @@
     이 함수는 ``value``\ 와 ``expire`` 변수가 없다는 점을 제외하면 ``set_cookie()``\ 와 동일합니다.
 
     .. note:: ``set_cookie()``\ 를 사용할 때 ``value``\ 가 빈 문자열로 설정되고 ``expire``\ 가 ``0``\ 으로 설정되면 쿠키가 삭제됩니다.
-        ``value``\ 가 비어 있지 않은 문자열로 설정되고 ``expire``\ 가 ``0``으로 설정되면 쿠키는 브라우저가 열려 있는 동안에만 지속됩니다.
+        ``value``\ 가 비어 있지 않은 문자열로 설정되고 ``expire``\ 가 ``0``\ 으로 설정되면 쿠키는 브라우저가 열려 있는 동안에만 지속됩니다.
 
     첫 번째 매개 변수에 값 배열이나 불연속 매개 변수(discrete parameters)를 설정할 수 있습니다.
 
