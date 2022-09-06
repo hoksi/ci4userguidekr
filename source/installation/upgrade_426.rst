@@ -16,7 +16,7 @@ Upgrading from 4.2.5 to 4.2.6
 Project Files
 *************
 
-**프로젝트 공간**(루트, 앱, 공개, 쓰기 가능)의 일부 파일의 외관(cosmetic) 업데이트를 받았습니다.
+**프로젝트 공간**\ (루트, 앱, 공개, 쓰기 가능)의 일부 파일이 외관(cosmetic) 업데이트를 받았습니다.
 이러한 파일은 전혀 건드릴 필요가 없습니다.
 프로젝트 공간의 변경 사항을 병합하는 데 도움이 되는 타사 CodeIgniter 모듈은 `Explore on Packagist <https://packagist.org/explore/?query=codeigniter4%20updates>`_\ 에서 찾을 수 있습니다.
 
