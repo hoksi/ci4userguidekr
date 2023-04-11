@@ -30,17 +30,13 @@ URI 인스턴스는 아래와 같이 간단합니다.
 ---------------
 
 여러 경우에, 당신이 정말로 원하는 것은 요청에 대한 현재 URL을 나타내는 객체입니다.
-**url_helper**\ 에서 사용 가능한 함수 중 하나를 사용할 수 있습니다.
+:doc:`../helpers/url_helper`\ 에서 사용 가능한 함수 중 하나를 사용할 수 있습니다.
 
 .. literalinclude:: uri/004.php
 
-첫 번째 매개 변수로 ``true``\ 를 전달해야 합니다. 
-그렇지 않으면 현재 URL의 문자열 표현이 반환됩니다.
-This URI is based on the path (relative to your ``baseURL``) as determined by the current request object and your settings in ``Config\App`` (baseURL, indexPage, and forceGlobalSecureRequests).
-Assuming that you're in a controller that extends ``CodeIgniter\Controller`` you can get this relative path
-
-이 URI는 request 객체와 ``Config\App``(baseURL, indexPage, forceGlobalSecureRequests)의 설정에 다라 결정된 경로(``baseURL``\ 에 상대적)를 기반으로 합니다.
-사용자가 ``CodeIgniter\Controller``\ 를 확장하는 컨트롤러에 있다고 가정하면 이 상대 경로를 얻을 수 있습니다.
+첫 번째 매개 변수로 ``true``\ 를 전달해야 합니다. 그렇지 않으면 현재 URL의 문자열 표현이 반환됩니다.
+이 URI는 현재 요청 객체와 ``Config\App`` (``baseURL``, ``indexPage``, and ``forceGlobalSecureRequests``)\ 의 설정에 따라 결정된 경로(``baseURL``\ 의 상대적인 경로)를 기반으로 합니다.
+``CodeIgniter\Controller``\ 를 확장하는 컨트롤러에서 실행 중이라면 다음과 같이 상대 경로를 가져올 수 있습니다.
 
 .. literalinclude:: uri/005.php
 
@@ -95,10 +91,10 @@ URI 인스턴스가 있으면 URI의 다양한 부분을 설정하거나 검색�
 
 .. note:: 현재 포트가 구성표의 기본 포트인 경우 표시되지 않습니다.
 
-사용자 정보
+UserInfo
 ----------------
 
-사용자 정보 섹션은 FTP URI에서 사용 하는 사용자 이름과 비밀번호입니다. 
+사용자정보(UserInfo) 섹션은 FTP URI에서 사용 하는 사용자 이름과 비밀번호입니다. 
 권한의 일부로 이를 얻을 수는 있지만 직접 검색할 수도 있습니다
 
 .. literalinclude:: uri/012.php
@@ -137,31 +133,51 @@ URI의 호스트 부분은 일반적으로 URL의 도메인 이름입니다.
 쿼리(Query)
 ---------------
 
-간단한 문자열 표현을 사용하여 클래스를 통해 쿼리 변수를 조작할 수 있습니다.
+간단한 문자열 표현을 사용하여 클래스를 통해 쿼리 데이타를 조작할 수 있습니다.
+
+쿼리 가져오기/설정하기
+^^^^^^^^^^^^^^^^^^^^^^^
+
 쿼리 값은 현재 문자열로만 설정할 수 있습니다.
 
 .. literalinclude:: uri/017.php
 
+``setQuery()`` 메소드는 기존의 쿼리 변수를 덮어쓰게 됩니다.
+
 .. note:: 쿼리 값에는 조각이 포함될 수 없습니다. 유효하지 않은 경우 ``InvalidArgumentException``\ 이 발생합니다.
+
+배열로 쿼리 설정
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 배열을 사용하여 쿼리 값을 설정할 수 있습니다
 
 .. literalinclude:: uri/018.php
 
-``setQuery()``\ 와 ``setQueryArray()`` 메소드는 기존 쿼리 변수를 덮어 씁니다.
+``setQueryArray()`` 메소드는 기존 쿼리 변수를 덮어 씁니다.
+
+쿼리 값 추가하기
+^^^^^^^^^^^^^^^^^^
+
 ``addQuery()`` 메소드를 사용하여 기존 쿼리 변수를 손상시키지 않고 쿼리 변수 컬렉션에 값을 추가할 수 있습니다.
 첫 번째 매개 변수는 변수의 이름이고 두 번째 매개 변수는 값입니다.
 
 .. literalinclude:: uri/019.php
 
-**쿼리 값 필터링**
+쿼리 값 필터링
+^^^^^^^^^^^^^^^^
+
+``getQuery()`` 메소드는 쿼리 변수 컬렉션의 모든 값을 반환합니다.
 
 *only* 또는 *except* 키를 사용하여 ``getQuery()`` 메소드에 옵션 배열을 전달하여 리턴된 쿼리 값을 필터링할 수 있습니다.
 
 .. literalinclude:: uri/020.php
 
-이 한 번의 호출 동안 반환된 값만 변경됩니다.
-URI의 쿼리 값을보다 영구적으로 수정해야 하는 경우 ``stripQuery()``\ 와 ``keepQuery()`` 메소드를 사용하여 실제 객체의 쿼리 변수 컬렉션을 변경할 수 있습니다.
+반환된 값은 한 번만 변경됩니다.
+
+쿼리 값 변경하기
+^^^^^^^^^^^^^^^^^^^^^
+
+URI의 쿼리 값을 영구적으로 수정해야 하는 경우 ``stripQuery()``\ 와 ``keepQuery()`` 메소드를 사용하여 실제 객체의 쿼리 변수 컬렉션을 변경할 수 있습니다.
 
 .. literalinclude:: uri/021.php
 
@@ -171,7 +187,7 @@ URI의 쿼리 값을보다 영구적으로 수정해야 하는 경우 ``stripQue
 조각(Fragment)
 -------------------
 
-조각(fragment)은 URL 끝 부분에 파운드 기호(#)가 옵니다.
+조각(fragment)은 URL 끝 부분에 파운드 기호(``#``)가 옵니다.
 HTML URL에서 이들은 페이지 앵커에 대한 링크입니다. 
 미디어 URI는 다양한 방법으로 그것들을 사용할 수 있습니다.
 
@@ -181,9 +197,13 @@ HTML URL에서 이들은 페이지 앵커에 대한 링크입니다.
 URI 세그먼트
 ==================
 
-슬래시 사이의 경로의 각 섹션은 단일 세그먼트입니다. 
-URI 클래스는 세그먼트 값이 무엇인지 판별하는 간단한 방법을 제공합니다.
-세그먼트는 경로에서 가장 왼쪽부터 인덱스는 1로 시작합니다.
+슬래시 사이의 경로의 각 섹션은 단일 세그먼트입니다.
+
+.. note:: 사이트 URI의 경우, URI 세그먼트는 baseURL에 상대적인 URI 경로 부분을 의미합니다. 
+    baseURL에 하위 폴더가 포함된 경우 값은 현재 URI 경로와 다를 수 있습니다.
+
+URI 클래스는 세그먼트 값이 무엇인지 결정하는 간단한 방법을 제공합니다.
+세그먼트 인덱스는 경로의 가장 왼쪽부터 1로 시작합니다.
 
 .. literalinclude:: uri/023.php
 
@@ -199,6 +219,9 @@ URI 클래스는 세그먼트 값이 무엇인지 판별하는 간단한 방법�
 마지막으로 모든 세그먼트의 배열을 검색할 수 있습니다.
 
 .. literalinclude:: uri/026.php
+
+.. note:: 마지막 +1 세그먼트를 가져올 수 있습니다. 마지막 +2 세그먼트 이상을 가져오려고 하면 기본적으로 예외가 발생합니다.
+    ``setSilent()`` 메소드를 사용하여 예외를 방지할 수 있습니다.
 
 ===========================
 예외 던지기 비활성화

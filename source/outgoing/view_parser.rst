@@ -167,21 +167,21 @@ Parser 클래스는 내부적으로 연관 배열을 사용하여 ``render()``\ 
 
 .. literalinclude:: view_parser/008.php
 
-의사 변수 ``blog_entry``\ 의 값은 연관 배열이며 각 키/값 쌍은 해당 변수의 루프안에 노출됩니다.
+의사 변수 ``blog_entries``\ 의 값은 연관 배열이며 각 키/값 쌍은 해당 변수의 루프안에 노출됩니다.
 
 위와 데이터로 작동하는 **blog_template.php**
 
 ::
 
 	<h1>{blog_title} - {blog_heading}</h1>
-	{blog_entry}
+	{blog_entries}
 		<div>
 			<h2>{title}</h2>
 			<p>{body}</p>
 		</div>
-	{/blog_entry}
+	{/blog_entries}
 
-``blog_entry`` 범위내에서 다른 유사 변수에 액세스할 수 있도록 하려면 ``cascadeData`` 옵션이 true로 설정되어 있는지 확인하십시오.
+``blog_entries`` 범위내에서 다른 유사 변수에 액세스할 수 있도록 하려면 ``cascadeData`` 옵션이 true로 설정되어 있는지 확인하십시오.
 
 주석
 ========
@@ -368,8 +368,9 @@ limit_chars       limit            Limits the number of characters to $limit.   
 
 limit_words       limit            Limits the number of words to $limit.                       { v|limit_words(20) }
 
-local_currency    currency, locale Displays a localized version of a currency. "currency"      { v|local_currency(EUR,en_US) }
-                                   valueis any 3-letter ISO 4217 currency code.
+local_currency    currency,        Displays a localized version of a currency. "currency"      { v|local_currency(EUR,en_US) }
+                  locale,          valueis any 3-letter ISO 4217 currency code.
+                  fraction
 
 local_number      type, precision, Displays a localized version of a number. "type" can be     { v|local_number(decimal,2,en_US) }
                   locale           one of: decimal, currency, percent, scientific, spellout,

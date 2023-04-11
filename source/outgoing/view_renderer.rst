@@ -6,12 +6,14 @@
     :local:
     :depth: 2
 
+***************************
 뷰 랜더러 사용하기
 ***************************
-``view()`` 함수는 ``renderer`` 서비스의 인스턴스를 가져와 데이터를 설정하고 뷰를 랜더링하는 편리한 함수입니다.
+:php:func:`view()` 함수는 ``renderer`` 서비스의 인스턴스를 가져와 데이터를 설정하고 뷰를 랜더링하는 편리한 함수입니다.
 이것은 잘 동작하지만, 이것을 직접해야 할 경우가 있다면 View 서비스에 직접 액세스할 수 있습니다.
 
 .. literalinclude:: view_renderer/001.php
+   :lines: 2-
 
 또는 ``View`` 클래스를 기본 렌더러로 사용하지 않는다면 직접 인스턴스화할 수 있습니다
 
@@ -19,8 +21,11 @@
 
 .. important:: 컨트롤러 내에서만 서비스를 작성해야합니다. 라이브러리에서 View 클래스에 액세스해야 한다면, 라이브러리 생성자에서 종속성(dependency)으로 설정해야합니다.
 
-그런 다음 제공하는 세 가지 표준 방법중 하나를 사용할 수 있습니다.:
-**render(viewpath, options, save)**, **setVar(name, value, context)**, **setData(data, context)**.
+제공하는 다음 세 가지 표준 방법중 하나를 사용할 수 있습니다.
+
+:php:meth:`render() <CodeIgniter\\View\\View::render()>`,
+:php:meth:`setVar() <CodeIgniter\\View\\View::setVar()>`,
+:php:meth:`setData() <CodeIgniter\\View\\View::setData()>`.
 
 랜더러가 하는 일
 ===================
@@ -37,12 +42,27 @@ View 클래스는 연관 배열을 사용하여 ``render()``\ 를 호출할 때�
 값이 배열인 매개 변수에 특별한 의미는 없습니다.
 PHP 코드에서 배열을 적절하게 처리하는 것은 사용자의 책임입니다.
 
+뷰 매개 변수 설정
+=======================
+
+:php:meth:`setVar() <CodeIgniter\\View\\View::setVar()>` 메소드는 뷰 매개 변수를 설정합니다.
+
+.. literalinclude:: view_renderer/008.php
+   :lines: 2-
+
+:php:meth:`setData() <CodeIgniter\\View\\View::setData()>` 메소드는 한 번에 여러 뷰 매개 변수를 설정합니다.
+
+.. literalinclude:: view_renderer/007.php
+   :lines: 2-
+
+
 메소드 체이닝(Chaining)
 ===========================
 
 ``setVar()``\ 와 ``setData()`` 메소드는 체이닝이 가능하므로 여러 다른 호출을 결합할 수 있습니다
 
 .. literalinclude:: view_renderer/003.php
+   :lines: 2-
 
 이스케이핑(Escaping) 데이타
 =============================
@@ -54,8 +74,9 @@ PHP 코드에서 배열을 적절하게 처리하는 것은 사용자의 책임�
 데이터를 이스케이프하지 않으려면 각 함수에 ``'null'`` 또는 ``'raw'``\ 를 전달하면 됩니다.
 
 .. literalinclude:: view_renderer/004.php
+   :lines: 2-
 
-데이터를 이스케이프하지 않기로 선택하거나 객체 인스턴스를 전달하는 경우 ``esc()`` 함수를 사용하여 뷰의 데이터를 수동으로 이스케이프할 수 있습니다.
+데이터를 이스케이프하지 않기로 선택하거나 객체 인스턴스를 전달하는 경우 :php:func:`esc()` 함수를 사용하여 뷰의 데이터를 수동으로 이스케이프할 수 있습니다.
 첫 번째 매개 변수는 이스케이프할 문자열입니다. 두 번째 매개 변수는 데이터를 이스케이프하기 위한 컨텍스트입니다 (아래 참조).
 
 ::
@@ -93,8 +114,9 @@ PHP 코드에서 배열을 적절하게 처리하는 것은 사용자의 책임�
 -   ``cache_name`` - 캐시된 뷰 결과를 저장/검색하는데 사용되는 ID; 기본적으로 viewpath; ``renderString()``\ 은 무시
 -   ``saveData`` - 후속 호출에 대해 뷰 데이터 매개 변수를 유지해야 하는 경우 true
 
-.. note:: 인터페이스에 의해 정의된 ``saveData``\ 는 부울(boolean)이어야 하지만 클래스(아래의 ``View``\ 와 같은)를 구현하면, 이 값이 ``null`` 값으로 확장될 수 있습니다.
+.. note:: 인터페이스에 의해 정의된 ``saveData()``\ 는 부울(boolean)이어야 하지만 클래스(아래의 ``View``\ 와 같은)를 구현하면, 이 값이 ``null`` 값으로 확장될 수 있습니다.
 
+***************
 Class Reference
 ***************
 
@@ -103,7 +125,6 @@ Class Reference
 .. php:class:: View
 
     .. php:method:: render($view[, $options[, $saveData = false]])
-        :noindex:
 
         :param  string       $view: 뷰 소스의 파일 이름
         :param  array        $options: 옵션 배열, 키/값 쌍
@@ -114,9 +135,9 @@ Class Reference
         파일 이름과 이미 설정된 데이터를 기반으로 출력을 빌드합니다.
         
         .. literalinclude:: view_renderer/005.php
+           :lines: 2-
 
     .. php:method:: renderString($view[, $options[, $saveData = false]])
-        :noindex:
 
         :param  string       $view: 렌더링 할 뷰의 내용 (예 : 데이터베이스에서 검색된 내용)
         :param  array        $options: 옵션 배열, 키/값 쌍
@@ -127,11 +148,11 @@ Class Reference
         뷰 프래그먼트와 이미 설정된 데이터를 기반으로 출력을 빌드합니다.
         
         .. literalinclude:: view_renderer/006.php
+           :lines: 2-
 
         데이터베이스에 저장된 컨텐츠를 표시하는데 사용될 수 있지만, 이러한 데이터의 유효성을 검사하고 적절하게 이스케이프 하지 않으면 잠재적인 보안 취약점이 됩니다.
 
     .. php:method:: setData([$data[, $context = null]])
-        :noindex:
 
         :param  array   $data: 뷰 데이터 문자열의 배열, 키/값 쌍
         :param  string  $context: 데이터 이스케이프에 사용할 컨텍스트
@@ -141,6 +162,7 @@ Class Reference
         한 번에 여러 개의 뷰 데이터를 설정합니다
         
         .. literalinclude:: view_renderer/007.php
+           :lines: 2-
 
         지원되는 이스케이프 컨텍스트: ``html``, ``css``, ``js``, ``url``, ``attr``, ``raw``.
         ``raw``\ 면 이스케이프가 발생하지 않습니다.
@@ -148,7 +170,6 @@ Class Reference
         각 호출은 뷰가 렌더링될 때까지 객체가 누적하는 데이터 배열에 추가합니다.
 
     .. php:method:: setVar($name[, $value = null[, $context = null]])
-        :noindex:
 
         :param  string  $name: 뷰 데이터 변수명
         :param  mixed   $value: 뷰 데이터의 값
@@ -159,6 +180,7 @@ Class Reference
         한 개의 뷰 데이터를 설정합니다
         
         .. literalinclude:: view_renderer/008.php
+           :lines: 2-
 
         지원되는 이스케이프 컨텍스트: ``html``, ``css``, ``js``, ``url``, ``attr``, ``raw``.
         ``raw``\ 면 이스케이프가 발생하지 않습니다.

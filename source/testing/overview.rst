@@ -106,6 +106,8 @@ PHPUnit의 ``TestCase``\ 는 준비 및 정리를 돕는 4가지 방법을 제�
 
 .. literalinclude:: overview/003.php
 
+.. _testing-overview-traits:
+
 Traits
 ------
 
@@ -123,7 +125,12 @@ Traits
 assertLogged($level, $expectedMessage)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-실제로 기록될 것으로 예상되는 것
+기대한 것이 로그에 올바르게 기록되었는지 확인하세요.
+
+assertLogContains($level, $logMessage)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+로그에 메시지 부분을 포함하는 레코드가 있는지 확인하세요.
 
 .. literalinclude:: overview/007.php
 
@@ -248,16 +255,89 @@ Services::resetSingle(string $name)
         
 .. note:: 모든 구성 요소 팩토리는 각 테스트 사이에 기본적으로 재설정됩니다. 인스턴스를 유지해야하는 경우 테스트 케이스의 ``$setUpMethods``\ 를 수정합니다.
 
-스트림(Stream) 필터
-=========================
+.. _testing-cli-output:
 
-테스트하기 어려운 것을 테스트해야 할 수도 있습니다.
-때로는 PHP 자체 STDOUT 또는 STDERR과 같은 스트림 캡처가 도움이 될 수 있습니다.
-``CITestStreamFilter``\ 는 선택한 스트림의 출력을 캡처하는 데 도움이됩니다.
+Testing CLI Output
+==================
 
-**CITestStreamFilter**\ 는 이러한 헬퍼 메소드의 대안을 제공합니다.
+StreamFilterTrait
+-----------------
+
+.. versionadded:: 4.3.0
+
+**StreamFilterTrait** provides an alternate to these helper methods.
+
+You may need to test things that are difficult to test. Sometimes, capturing a stream, like PHP's own STDOUT, or STDERR,
+might be helpful. The ``StreamFilterTrait`` helps you capture the output from the stream of your choice.
+
+**Overview of methods**
+
+- ``StreamFilterTrait::getStreamFilterBuffer()`` Get the captured data from the buffer.
+- ``StreamFilterTrait::resetStreamFilterBuffer()`` Reset captured data.
+**StreamFilterTrait**\ 은 이러한 헬퍼 메서드의 대체 방법을 제공합니다.
+
+테스트하기 어려운 것들을 테스트해야 할 수도 있습니다. 
+때로는 PHP의 STDOUT 또는 STDERR과 같은 스트림을 캡처하는 것이 도움이 될 수 있습니다. 
+``StreamFilterTrait``\ 은 원하는 스트림의 출력을 캡처하는 데 도움이 됩니다.
+
+**메소드 개요**
+
+- ``StreamFilterTrait::getStreamFilterBuffer()`` : 버퍼에서 캡처한 데이터 가져오기.
+- ``StreamFilterTrait::resetStreamFilterBuffer()`` : 캡처한 데이터 재설정.
 
 
 테스트 사례중 하나에서 이것을 보여주는 예제
 
 .. literalinclude:: overview/018.php
+
+``StreamFilterTrait``\ 은 자동으로 호출되는 구성자(configurator)가 있습니다. 
+자세한 내용은 :ref:`Testing Traits <testing-overview-traits>`\ 를 참조하세요.
+
+테스트에서 ``setUp()`` 또는 ``tearDown()`` 메소드를 재정의하는 경우, 각각 ``parent::setUp()``\ 과  ``parent::tearDown()`` 메소드를 호출하여 ``StreamFilterTrait``\ 을 구성해야 합니다.
+
+CITestStreamFilter
+------------------
+
+**CITestStreamFilter**\ 는 수동/단일 사용을 위한 것입니다.
+
+하나의 테스트에서 스트림을 캡처해야하는 경우, StreamFilterTrait trait 대신에 스트림에 필터를 수동으로 추가할 수 있습니다.
+
+**메소드 개요**
+
+- ``CITestStreamFilter::registration()`` : 필터 등록.
+- ``CITestStreamFilter::addOutputFilter()`` : 출력 스트림에 필터 추가.
+- ``CITestStreamFilter::addErrorFilter()`` : 오류 스트림에 필터 추가.
+- ``CITestStreamFilter::removeOutputFilter()`` : 출력 스트림에서 필터 제거.
+- ``CITestStreamFilter::removeErrorFilter()`` : 오류 스트림에서 필터 제거.
+
+.. literalinclude:: overview/020.php
+
+.. _testing-cli-input:
+
+Testing CLI Input
+=================
+
+PhpStreamWrapper
+----------------
+
+.. versionadded:: 4.3.0
+
+**PhpStreamWrapper**\ 는 ``CLI::prompt()``, ``CLI::wait()``, ``CLI::input()``\ 와 같은 사용자 입력이 필요한 메서드를 테스트하기 위한 방법을 제공합니다.
+
+.. note:: PhpStreamWrapper는 스트림 래퍼 클래스입니다. 
+    PHP의 스트림 래퍼에 대해 알지 못하는 경우, PHP 매뉴얼의 `The streamWrapper class <https://www.php.net/manual/en/class.streamwrapper.php>`_\ 를 참조하십시오.
+
+**메소드 개요**
+
+- ``PhpStreamWrapper::register()`` : - ``PhpStreamWrapper::register()``\ 를 ``php`` 프로토콜에 등록합니다.
+- ``PhpStreamWrapper::restore()`` : php 프로토콜 래퍼를 PHP 내장 래퍼로 복원합니다.
+- ``PhpStreamWrapper::setContent()`` : 입력 데이터를 설정합니다.
+
+.. important:: PhpStreamWrapper는 ``php://stdin``\ 만 테스트하기 위한 것입니다.
+    하지만 등록할 때는 ``php://stdout``, ``php://stderr``, ``php://memory``\ 와 같은 `php protocol <https://www.php.net/manual/en/wrappers.php.php>`_ 스트림을 모두 처리하게 됩니다.
+    따라서 필요할 때만 ``PhpStreamWrapper``\ 를 등록/해제하는 것을 강력하게 권장됩니다.
+    그렇지 않으면 등록된 동안 다른 내장 php 스트림에 방해가 됩니다.
+
+테스트 케이스 안에서 이것을 한 예시는 다음과 같습니다. :
+
+.. literalinclude:: overview/019.php

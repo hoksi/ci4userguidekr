@@ -1,5 +1,6 @@
 .. _validation:
 
+####################
 검증(Validation)
 ####################
 
@@ -9,6 +10,7 @@ CodeIgniter는 작성하는 코드의 양을 최소화하는데 도움이되는 
     :local:
     :depth: 2
 
+**********
 개요
 **********
 
@@ -34,6 +36,7 @@ CodeIgniter의 데이터 검증 접근 방식을 설명하기 전에 이상적�
 위의 프로세스는 매우 복잡한 것은 없지만 일반적으로 상당한 양의 코드가 필요하며, 오류 메시지를 표시하기 위해 다양한 제어 구조가 HTML 형식으로 배치됩니다. 
 폼 검증은 작성하기는 쉽지만 구현하기가 매우 지저분하고 지루합니다.
 
+*****************
 폼 검증 튜토리얼
 *****************
 
@@ -61,7 +64,7 @@ CodeIgniter의 데이터 검증 접근 방식을 설명하기 전에 이상적�
     </head>
     <body>
 
-        <?= $validation->listErrors() ?>
+        <?= validation_list_errors() ?>
 
         <?= form_open('form') ?>
 
@@ -114,6 +117,9 @@ CodeIgniter의 데이터 검증 접근 방식을 설명하기 전에 이상적�
 
 .. literalinclude:: validation/001.php
 
+.. note:: v4.3.0부터 :ref:`$this->request->is() <incomingrequest-is>` 메소드를 사용할 수 있습니다. 
+    이전 버전에서는 ``if (strtolower($this->request->getMethod()) !== 'post')``\ 를 사용해야 합니다.
+
 라우트
 ==========
 
@@ -158,7 +164,7 @@ signup.php
 
     ::
 
-    <?= $validation->listErrors() ?>
+    <?= validation_list_errors() ?>
 
     이 함수는 검증에서 보낸 모든 오류 메시지를 반환합니다.
     메시지가 없으면 빈 문자열을 반환합니다.
@@ -184,6 +190,7 @@ POST 요청에 대해 컨트롤러에서 제공하는 ``validate()`` 메소드�
 
 폼을 제출할 경우 성공 또는 오류 메시지가 있는 폼을 볼 수 있습니다.
 
+*********************
 검증을 위한 구성
 *********************
 
@@ -192,10 +199,17 @@ POST 요청에 대해 컨트롤러에서 제공하는 ``validate()`` 메소드�
 전통적이고 엄격한 규칙
 ============================
 
-CI4에는 두 가지 종류의 유효성 검사 규칙 클래스가 있습니다.
-기본 규칙 클래스(**Traditional Rules**)에는 ``CodeIgniter\Validation``\ 이라는 네임스페이스가 있고 새 클래스(**Strict Rules**)에는 엄격한 유효성 검사를 제공하는 ``CodeIgniter\Validation\StrictRules``\ 가 있습니다. .
+CodeIgniter4에는 두 가지 종류의 유효성 검사 규칙 클래스가 있습니다.
+전통적인 규칙 클래스(**Traditional Rules**)는 네임스페이스 ``CodeIgniter\Validation``\ 를 사용하고, 새로운 클래스(**Strict Rules**)는 엄격한 유효성 검사를 제공하는 ``CodeIgniter\Validation\StrictRules`` 네임스페이스를 사용합니다.
 
-**기본 규칙(Traditional Rules)**\ 은 암시적으로 문자열 값이 검증되고 입력 값이 암시적으로 문자열 값으로 변환될 수 있다고 가정합니다.
+.. note:: v4.3.0부터 보안을 강화하기 위해 Strict Rules가 기본값으로 사용됩니다.
+
+전통적인 규칙(Traditional Rules)
+---------------------------------
+
+.. warning:: JSON 데이터와 같은 문자열이 아닌 값을 포함하는 데이터의 유효성 검사할 때는 **Strict Rules**\ 를 사용하는 것이 권장됩니다.
+
+**전통적인 규칙(Traditional Rules)**\ 은 암시적으로 문자열 값이 검증되고 입력 값이 암시적으로 문자열 값으로 변환될 수 있다고 가정합니다.
 POST 데이터 유효성 검사와 같은 가장 기본적인 경우에 작동합니다.
 
 그러나 JSON 입력 데이터를 사용하는 경우 데이터의 유형은 **bool/null/array**\ 일 수 있습니다.
@@ -206,13 +220,21 @@ POST 데이터 유효성 검사와 같은 가장 기본적인 경우에 작동�
 
 .. warning:: JSON 데이터와 같이 문자열이 아닌 값을 포함하는 데이터의 유효성을 검사할 때 **엄격한 규칙**\ 을 사용하는 것이 좋습니다.
 
-엄격한 규칙 사용
-------------------
+Strict Rules
+------------
 
-엄격한 규칙을 사용하려면 **app/Config/Validation.php**\ 에서 규칙 클래스를 변경해야 합니다.
+.. versionadded:: 4.2.0
+
+**Strict Rules**\ 는 암묵적 형 변환을 사용하지 않습니다.
+
+전통적인 규칙(Traditional Rules) 사용
+--------------------------------------
+
+전통적인 규칙을 사용하려면, **app/Config/Validation.php** 파일에서 규칙 클래스를 변경해야 합니다.
 
 .. literalinclude:: validation/003.php
 
+****************
 라이브러리 로드
 ****************
 
@@ -224,6 +246,7 @@ POST 데이터 유효성 검사와 같은 가장 기본적인 경우에 작동�
 
 .. note:: :doc:`컨트롤러 </incoming/controllers>`\ 와 :doc:`모델 </models/model>` 모두 검증을 보다 쉽게 수행할 수 있는 메소드를 제공하므로 이 메소드를 사용할 필요가 없습니다.
 
+************************
 검증 규칙 설정
 ************************
 
@@ -275,6 +298,7 @@ Request 객체의 인스턴스를 전달하면, 모든 입력 데이터를 가�
     요청이 PUT, PATCH, DELETE 요청이고 HTML 폼(form) 포스트(POST)가 아니며 (``Content-Type: multipart/ form-data``)인 경우 :ref:`$request->getRawInput() <incomingrequest-retrieving-raw-data>`\ 에서 Raw 데이터를 가져오고,
     그 외의 경우 :ref:`$request->getVar() <incomingrequest-getting-data>`\ 에서 데이터를 가져옵니다.
 
+***********
 검증 작업
 ***********
 
@@ -384,12 +408,13 @@ POST 데이터에 다음이 있다고 가정합니다.
 
 또한 전달된 동적 키가 양식 데이터와 충돌하지 않도록 주의한다면 런타임에 더 많은 동적 규칙을 만드는 데 사용할 수 있습니다.
 
+******************
 오류에 대한 작업
 ******************
 
 검증 라이브러리는 오류 메시지를 설정하고, 사용자 지정 오류 메시지를 제공하며 표시할 하나 이상의 오류를 검색하는 데 도움이 되는 몇 가지 방법을 제공합니다.
 
-기본적으로 오류 메시지는 ``system/Language/en/Validation.php``\ 의 언어 문자열에서 파생되며, 각 규칙에는 항목이 있습니다.
+기본적으로 오류 메시지는 **system/Language/en/Validation.php**\ 의 언어 문자열에서 파생되며, 각 규칙에는 항목이 있습니다.
 
 .. _validation-custom-errors:
 
@@ -423,11 +448,11 @@ POST 데이터에 다음이 있다고 가정합니다.
 
 .. note:: 레이블 스타일 오류 메시지를 사용할 때 두 번째 매개변수를 ``setRules()``\ 에 전달하면 첫 번째 매개변수 값으로 덮어씁니다.
 
-메시지 및 검증 레이블 변환
+메시지 및 검증 레이블 번역
 ============================
 
-언어 파일에서 변환된 문자열을 사용하려면 점 구문을 사용하면 됩니다. 
-``app/Language/en/Rules.php``\ 에 번역본이 있는 파일이 있다고 가정해 보겠습니다. 
+언어 파일에서 번역된 문자열을 사용하려면 점 구문(dot syntax)을 사용하면 됩니다. 
+**app/Language/en/Rules.php**\ 에 번역본이 있는 파일이 있다고 가정해 보겠습니다. 
 이 파일에 정의된 언어 라인을 다음과 같이 간단히 사용할 수 있습니다.
 
 .. literalinclude:: validation/025.php
@@ -487,6 +512,24 @@ POST 데이터에 다음이 있다고 가정합니다.
 
 .. literalinclude:: validation/029.php
 
+.. _validation-redirect-and-validation-errors:
+
+리다이렉트 및 유효성 검사 오류
+===============================
+
+PHP는 요청 간에 아무것도 공유하지 않습니다. 따라서 유효성 검사가 실패하면 리다이렉트할 때 리다이렉트된 요청에서 유효성 검사 오류가 발생하지 않습니다.
+
+이 경우에는 Form 헬퍼 함수 :php:func:`validation_errors()`, :php:func:`validation_list_errors()` and :php:func:`validation_show_error()`\ 를 사용해야 합니다.
+이 함수들은 세션에 저장된 유효성 검사 오류를 확인합니다.
+
+세션에 유효성 검사 오류를 저장하려면 :php:func:`redirect() <redirect>`\ 와 함께 ``withInput()``\ 을 사용해야 합니다.
+
+.. literalinclude:: validation/042.php
+   :lines: 2-
+
+.. _validation-customizing-error-display:
+
+**********************
 오류 표시 사용자 정의
 **********************
 
@@ -522,7 +565,7 @@ POST 데이터에 다음이 있다고 가정합니다.
 ======
 
 뷰를 만든 후에는 검증 라이브러리에 해당 뷰를 알려야 합니다.
-``Config/Validation.php``\ 에는 사용자 정의 뷰를 나열하고 참조 할 수 있는 짧은 별명(alias)을 제공하는 ``$templates``\ 속성이 있습니다.
+**app/Config/Validation.php**\ 에는 사용자 정의 뷰를 나열하고 참조 할 수 있는 짧은 별명(alias)을 제공하는 ``$templates``\ 속성이 있습니다.
 위의 예제 파일을 추가하면 다음과 같습니다.
 
 .. literalinclude:: validation/032.php
@@ -542,44 +585,78 @@ POST 데이터에 다음이 있다고 가정합니다.
 
     <?= $validation->showError('username', 'my_single') ?>
 
+***********************
 사용자 정의 규칙 생성
 ***********************
 
-규칙은 단순한 네임스페이스 클래스내에 저장됩니다.
-오토로더가 찾을 수 있다면 원하는 어느 위치든 저장할 수 있습니다. 
-이러한 파일을 규칙 세트(RuleSet)라고합니다.
-새 규칙 세트를 추가하려면 **Config/Validation.php**\ 의 ``$ruleSets`` 배열에 추가하십시오.
+규칙 클래스 사용하기
+=====================
+
+규칙은 간단한 네임스페이스 클래스에 저장됩니다. 오토로더가 찾을 수 있다면 어떤 위치에서든 저장할 수 있습니다.
+이 파일들은 RuleSets라고 불립니다.
+
+RuleSet 추가
+----------------
+
+새로운 RuleSet을 추가하려면 **app/Config/Validation.php** 파일을 편집하고 새 파일을 ``$ruleSets`` 배열에 추가하십시오.
 
 .. literalinclude:: validation/033.php
 
 정규화된 클래스 이름을 가진 간단한 문자열 또는 위와 같은 ``::class`` 접미사를 사용하여 추가할 수 있습니다.
 여기서 가장 큰 장점은 고급 IDE에서 몇 가지 추가 탐색 기능을 제공한다는 것입니다.
 
-파일 자체에서 각 메소드는 규칙이며, 문자열을 첫 번째 매개 변수로 승인해야 합니다.
-테스트를 통과한 경우 부울 true 값을 그렇지 않은 경우 false를 리턴해야 합니다.
+규칙 클래스 만들기
+---------------------
+
+파일 내에서 각각의 메소드는 하나의 규칙이며, 첫 번째 매개변수로 유효성을 검사할 값을 받아야 하고, 검사를 통과하면 true를 반환하고 통과하지 못하면 false를 반환해야 합니다
 
 .. literalinclude:: validation/034.php
 
-기본적으로 시스템은 ``CodeIgniter\Language\en\Validation.php``\ 에서 오류에 사용되는 언어 문자열을 찾습니다.
-사용자 지정 규칙에서 두 번째 매개 변수에서 ``$error`` 변수를 참조하여 오류 메시지를 제공할 수 있습니다.
+기본적으로 시스템은 **system/Language/en/Validation.php**\ 에서 오류에 사용되는 언어 문자열을 찾습니다.
+사용자 지정 규칙에서 두 번째 매개 변수에서 ``&$error`` 변수를 참조하여 오류 메시지를 제공할 수 있습니다.
 
 .. literalinclude:: validation/035.php
 
-새로운 규칙은 다른 규칙처럼 사용합니다.
+사용자 정의 규칙 사용
+----------------------
+
+새로운 사용자 정의 규칙은 다른 규칙과 마찬가지로 사용할 수 있습니다.
 
 .. literalinclude:: validation/036.php
 
 허용되는 매개 변수
-=====================
+---------------------
 
-분석법이 매개 변수와 함께 작동해야 하는 경우 함수에는 최소 세 개의 매개 변수가 필요합니다.
-유효성 검증할 문자열, 매개 변수 문자열, 폼에서 제출한 모든 데이터가 있는 배열.
-``$data`` 배열은 결과를 기반으로 제출된 다른 필드의 값을 확인해야 하는 ``required_with``\ 와 같은 규칙에 특히 유용합니다.
+만약 당신의 메소드가 매개변수와 함께 작동해야하는 경우, 함수는 적어도 세 개의 매개변수가 필요합니다.
+검증할 값을 나타내는 첫 번째 매개변수, 매개변수 문자열을 나타내는 두 번째 매개변수, 그리고 제출된 모든 데이터가 포함된 배열인 ``$data`` 매개변수입니다.
+``$data`` 배열은 특히 ``required_with``\ 와 같은 규칙에서 유용합니다. 이러한 규칙은 결과를 기반으로 다른 제출된 필드의 값을 확인합니다.
 
 .. literalinclude:: validation/037.php
 
-위에서 설명한 것처럼 사용자 지정 오류는 네 번째 매개 변수로 반환될 수 있습니다.
+사용자 정의 오류는 위에서 설명한대로 네 번째 매개변수 ``&$error``\ 로 반환할 수 있습니다.
 
+.. _validation-using-closure-rule:
+
+클로저 규칙 사용
+==================
+
+.. versionadded:: 4.3.0
+
+응용 프로그램 전체에서 사용자 정의 규칙이 한 번만 필요한 경우 규칙 클래스 대신 클로저를 사용할 수 있습니다.
+
+검증 규칙에 대해 배열을 사용해야합니다.
+
+.. literalinclude:: validation/040.php
+
+클로저 규칙의 오류 메시지를 설정해야합니다.
+오류 메시지를 지정할 때 클로저 규칙에 대한 배열 키를 설정하십시오.
+위의 코드에서 ``required`` 규칙은 키 ``0``\ 을 가지고 있으며, 클로저는 ``1``\ 을 가지고 있습니다.
+
+또는 다음과 같이 매개변수를 사용할 수 있습니다.
+
+.. literalinclude:: validation/041.php
+
+********************
 사용 가능한 규칙
 ********************
 
@@ -622,8 +699,8 @@ is_natural              No          필드에 0, 1, 2, 3 등의 자연수 이외
 is_natural_no_zero      No          필드에 0, 1, 2, 3 등을 제외하고 자연수 이외의 것이 있으면 실패합니다.
 is_not_unique           Yes         주어진 값이 존재하는지 데이터베이스를 확인합니다. 필드/값 별로 레코드를 무시하여 필터링         is_not_unique[table.field,where_field,where_value]
                                     할 수 있습니다 (현재 하나의 필터 만 허용).
-is_unique               Yes         이 필드 값이 데이터베이스에 존재하는지 확인합니다. 선택적으로 무시할 열과 값을 설정하면         is_unique[table.field,ignore_field,ignore_value]
-                                    레코드 자체를 무시하여 업데이트할 때 유용합니다.
+is_unique               Yes         이 필드 값이 데이터베이스에 존재하는지 확인합니다. 선택적으로 무시할 열(column)과 값(value)을   is_unique[table.field,ignore_field,ignore_value]
+                                    설정할 수 있으며 레코드 자체를 무시하고 업데이트하는 경우에 유용합니다.
 less_than               Yes         필드가 매개 변수 값보다 크거나 같거나 숫자가 아닌 경우 실패합니다.                              less_than[8]
 less_than_equal_to      Yes         필드가 매개 변수 값보다 크거나 숫자가 아닌 경우 실패합니다.                                     less_than_equal_to[8]
 matches                 Yes         값은 매개 변수의 필드 값과 일치해야합니다.                                                      matches[field]

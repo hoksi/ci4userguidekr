@@ -18,11 +18,14 @@ CodeIgniter의 모델은 데이터베이스에서 **단일 테이블** 작업을
 모델에 액세스하기
 ******************
 
-모델은 일반적으로 ``app/Models`` 디렉토리에 저장되며, ``namespace App\Models``\ 와 같이 디렉토리 내의 위치와 일치하는 네임스페이스를 가집니다.
+모델은 일반적으로 **app/Models** 디렉토리에 저장되며, ``namespace App\Models``\ 와 같이 디렉토리의 위치와 일치하는 네임스페이스를 가집니다.
 
 새 인스턴스를 만들거나 :php:func:`model()` 헬퍼 함수를 사용하여 클래스 내 모델에 액세스할 수 있습니다.
 
 .. literalinclude:: model/001.php
+
+``model()`` 함수는 내부적으로 ``Factories::models()`` 함수를 사용합니다.
+첫 번째 매개변수에 대한 자세한 내용은 :ref:`factories-example`\ 를 참조하세요.
 
 CodeIgniter 모델
 *******************
@@ -211,10 +214,18 @@ $beforeInsert
 ^^^^^^^^^^^^^
 $afterInsert
 ^^^^^^^^^^^^
+$beforeInsertBatch
+^^^^^^^^^^^^^^^^^^
+$afterInsertBatch
+^^^^^^^^^^^^^^^^^
 $beforeUpdate
 ^^^^^^^^^^^^^
 $afterUpdate
-^^^^^^^^^^^^
+^^^^^^^^^^^^^
+$beforeUpdateBatch
+^^^^^^^^^^^^^^^^^^
+$afterUpdateBatch
+^^^^^^^^^^^^^^^^^
 $beforeFind
 ^^^^^^^^^^^
 $afterFind
@@ -316,6 +327,20 @@ insert()
 
 .. literalinclude:: model/015.php
 
+.. _model-allow-empty-inserts:
+
+allowEmptyInserts()
+-------------------
+
+.. versionadded:: 4.3.0
+
+기본적으로 모델은 데이터가 비어 있을 때 예외를 발생시킵니다.
+그러나 ``allowEmptyInserts()`` 메소드를 호출하면 검사가 수행되지 않아 비어 있는 데이터를 삽입할 수 있습니다. 
+
+.. literalinclude:: model/056.php
+
+다시 검사를 활성화하려면 ``allowEmptyInserts(false)``\ 를 호출하면 됩니다.
+
 update()
 --------
 
@@ -325,7 +350,8 @@ update()
 
 .. literalinclude:: model/016.php
 
-.. important:: ``$primaryKey`` 필드가 ``null``\ 로 설정된 경우 업데이트는 테이블의 모든 레코드에 영향을 미칩니다.
+.. important:: v4.3.0 이후부터 이 메소드가 WHERE절 없이 SQL 문을 생성하는 경우 ``DatabaseException`` 예외가 발생합니다.
+    이전 버전에서는 ``$primaryKey``\ 가 지정되지 않고 WHERE절 없이 SQL 문이 생성된 경우에도 쿼리가 실행되어 테이블의 모든 레코드가 업데이트되었습니다.
 
 기본(primary) 키 배열을 첫 번째 매개 변수로 전달하여 한 번의 호출로 여러 레코드를 업데이트할 수 있습니다.
 
@@ -334,6 +360,8 @@ update()
 유효성 검사, 이벤트 등의 추가 이점을 갖는 쿼리 빌더의 업데이트 명령을 수행하려면, 매개 변수를 비운채 사용하십시오.
 
 .. literalinclude:: model/018.php
+
+.. _model-save:
 
 save()
 ------
@@ -557,6 +585,8 @@ asObject()
 
 .. literalinclude:: model/049.php
 
+.. _model-events-callbacks:
+
 쿼리 빌더 사용
 **************************
 
@@ -609,7 +639,11 @@ CodeIgniter Model은 해당 모델의 데이터베이스 연결을 위해 쿼리
 
 모델 실행시 호출 가능한 콜백 메소드를 지정할 수 있는 몇 가지 이벤트 포인트가 있습니다.
 이를 이용하여 데이터를 정규화하거나, 암호를 해시하고 관련 엔터티를 저장하는 작업등을 수행할 수 있습니다.
-모델 실행의 다음 이벤트 포인트(``$beforeInsert``, ``$afterInsert``, ``$beforeUpdate``, ``$afterUpdate``, ``$afterFind``, ``$afterDelete``)는 각 클래스 속성을 통해 영향을 받을 수 있습니다.
+모델 실행의 다음 이벤트 포인트 ``$beforeInsert``, ``$afterInsert``,
+``$beforeInsertBatch``, ``$afterInsertBatch``, ``$beforeUpdate``, ``$afterUpdate``, ``$beforeUpdateBatch``,
+``$afterUpdateBatch``, ``$afterFind``, and ``$afterDelete``\ 는 각 클래스 속성을 통해 영향을 받을 수 있습니다.
+
+.. note:: v4.3.0 이후부터 ``$beforeInsertBatch``, ``$afterInsertBatch``, ``$beforeUpdateBatch``, ``$afterUpdateBatch``\ 를 사용할 수 있습니다.
 
 콜백 정의
 ============
@@ -636,7 +670,7 @@ insert* 또는 update* 메소드의 경우 데이터베이스에 삽입되는 �
 
 .. literalinclude:: model/052.php
 
-``allowCallbacks()`` 메서드를 호출하는 단일 모델에 대해 이 설정을 일시적으로 변경할 수도 있습니다.
+``allowCallbacks()`` 메서드를 사용하여 단일 모델에 대해 이 설정을 일시적으로 변경할 수 있습니다.
 
 .. literalinclude:: model/053.php
 
@@ -646,18 +680,26 @@ insert* 또는 update* 메소드의 경우 데이터베이스에 삽입되는 �
 각 콜백에 전달되는 데이터는 약간씩 다릅니다.
 다음은 각 이벤트의 ``$data`` 매개 변수에 전달되는 세부 정보입니다.
 
-================ =========================================================================================================
+================= =========================================================================================================
 Event            $data contents
-================ =========================================================================================================
+================= =========================================================================================================
 beforeInsert      **data** = Insert되는 키/값 쌍 객체, 엔터티 클래스가 insert 메소드로 전달되면 먼저 배열로 변환됩니다.
 afterInsert       **id** = 새 행의 기본 키, 실패 시 0
                   **data** = Insert될 원래의 키/값 쌍
                   **result** = 쿼리 빌더 insert() 메소드 호출 결과
+beforeInsertBatch **data** = 삽입되는 값들의 연관 배열.  insertBatch 메소드에 객체나 Entity 클래스가 전달되면 
+                  먼저 배열로 변환됩니다.
+afterInsertBatch  **data** = 삽입되는 값들의 연관 배열.
+                  **result** = Query Builder를 통해 사용된 insertbatch() 메소드의 결과.
 beforeUpdate      **id** = Update할 행의 기본(primary) 키 배열
-                  **data** = Update되는 키/값 쌍 객체, 엔터티 클래스가 Update 메소드로 전달되면 먼저 배열로 변환됩니다.
+                  **data** = Update되는 키/값 쌍, update 메소드에 객체나 Entity 클래스가 전달되면 먼저 배열로 변환됩니다.
 afterUpdate       **id** = Update할 행의 기본(primary) 키 배열
-                  **data** = 업데이트되는 키/값 쌍
+                  **data** = Update되는 키/값 쌍
                   **result** = 쿼리 빌더 update() 메소드 호출 결과
+beforeUpdateBatch **data** = 업데이트되는 값들의 연관 배열, updateBatch 메소드에 객체나 Entity 클래스가 전달되면
+                  먼저 배열로 변환됩니다.
+afterUpdateBatch  **data** = 업데이트되는 키/값 쌍.
+                  **result** =  Query Builder를 통해 사용된 updateBatch() 메소드의 결과
 beforeFind        호출 **method** 이름, **singleton** 요청 여부와 추가 필드
 - first()         추가 필드 없음
 - find()          **id** = 검색되는 행의 기본 키
@@ -671,7 +713,7 @@ afterDelete       **id** = 삭제되는 행의 기본 키
                   **purge** = 소프트 삭제(soft-delete) 행을 강제로 삭제할지 여부(boolean)
                   **result** = 쿼리 빌더 delete() 메소드 호출 결과
                   **data** = 사용안함
-================ =========================================================================================================
+================= =========================================================================================================
 
 Modifying Find* Data
 ====================

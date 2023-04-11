@@ -2,11 +2,14 @@
 시간과 날짜
 ###############
 
-CodeIgniter는 PHP의 DateTime 객체를 기반으로 하는 완전히 현지화된 변하지 않는 날짜/시간 클래스를 제공하지만, 
+CodeIgniter는 PHP의 DateTimeImmutable 객체를 기반으로 하는 완전히 현지화된 변하지 않는 날짜/시간 클래스를 제공하지만, 
 Intl 확장 기능을 사용하여 시간을 시간대별로 변환하고 다른 로케일에 대한 출력을 올바르게 표시합니다.
 이 클래스는 ``Time`` 클래스이며 ``CodeIgniter\\I18n`` 네임스페이스에 있습니다.
 
-.. note:: Time 클래스는 DateTime을 확장하므로 이 클래스에서 제공하지 않는 기능이 있으면 `DateTime <https://www.php.net/manual/en/class.datetime.php>`_  클래스에서 찾을수 있습니다.
+.. note:: Time 클래스는 ``DateTimeImmutable``\ 을 확장하므로, 이 클래스에서 제공하지 않는 기능이 있으면 `DateTimeImmutable <https://www.php.net/manual/en/class.datetimeimmutable.php>`_ 클래스에서 찾을수 있습니다.
+
+.. note:: 버전 4.3.0 이전에는 Time 클래스가 ``DateTime`` 클래스를 확장하고 일부 상속된 메소드가 현재 객체 상태를 변경했습니다.
+    이 버그는 4.3.0에서 수정되었습니다. 하위 호환성을 위해 이전 Time 클래스가 필요한 경우 일시적으로 사용할 수 있는 ``TimeLegay`` 클래스를 사용할 수 있습니다.
 
 .. contents::
     :local:
@@ -43,7 +46,7 @@ parse()
 =======
 
 이 헬퍼 메소드는 기본 생성자의 정적 버전입니다.
-첫 번째 매개 변수로 DateTime의 생성자로 허용되는 문자열, 두 번째 매개 변수로 시간대 및 세 번째 매개 변수로 로케일을 사용합니다.
+첫 번째 매개 변수로 DateTimeImmutable의 생성자로 허용되는 문자열, 두 번째 매개 변수로 시간대 및 세 번째 매개 변수로 로케일을 사용합니다.
 
 .. literalinclude:: time/004.php
 
@@ -101,8 +104,8 @@ create()
 createFromFormat()
 ==================
 
-이것은 같은 이름의 DateTime 메소드를 대체합니다. 
-이렇게하면 시간대를 동시에 설정할 수 있으며 DateTime 대신 ``Time`` 인스턴스를 반환합니다.
+이것은 같은 이름의 DateTimeImmutable 메소드를 대체합니다. 
+이렇게하면 시간대를 동시에 설정할 수 있으며 DateTimeImmutable 대신 ``Time`` 인스턴스를 반환합니다.
 
 .. literalinclude:: time/011.php
 
@@ -133,14 +136,14 @@ DateTime에서 로케일을 인식하지 못하므로 시간대 설정은 유지
 값 표시
 ********************
 
-Time 클래스는 DateTime을 확장하므로 ``format()`` 메소드를 포함한 DateTime 클래스가 제공하는 모든 출력 메소드를 사용할 수 있습니다.
-그러나 DateTime 메소드는 지역화된 결과를 제공하지 않습니다. 
+Time 클래스는 DateTimeImmutable을 확장하므로 ``format()`` 메소드를 포함한 DateTime 클래스가 제공하는 모든 출력 메소드를 사용할 수 있습니다.
+그러나 DateTimeImmutable 메소드는 지역화된 결과를 제공하지 않습니다. 
 Time 클래스는 현지화된 버전의 값을 표시하기 위한 여러 가지 헬퍼 메소드를 제공합니다.
 
 toLocalizedString()
 ===================
 
-현지화된 DateTime() 형식 메소드 버전입니다. 
+DateTimeImmutable의 ``format()`` 메서드의 로컬화된 버전입니다.
 하지만 익숙한 값을 사용하는 대신 `IntlDateFormatter <https://www.php.net/manual/en/class.intldateformatter.php>`__ 클래스에 허용되는 값을 사용해야 합니다.
 전체 값은 `목록 <https://unicode-org.github.io/icu-docs/apidoc/released/icu4c/classSimpleDateFormat.html#details>`__\ 에서 찾을 수 있습니다.
 

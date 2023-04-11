@@ -118,7 +118,7 @@ CodeIgniter는 공통 인터페이스뒤에서 파일 사용을 표준화하여 
 
 ::
 
-	<input type="file" name="avatar" />
+	<input type="file" name="avatar">
 
 다음과 같은 간단한 배열을 반환합니다.
 
@@ -134,7 +134,7 @@ CodeIgniter는 공통 인터페이스뒤에서 파일 사용을 표준화하여 
 
 ::
 
-	<input type="file" name="my-form[details][avatar]" />
+	<input type="file" name="my-form[details][avatar]">
 
 ``getFiles()``\ 에 의해 반환된 배열은 다음과 같습니다.
 
@@ -152,8 +152,8 @@ CodeIgniter는 공통 인터페이스뒤에서 파일 사용을 표준화하여 
 
 ::
 
-	Upload an avatar: <input type="file" name="my-form[details][avatars][]" />
-	Upload an avatar: <input type="file" name="my-form[details][avatars][]" />
+	Upload an avatar: <input type="file" name="my-form[details][avatars][]">
+	Upload an avatar: <input type="file" name="my-form[details][avatars][]">
 
 이 경우 반환 된 파일 배열은
 
@@ -183,7 +183,7 @@ CodeIgniter는 공통 인터페이스뒤에서 파일 사용을 표준화하여 
 
 ::
 
-	<input type="file" name="userfile" />
+	<input type="file" name="userfile">
 
 다음과 같은 간단한 파일 인스턴스를 반환합니다.
 
@@ -196,7 +196,7 @@ CodeIgniter는 공통 인터페이스뒤에서 파일 사용을 표준화하여 
 
 ::
 
-	<input type="file" name="my-form[details][avatar]" />
+	<input type="file" name="my-form[details][avatar]">
 
 파일 인스턴스를 얻으려면
 
@@ -209,7 +209,7 @@ HTML에서
 
 ::
 
-    <input type="file" name="images[]" multiple />
+    <input type="file" name="images[]" multiple>
 
 컨트롤러에서
 
@@ -232,8 +232,8 @@ HTML에서
 
 ::
 
-	Upload an avatar: <input type="file" name="my-form[details][avatars][]" />
-	Upload an avatar: <input type="file" name="my-form[details][avatars][]" />
+	Upload an avatar: <input type="file" name="my-form[details][avatars][]">
+	Upload an avatar: <input type="file" name="my-form[details][avatars][]">
 
 컨트롤러에서
 
@@ -309,32 +309,51 @@ getClientMimeType()
 -------------------
 
 클라이언트가 제공한 파일의 MIME 유형 (MIM 유형)을 리턴합니다.
-신뢰할 수 없습니다.
+신뢰할 수 없는 MIME 유형을 반환합니다.
 신뢰할 수 있는 MIME 유형을 원한다면 ``getMimeType()``\ 을 사용하십시오.
 
-::
-
-	$type = $file->getClientMimeType();
-
-	echo $type; // image/png
+.. literalinclude:: uploaded_files/015.php
 
 파일 이동
 =========
+
+원본 파일 이름
+-----------------
 
 각 파일은 적절하게 이름이 지정된 ``move()`` 메소드를 사용하여 새 위치로 이동할 수 있습니다.
 첫 번째 매개 변수로 디렉토리와 함께 사용하여 파일명을 전달하여 이동시킵니다.
 
 .. literalinclude:: uploaded_files/016.php
 
-기본적으로 원래 파일 이름이 사용됩니다. 
-두 번째 매개 변수로 새 파일 이름을 전달하여 수정할 수 있습니다
+기본적으로 원래 파일 이름이 사용됩니다.
+
+새 파일 이름
+--------------
+
+두 번째 매개변수로 새 파일 이름을 지정할 수 있습니다.
 
 .. literalinclude:: uploaded_files/017.php
+
+기존 파일 덮어쓰기
+-------------------------
+
+기본적으로 대상 파일이 이미 존재하는 경우, 새 파일 이름이 자동으로 지정됩니다.
+예를 들어, 디렉토리에 이미 **image_name.jpg** 파일이 있는 경우, 파일 이름은 자동으로 **image_name_1.jpg**\ 가 됩니다.
+
+세 번째 매개변수로 ``true``\ 를 전달하여 기존 파일을 덮어쓸 수 있습니다.
+
+.. literalinclude:: uploaded_files/022.php
+
+파일이 이동했는지 확인하기
+---------------------------
 
 파일이 제거되면 임시 파일이 삭제됩니다.
 부울을 반환하는 ``hasMoved()`` 메소드로 파일이 이동했는지 확인할 수 있습니다.
 
 .. literalinclude:: uploaded_files/018.php
+
+파일 이동이 실패할 경우
+------------------------
 
 다음과 같은 경우 업로드된 파일을 ``HTTP/Exception``\ 이 발생하며 이동하지 못할 수 있습니다.
 
@@ -351,7 +370,7 @@ getClientMimeType()
 
 ::
 
-	<input type="file" name="userfile" />
+	<input type="file" name="userfile">
 
 기본적으로 업로드 파일은 쓰기 가능한 업로드 디렉토리에 저장됩니다.
 YYYYMMDD 폴더와 같은 임의의 파일 이름이 생성되고 파일 경로를 반환합니다.

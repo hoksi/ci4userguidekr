@@ -55,6 +55,8 @@ CodeIgniter가 헤더와 본문 전송을 담당하므로 클래스를 직접 �
 
 .. literalinclude:: response/006.php
 
+.. _force-file-download:
+
 강제 파일 다운로드
 ===================
 
@@ -125,6 +127,11 @@ XSS 공격에 대한 최선의 보호 방법 중 하나는 사이트에서 콘�
 
 CSP 켜기
 --------
+
+.. important:: :ref:`Debug Toolbar <the-debug-toolbar>`\ 는 Kint를 사용하며, 인라인 스크립트로 출력됩니다.
+    따라서 CSP가 켜져 있을 때는 Debug Toolbar에 대한 CSP nonce가 자동으로 출력됩니다.
+    그러나 CSP nonce를 사용하지 않는 경우, 이는 의도하지 않은 CSP 헤더로 변경되어 프로덕션 환경과는 다르게 동작하게 됩니다.
+    CSP 동작 여부를 확인하려면 Debug Toolbar를 끄면됩니다.
 
 기본적으로 이 기능은 꺼져있습니다. 
 어플리케이션에서 지원을 활성화하려면  **app/Config/App.php**\ 에서 ``CSPEnabled`` 값을 수정하십시오.
@@ -345,7 +352,7 @@ Class Reference
 
         :param array|Cookie|string $name: 쿠키명 또는 매개 변수 배열
         :param string $value: 쿠키값
-        :param int $expire: 쿠키 만료 시간(초)
+        :param int $expire: 쿠키 만료 시간(초). ``0``\ 으로 설정하면 쿠키가 브라우저가 열려있는 동안만 유지됩니다.
         :param string $domain: 쿠키 domain
         :param string $path: 쿠키 path
         :param string $prefix: 쿠키명 prefix. ``''``\ 로 설정하면 **app/Config/Cookie.php**\ 의 기본값이 사용됩니다.
