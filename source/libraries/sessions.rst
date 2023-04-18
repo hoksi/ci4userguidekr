@@ -313,54 +313,51 @@ CodeIgniter는 일반적으로 모든 것을 즉시 사용할 수 있도록 합�
 그러나 세션은 모든 응용 프로그램에서 매우 민감한 구성 요소이므로 신중하게 구성해야합니다. 
 시간을내어 모든 옵션과 그 효과를 고려하십시오.
 
-**app/Config/App.php** 파일에서 다음 세션 관련 환경 설정을 찾을 수 있습니다.
+.. note:: v4.3.0 이후로 새로운 파일인 **app/Config/Session.php**\ 가 추가되었습니다.
+	이전 버전에서는 세션 설정이 **app/Config/App.php** 파일에 있었습니다.
 
-============================== ================== =========================== ============================================================
-Preference                     Default            Options                     Description
-============================== ================== =========================== ============================================================
-**sessionDriver**              FileHandler::class FileHandler::class          사용할 세션 스토리지 드라이버
-                                                  DatabaseHandler::class      모든 세션 드라이버는 ``CodeIgniter\Session\Handlers\`` 
-                                                  MemcachedHandler::class     네임스페이스에 있습니다.
-                                                  RedisHandler::class
-                                                  ArrayHandler::class
-**sessionCookieName**          ci_session         [A-Za-z\_-] characters only 세션 쿠키에 사용되는 이름
-                                                                              이 값은 Database/Memcached/Redis 세션 레코드의 키에 
-                                                                              포함됩니다. 그러므로 키의 최대 길이를 초과하지 않도록 
-                                                                              값을 설정하십시오.
-**sessionExpiration**          7200 (2 hours)     Time in seconds (integer)   세션이 유지되기를 원하는 시간(초)
-                                                                              브라우저가 종료될 때까지 유효한 세션을 원한다면 값을 
-                                                                              0으로 설정하세요.
-**sessionSavePath**            null               None                        사용하고 있는 드라이버에 따라 저장 위치를 지정합니다.
-**sessionMatchIP**             false              true/false (boolean)        세션 쿠키를 읽을 때 사용자의 IP 주소를 검증할 지 여부
-                                                                              일부 ISP가 IP를 동적으로 변경하기 때문에, 유효기간이 없는
-                                                                              세션을 원한다면 일반적으로 이 값을 false로 설정합니다.
-**sessionTimeToUpdate**        300                Time in seconds (integer)   이 옵션은 세션 클래스가 자체적으로 재생성되고 새로운 세션 
-                                                                              ID를 생성하는 빈도를 제어합니다. 0으로 설정하면 세션 ID 
-                                                                              재생성이 비활성화됩니다.
-**sessionRegenerateDestroy**   false              true/false (boolean)        세션 ID를 자동으로 재생성 할 때 이전 세션 ID와 연관된
-                                                                              세션 데이터를 삭제할 지 여부입니다.
-                                                                              false로 설정하면 데이터는 나중에 가비지 콜렉터에 의해
-                                                                              삭제됩니다.
-============================== ================== =========================== ============================================================
+You'll find the following Session related preferences in your **app/Config/Session.php** file:
+**app/Config/Session.php** 파일에서 다음과 같은 세션 관련 설정을 찾을 수 있습니다.
 
-.. note:: 세션 라이브러리는 PHP의 세션 관련 INI 설정과 위의 항목 중 하나라도 구성되지 않은 경우, 최후의 수단으로 'sess_expire_on_close'\ 와 같은 레거시 CI 설정을 가져 오려고 시도합니다.
+======================= ============================================ ================================================= ============================================================================================
+Preference                     Default                                      Options                                           Description
+======================= ============================================ ================================================= ============================================================================================
+**driver**              CodeIgniter\\Session\\Handlers\\FileHandler  CodeIgniter\\Session\\Handlers\\FileHandler       사용할 세션 드라이버를 지정합니다.
+                                                                     CodeIgniter\\Session\\Handlers\\DatabaseHandler
+                                                                     CodeIgniter\\Session\\Handlers\\MemcachedHandler
+                                                                     CodeIgniter\\Session\\Handlers\\RedisHandler
+                                                                     CodeIgniter\\Session\\Handlers\\ArrayHandler
+**cookieName**          ci_session                                   [A-Za-z\_-] characters only                       세션 쿠키의 이름을 지정합니다.
+**expiration**          7200 (2 hours)                               Time in seconds (integer)                         세션이 지속되는 시간(초)을 지정합니다.
+                                                                                                                       브라우저가 닫힐 때까지만 세션이 지속되길 원한다면 0으로 지정합니다.
+**savePath**            null                                         None                                              드라이버에 따라 저장 위치를 지정합니다.
+**matchIP**             false                                        true/false (boolean)                              세션 쿠키를 읽을 때 사용자 IP 주소를 검증할지 여부를 지정합니다.
+                                                                                                                       일부 ISP에서 IP 주소가 동적으로 변경되므로 만료되지 않는 세션을 필요하다면
+                                                                                                                       이 값을 false로 설정해야 합니다.
+**timeToUpdate**        300                                          Time in seconds (integer)                         이 옵션은 세션 클래스가 자체를 자주 재생성하고 새 세션 ID를 생성하는 주기를 제어합니다.
+                                                                                                                       0으로 설정하면 세션 ID 재생성이 비활성화됩니다.
+**regenerateDestroy**   false                                        true/false (boolean)                              자동으로 세션 ID를 다시 생성할 때 이전 세션 ID와 연결된 세션 데이터를 파괴할지 여부를 
+                                                                                                                       지정합니다. false로 설정하면 데이터는 나중에 가비지 컬렉터에 의해 삭제됩니다.
+======================= ============================================ ================================================= ============================================================================================
+
+.. note:: 세션 라이브러리는 PHP의 세션 관련 INI 설정과 위의 항목 중 하나라도 구성되지 않은 경우, 최후의 수단으로 'sess_expire_on_close'\ 와 같은 코드이그나이터 3의 설정을 가져 오려고 시도합니다.
 	그러나 예기치 않은 결과가 발생하거나 나중에 변경될 수 있으므로 이 방법에 의존해서는 안됩니다. 모든 것을 올바르게 구성하십시오.
 
 .. note:: ``sessionExpiration``\ 을 ``0``\ 으로 설정하면 PHP가 설정한 세션 관리의 ``session.gc_maxlifetime`` 설정 값 그대로(기본값 ``1440``) 사용됩니다.
 	이 값은 필요에 따라 ``php.ini`` 또는 ``ini_set()``\ 을 통해 변경 가능 합니다.
 
-위의 값 외에도 쿠키 및 기본 드라이버는 :doc:`IncomingRequest </incoming/incomingrequest>`\ 와 :doc:`Security <security>` 클래스에서 공유하는 다음 구성 값을 적용합니다.
+위에서 언급한 값들 외에도, 세션 쿠키는 다음과 같은 구성 값을 **app/Config/Cookie.php** 파일에서 사용합니다
 
 ==================== =============== ===========================================================================
 Preference           Default         Description
 ==================== =============== ===========================================================================
-**cookieDomain**     ''              세션 적용 도메인
-**cookiePath**       /               세션 적용 가능 경로
-**cookieSecure**     false           암호화된 (HTTPS) 연결에서만 세션 쿠키를 작성할 지 여부
-**cookieSameSite**   Lax             세션 쿠키에 대한 SameSite 설정
+**domain**           ''              세션 적용 도메인
+**path**             /               세션 적용 가능 경로
+**secure**           false           암호화된 (HTTPS) 연결에서만 세션 쿠키를 작성할 지 여부
+**sameSite**         Lax             세션 쿠키에 대한 SameSite 설정
 ==================== =============== ===========================================================================
 
-.. note::'cookieHTTPOnly' 설정은 세션에 영향을 미치지 않습니다.
+.. note:: 'httponly' 설정은 세션에 영향을 미치지 않습니다.
 	대신 보안상의 이유로 HttpOnly 매개 변수가 항상 사용되며, ``Config\Cookie::$prefix`` 설정은 완전히 무시됩니다.
 
 세션 드라이버
@@ -376,7 +373,7 @@ Preference           Default         Description
 
 ``FileHandler`` 드라이버는 가장 안전한 선택이며, 모든 곳에서 작동할 것으로 예상되기 때문에 세션이 초기화 될 때 기본적으로 사용됩니다. (모든 환경에는 파일 시스템이 있습니다)
 
-그러나 다른 드라이버는 **app/Config/App.php** 파일의 ``public $sessionDriver``\ 을 통해 선택할 수 있습니다. (원하는 경우)
+그러나 다른 드라이버는 **app/Config/Session.php** 파일의 ``public $driver``\ 을 통해 선택할 수 있습니다. (원하는 경우)
 모든 드라이버는 각기 다른 주의 사항이 있으며, 이를 염두에 두어야합니다. 
 따라서 선택하기 전에 반드시 아래 부분을 잘 읽어보십시오.
 
@@ -390,10 +387,10 @@ FileHandler 드라이버 (기본)
 PHP의 기본 세션 구현과 똑같이 작동고 안전하다고 말할 수 있지만, 이것이 중요한 세부사항의 경우 기본 세션과 동일한 코드가 아니며 몇 가지 제한 사항과 장점이 있습니다.
 
 좀 더 구체적으로 말하면 session.save_path <https://www.php.net/manual/en/session.configuration.php#ini.session.save-path>_\ 에서 사용되는 PHP의 디렉토리 레벨 및 모드 형식을 지원하지 않습니다. 
-안전을 위해 대부분의 옵션이 하드 코딩되어 있으며, ``public $sessionSavePath``\ 는 절대 경로만 지원됩니다.
+안전을 위해 대부분의 옵션이 하드 코딩되어 있으며, ``public string $savePath``\ 는 절대 경로만 지원됩니다.
 
 알아야 할 또 다른 중요한 사항은 공개적으로 읽거나 공유 디렉토리를 사용하여 세션 파일을 저장하지 않도록 하는 것입니다.
-선택한 *sessionSavePath* 디렉토리의 내용을 볼 수있는 권한이 *당신에게만* 있는지 확인하십시오.
+선택한 *savePath* 디렉토리의 내용을 볼 수있는 권한이 *당신에게만* 있는지 확인하십시오.
 그렇지 않으면 이를 수행할 수 있는 모든 사람이 현재 세션 ("sessiion fixation" 공격이라고도 함)을 도용할 수 있습니다.
 
 유닉스 계열 운영 체제에서, 이것은 일반적으로 `chmod` 명령을 통해 해당 디렉토리에 대한 0700 모드 권한을 설정함으로써 달성되며, 디렉토리 소유자만 디렉토리에 대한 읽기 및 쓰기 작업을 수행할 수 있습니다.
@@ -423,6 +420,10 @@ PHP의 기본 세션 구현과 똑같이 작동고 안전하다고 말할 수 �
 DatabaseHandler 드라이버
 =============================
 
+.. important:: 다른 플랫폼은 공지된 잠금 메커니즘이 없기 때문에, 공식적으로는 MySQL과 PostgreSQL 데이터베이스만 지원됩니다.
+	잠금 없이 세션을 사용하면 AJAX의 무거운(heavy) 사용으로 인해 다양한 문제가 발생할 수 있으며, 이러한 경우에는 지원하지 않습니다.
+	성능 문제가 발생하는 경우 세션 데이터 처리 후 ``session_write_close()``\ 를 사용하십시오.
+
 'DatabaseHandler' 드라이버는 MySQL 또는 PostgreSQL과 같은 관계형 데이터베이스를 사용하여 세션을 저장합니다. 
 이는 개발자가 어플리케이션내에서 세션 데이터에 쉽게 액세스할 수 있기 때문에 많은 사용자에게 인기있는 선택입니다. 
 이는 데이터베이스의 다른 테이블 일뿐입니다.
@@ -431,7 +432,10 @@ DatabaseHandler 드라이버
 
 	- 영구 연결(persistent connection)을 사용할 수 없습니다.
 
-'DatabaseHandler' 세션 드라이버를 사용하려면 세션 테이블을 만든 다음 이를 ``$sessionSavePath``\ 의 값으로 설정해야 합니다.
+DatabaseHandler 구성
+-------------------------
+
+'DatabaseHandler' 세션 드라이버를 사용하려면 세션 테이블을 만든 다음 이를 ``$savePath``\ 의 값으로 설정해야 합니다.
 예를 들어 테이블 이름으로 'ci_sessions'을 사용하려면 다음과 같이합니다.
 
 .. literalinclude:: sessions/039.php
@@ -463,8 +467,11 @@ PostgreSQL
 
 	CREATE INDEX "ci_sessions_timestamp" ON "ci_sessions" ("timestamp");
 
-또한 **'sessionMatchIP' 설정에 따라 기본 키를 추가**\ 해야 합니다. 
-아래 예제는 MySQL과 PostgreSQL 모두에서 작동합니다.
+.. note:: ``id`` 값은 세션 쿠키 이름(``Config\Session::$cookieName``)과 세션 ID, 그리고 구분 기호를 포함합니다.
+	예를 들어, 세션 ID가 긴 경우에는 필요에 따라 이 값을 증가시켜야 합니다.
+
+또한 **$matchIP 설정에 따라** PRIMARY KEY를 추가해야 합니다.
+아래 예시는 MySQL과 PostgreSQL에서 모두 작동합니다.
 
 ::
 
@@ -477,7 +484,7 @@ PostgreSQL
 	// To drop a previously created primary key (use when changing the setting)
 	ALTER TABLE ci_sessions DROP PRIMARY KEY;
 
-사용할 데이터베이스 그룹 이름을 **application\Config\App.php** 파일의 ``$sessionDBGroup``\ 에 지정할 수 있습니다.
+사용할 데이터베이스 그룹은 **app/Config/Session.php** 파일에 새로운 줄을 추가하여 그룹 이름을 지정할 수 있습니다.
 
 .. literalinclude:: sessions/040.php
 
@@ -488,11 +495,7 @@ PostgreSQL
   > php spark make:migration --session
   > php spark migrate
 
-이 명령은 코드를 생성할 때 **sessionSavePath**\ 와 **sessionMatchIP** 설정을 고려합니다.
-
-.. important:: 다른 데이터베이스 플랫폼은 잠금 메커니즘에 접근할 수 없기 때문에 MySQL 및 PostgreSQL 데이터베이스만 공식적으로 지원됩니다.
-	특히 AJAX를 많이 사용하는 경우 잠금없이 세션을 사용할 경우 문제가 발생할 수 있으므로, 잠금을 지원하지 않는 경우는 지원하지 않습니다.
-	성능 문제가 발생한다면 세션 데이터 처리를 완료한 후 ``session_write_close()``\ 를 사용하십시오.
+이 명령은 코드를 생성할 때 **savePath**\ 와 **matchIP** 설정을 고려합니다.
 
 .. _sessions-redishandler-driver:
 
@@ -500,20 +503,24 @@ RedisHandler 드라이버
 ============================
 
 .. note:: Redis의 잠금 메커니즘에 직접 접근할 수 없으므로 ,이 드라이버의 잠금은 최대 300초 동안 유지되는 별도의 값으로 에뮬레이션됩니다.
+	``v4.3.2`` 이상에서는 **TLS** 프로토콜을 사용하여 ``Redis``\ 에 연결할 수 있습니다.
 
 Redis는 고성능으로 인해 캐싱에 일반적으로 사용되는 스토리지 엔진으로 'RedisHandler' 세션 드라이버를 사용하는 가장 큰 이유입니다.
 
 단점은 관계형 데이터베이스만큼 편재적이지 않으며 시스템에 `phpredis <https://github.com/phpredis/phpredis>`_ PHP 확장이 설치되어 있어야 하며, PHP 번들로 제공되지 않는다는 것입니다.
 이미 Redis에 익숙하고 다른 목적으로 사용하는 경우 RedisHandler 드라이버를 사용하고 있을 가능성이 있습니다.
 
-'FileHandler'\ 와 'DatabaseHandler' 드라이버와 마찬가지로 ``$sessionSavePath`` 설정을 통해 세션의 저장 위치를 ​​구성합니다.
+RedisHandler 구성
+----------------------
+
+'FileHandler'\ 와 'DatabaseHandler' 드라이버와 마찬가지로 ``$savePath`` 설정을 통해 세션의 저장 위치를 ​​구성합니다.
 'RedisHandler' 형식(format)은 약간 다르며 복잡합니다.
 *phpredis* 확장의 README 파일에 잘 설명되므로 링크해 드립니다.
 
 	https://github.com/phpredis/phpredis#php-session-handler
 
-.. warning:: CodeIgniter의 세션 라이브러리는 실제 'redis'\ 의 ``session.save_handler``\ 를 사용하지 않습니다.
-	위 링크에서 **오직** 경로 형식(path format)만 참고하십시오.
+.. important:: CodeIgniter의 세션 라이브러리는 실제 'redis'\ 의 ``session.save_handler``\ 를 사용하지 않습니다.
+	위 링크에서 **only** 경로 형식(path format)만 참고하십시오.
 
 그러나 대부분의 경우, 간단한 ``host:port``\ 쌍만 있어도 충분합니다
 
@@ -535,7 +542,10 @@ MemcachedHandler 드라이버
 그러나 Memcached가 제공하는 유일한 보증은 Y초 후에 값 X가 만료되도록 설정하면 Y초가 지난후에 삭제된다는 것입니다 (그러나 반드시 그 시간보다 빨리 만료되지는 않습니다).
 이것은 매우 드물게 발생하지만 세션이 손실될 수 있으므로 고려해야 합니다.
 
-``$sessionSavePath`` 형식(format)은 ``host:port`` 쌍으로 매우 간단합니다.
+MemcachedHandler 구성
+--------------------------
+
+``$savePath`` 형식(format)은 ``host:port`` 쌍으로 매우 간단합니다.
 
 .. literalinclude:: sessions/042.php
 
