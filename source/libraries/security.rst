@@ -43,9 +43,12 @@ CodeIgniter의 CSRF 보호를 사용할 때 여전히 다음과 같이 코딩해
 
 ::
 
-    if (strtolower($this->request->getMethod()) !== 'post') {
+    if (! $this->request->is('post')) {
         return $this->response->setStatusCode(405)->setBody('Method Not Allowed');
     }
+
+.. note:: :ref:`$this->request->is() <incomingrequest-is>` 메소드는 v4.3.0 이후 버전에서 사용할 수 있습니다. 
+    이전 버전에서는 ``if (strtolower($this->request->getMethod()) !== 'post')``\ 와 같이 사용해야합니다.
 
 자동 라우팅이 활성화된 경우
 ----------------------------
@@ -54,7 +57,7 @@ CodeIgniter의 CSRF 보호를 사용할 때 여전히 다음과 같이 코딩해
 
 ::
 
-    if (strtolower($this->request->getMethod()) !== 'post') {
+    if (! $this->request->is('post')) {
         return $this->response->setStatusCode(405)->setBody('Method Not Allowed');
     }
 
@@ -100,16 +103,26 @@ Token Randomization
 
 .. note:: v4.2.3부터 ``Security::generateHash()`` 메소드를 사용하여 수동으로 CSRF 토큰을 재생성할 수 있습니다.
 
+.. _csrf-redirection-on-failure:
+
 실패 시 리디렉션
 ======================
 
-요청이 CSRF 유효성 검사에 실패하면 기본적으로 이전 페이지로 리디렉션되어 최종 사용자에게 표시 할 수있는 ``error`` 플래시 메시지를 설정합니다. 
-이것은 단순히 충돌하는 것보다 더 좋은 경험을 제공합니다. 
-다음과 같이 **app/Config/Security.php**\ 매개 변수를 편집하여 끌 수 있습니다.
+v4.3.0부터, 요청이 CSRF 유효성 검사를 통과하지 못하면 기본적으로 SecurityException이 발생합니다.
+
+이전 페이지로 리디렉션하도록하려면, **app/Config/Security.php**\ 에서 다음 구성 매개변수 값을 변경하십시오.
 
 .. literalinclude:: security/005.php
 
-리디렉션 값이 **true**\ 인 경우 AJAX 호출은 리디렉션되지 않지만 오류가 발생합니다.
+리디렉션될 때, ``error`` 플래시 메시지가 설정되며, 다음 코드를 사용하여 뷰에서 사용자에게 표시할 수 있습니다.
+
+::
+
+    <?= session()->getFlashdata('error') ?>
+
+이는 단순히 충돌하는 것보다 더 나은 사용자 경험을 제공합니다.
+
+리디렉션 값이 ``true``\ 인 경우에도 AJAX 호출은 리디렉션하지 않으며 SecurityException을 throw합니다.
 
 CSRF 보호 활성화
 ======================

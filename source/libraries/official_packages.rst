@@ -16,7 +16,7 @@ CodeIgniter 프레임워크는 개발자가 직면하게 될 모든 문제를 �
 Shield
 ******
 
-`CodeIgniter Shield <https://github.com/codeigniter4/shield>`_\ 는 CodeIgniter 4용 인증 및 권한 부여 프레임워크입니다.
+`CodeIgniter Shield <https://codeigniter4.github.io/shield/>`_\ 는 CodeIgniter 4용 인증 및 권한 부여 프레임워크입니다.
 안전하고 유연하며 쉽게 확장하여 다양한 유형의 웹사이트의 요구 사항을 충족하도록 설계되었습니다.
 많은 기능중에는 다음이 포함됩니다.
 

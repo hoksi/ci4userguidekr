@@ -259,3 +259,35 @@ merge(bool $replace = true): bool
 Example
 
 .. literalinclude:: publisher/012.php
+
+.. _publisher-modifying-files:
+
+파일 수정
+===============
+
+replace(string $file, array $replaces): bool
+--------------------------------------------
+
+.. versionadded:: 4.3.0
+
+``$file`` 내용을 대체합니다. 두 번째 매개변수인 ``$replaces`` 배열은 검색 문자열을 키로, 치환 문자열을 값으로 지정합니다.
+
+.. literalinclude:: publisher/013.php
+
+addLineAfter(string $file, string $line, string $after): bool
+-------------------------------------------------------------
+
+.. versionadded:: 4.3.0
+
+``$after`` 문자열이 있는 라인 다음에 ``$line``\ 을 추가합니다.
+
+.. literalinclude:: publisher/014.php
+
+addLineBefore(string $file, string $line, string $after): bool
+--------------------------------------------------------------
+
+.. versionadded:: 4.3.0
+
+``$after`` 문자열이 있는 라인 이전에 ``$line``\ 을 추가합니다.
+
+.. literalinclude:: publisher/015.php

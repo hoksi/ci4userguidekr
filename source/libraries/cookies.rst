@@ -313,6 +313,8 @@ Class Reference
 
     .. php:method:: withNeverExpiring()
 
+        .. deprecated:: 4.2.6
+
         .. important:: 이 메소드는 더 이상 사용되지 않습니다. 향후 릴리스에서 제거될 예정입니다.
 
         :param string $name:

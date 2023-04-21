@@ -14,9 +14,9 @@
 무엇이 바뀌었습니까?
 =====================
 
-- CI4의 뷰는 이전과 매우 유사하지만 다르게 해석됩니다. CI3의 ``$this->load->view(x);`` 대신 ``return view(x);``\ 를 사용합니다.
-- CI4는 응답을 여러 조각으로 구성하는 *View cell*\ 과 페이지 레이아웃을 위한 *View Layouts*\ 을 지원합니다.
-- 템플릿 파서는 그대로 있으며, 상당히 개선되었습니다.
+- CI4의 뷰는 이전과 매우 유사하지만 다르게 해석됩니다. CI3의 ``$this->load->view('x');`` 대신 ``return view('x');``\ 를 사용합니다.
+- CI4는 응답을 여러 조각으로 구성하는 :doc:`../outgoing/view_cells`\ 과 페이지 레이아웃을 위한 :doc:`../outgoing/view_layouts`\ 을 지원합니다.
+- :doc:`Template Parser <../outgoing/view_parser>`\ 는 그대로 있으며, 상당히 개선되었습니다.
 
 업그레이드 가이드
 =================
@@ -26,6 +26,7 @@
     - ``$this->load->view('directory_name/file_name')`` => ``return view('directory_name/file_name');``
     - ``$content = $this->load->view('file', $data, TRUE);`` => ``$content = view('file', $data);``
 3. (선택사항) 뷰의 echo 구문 ``<?php echo $title; ?>``\ 을 ``<?= $title ?>``\ 로 변경할 수 있습니다.
+4. 만약 ``defined('BASEPATH') OR exit('No direct script access allowed');`` 라인이 존재한다면 제거합니다.
 
 Code Example
 ============

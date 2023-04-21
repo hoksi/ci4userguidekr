@@ -11,6 +11,7 @@
 	email
 	encryption
 	files
+	file_collections
 	honeypot
 	images
 	pagination

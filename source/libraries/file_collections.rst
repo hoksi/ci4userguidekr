@@ -1,9 +1,8 @@
 ################
-File Collections
+파일 Collections
 ################
 
-Working with groups of files can be cumbersome, so the framework supplies the ``FileCollection`` class to facilitate
-locating and working with groups of files across the filesystem.
+파일 그룹을 사용하는 작업은 번거로울 수 있으므로 파일 시스템 전체에서 파일 그룹을 쉽게 찾고 작업할 수 있는 ``FileCollection`` 클래스를 제공합니다.
 
 .. contents::
     :local:
@@ -13,49 +12,45 @@ locating and working with groups of files across the filesystem.
 Basic Usage
 ***********
 
-At its most basic, ``FileCollection`` is an index
-of files you set or build:
+``FileCollection``\ 은 가장 기본적으로 설정하거나 빌드하는 파일의 색인입니다.
 
 .. literalinclude:: files/011.php
 
-After you have input the files you would like to work with you may remove files or use the filtering commands to remove
-or retain files matching a certain regex or glob-style pattern:
+파일을 입력한 후, 일부 파일을 제거하거나 일치하는 특정 regex 또는 glob-style 패턴을 가진 파일을 제거하거나 유지하는 필터링 명령을 사용할 수 있습니다.
 
 .. literalinclude:: files/012.php
 
-When your collection is complete, you can use ``get()`` to retrieve the final list of file paths, or take advantage of
-``FileCollection`` being countable and iterable to work directly with each ``File``:
+컬렉션이 완성되면 ``get()``\ 을 사용하여 각 ``File``\ 과의 직접 작업을 위한 countable 과 iterable 이라는 장점을 지닌 ``FileCollection``\ 을 활용할 수 있습니다.
 
 .. literalinclude:: files/013.php
 
-Below are the specific methods for working with a ``FileCollection``.
+다음은 ``FileCollection``\ 으로 작업하는데 사용하는 구체적인 메소드입니다.
 
 *********************
-Starting a Collection
+컬렉션으로 시작하기
 *********************
 
 __construct(string[] $files = [])
 =================================
 
-The constructor accepts an optional array of file paths to use as the initial collection. These are passed to
-``add()`` so any files supplied by child classes in the ``$files`` will remain.
+생성자에 collection으로 사용할 파일 경로를 옵션 배열로 지정 할 수 있습니다. 
+지정된 파일은 ``add()`` 메소드에 전달되며 ``$files``\ 의 자식 클래스에서 제공한 파일은 그대로 유지됩니다.
 
 define()
 ========
 
-Allows child classes to define their own initial files. This method is called by the constructor and allows
-predefined collections without having to use their methods. Example:
+자식 클래스가 자신의 초기 파일을 정의할 수 있습니다. 
+이 메서드는 생성자에 의해 호출되며 메소드를 호출하지 않아도 미리 정의된 컬렉션을 사용할 수 있습니다.
 
 .. literalinclude:: files/014.php
 
-Now you may use the ``ConfigCollection`` anywhere in your project to access all App Config files without
-having to re-call the collection methods every time.
+이제 ``ConfigCollection``\ 을 사용하여 매번 collection 메소드를 다시 호출할 필요 없이 앱의 모든 구성(config) 파일에 액세스할 수 있습니다.
 
 set(array $files)
 =================
 
-Sets the list of input files to the provided string array of file paths. This will remove any existing
-files from the collection, so ``$collection->set([])`` is essentially a hard reset.
+입력 파일 목록을 제공된 파일 경로 문자열 배열로 설정합니다.
+빈 배열을 전달하면 컬렉션에서 기존 파일이 모두 제거되므로 ``$collection->set([])`` 은 기본적으로 하드 리셋입니다.
 
 ***************
 Inputting Files
@@ -64,29 +59,29 @@ Inputting Files
 add(string[]|string $paths, bool $recursive = true)
 ===================================================
 
-Adds all files indicated by the path or array of paths. If the path resolves to a directory then ``$recursive``
-will include sub-directories.
+경로 또는 경로 배열로 표시된 모든 파일을 추가합니다. 
+경로가 디렉터리로 확인되면 ``$recursive``\ 에 하위 디렉터리가 포함됩니다.
 
 addFile(string $file) / addFiles(array $files)
 ==============================================
 
-Adds the file or files to the current list of input files. Files are absolute paths to actual files.
+현재 입력 파일 목록에 파일을 추가합니다. 파일은 실제 파일의 절대 경로입니다.
 
 removeFile(string $file) / removeFiles(array $files)
 ====================================================
 
-Removes the file or files from the current list of input files.
+파일 또는 파일을 현재 입력 파일 목록에서 제거합니다.
 
 addDirectory(string $directory, bool $recursive = false)
 ========================================================
 addDirectories(array $directories, bool $recursive = false)
 ===========================================================
 
-Adds all files from the directory or directories, optionally recursing into sub-directories. Directories are
-absolute paths to actual directories.
+디렉토리 또는 디렉토리에서 모든 파일을 추가하고 선택적으로 하위 디렉토리로 이동합니다.
+디렉토리는 실제 디렉토리의 절대 경로입니다.
 
 ***************
-Filtering Files
+파일 필터링
 ***************
 
 removePattern(string $pattern, string $scope = null)
@@ -94,23 +89,20 @@ removePattern(string $pattern, string $scope = null)
 retainPattern(string $pattern, string $scope = null)
 ====================================================
 
-Filters the current file list through the pattern (and optional scope), removing or retaining matched
-files. ``$pattern`` may be a complete regex (like ``'#[A-Za-z]+\.php#'``) or a pseudo-regex similar
-to ``glob()`` (like ``*.css``).
-If a ``$scope`` is provided then only files in or under that directory will be considered (i.e. files
-outside of ``$scope`` are always retained). When no scope is provided then all files are subject.
-
-Examples:
+현재 파일 목록을 패턴(과 선택적 범위)을 통해 필터링하여 일치하는 파일을 제거하거나 유지합니다. 
+``$pattern``\ 은 완전한 정규식(예: ``'#[A-Za-z]+\.php#'``)이거나 ``glob()``\ 과 유사한 의사-정규식(예: ``*.css``)일 수 있습니다.
+``$scope``\ 가 제공되면 해당 디렉토리 내부 또는 하위의 파일만 고려됩니다.(``$scope`` 외부의 파일은 항상 유지됩니다).
+범위가 제공되지 않으면 모든 파일이 대상이 됩니다.
 
 .. literalinclude:: files/015.php
 
 ****************
-Retrieving Files
+파일 검색
 ****************
 
 get(): string[]
 ===============
 
-Returns an array of all the loaded input files.
+로드된 모든 입력 파일의 배열을 반환합니다.
 
-.. note:: ``FileCollection`` is an ``IteratorAggregate`` so you can work with it directly (e.g. ``foreach ($collection as $file)``).
+.. note:: ``FileCollection``\ 은 ``IteratorAggregate`` 이므로 직접 사용할 수 있습니다 (예: ``foreach ($collection as $file)``).

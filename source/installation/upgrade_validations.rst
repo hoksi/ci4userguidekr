@@ -14,23 +14,24 @@ Documentations of Library
 
 변경된 사항
 =====================
-- 유효성 검사 오류 표시를 변경하려면 CI4 유효성 검사 뷰(view) 템플릿을 설정해야 합니다.
+- 유효성 검사 오류 표시를 변경하려면 CI4 :ref:`유효성 검사 뷰(view) 템플릿 <validation-customizing-error-display>`\ 을 설정해야 합니다.
 - CI4 유효성 검사에는 CI3의 콜백이나 호출 가능이 없습니다.
 - CI4 유효성 검사 형식 규칙은 빈 문자열을 허용하지 않습니다.
 - CI4 유효성 검사는 데이터를 변경하지 않습니다.
+- v4.3.0부터 :php:func:`validation_errors()`\ 가 도입되었지만, CI3와 API가 다릅니다.
 
 Upgrade Guide
 =============
 1. 폼을 포함된 뷰의 다음 항목을 변경합니다.
 
-    - ``<?php echo validation_errors(); ?>`` 대신 ``<?= $validation->listErrors() ?>``
+    - ``<?php echo validation_errors(); ?>`` 대신 ``<?= validation_list_errors() ?>``
 
 2. 컨트롤러의 다음 항목을 변경합니다.
 
     - ``$this->load->helper(array('form', 'url'));`` 대신 ``helper(['form', 'url']);``
     - ``$this->load->library('form_validation');`` 삭제
     - ``if ($this->form_validation->run() == FALSE)`` 대신 ``if (! $this->validate([]))``
-    - ``$this->load->view('myform');`` 대신 ``echo view('myform', ['validation' => $this->validator,]);``
+    - ``$this->load->view('myform');`` 대신 ``return view('myform', ['validation' => $this->validator,]);``
 
 3. 컨트롤러에서 유효성 검사 규칙을 배열로 설정하여 변경합니다.
 
@@ -90,7 +91,7 @@ Path: **app/Views**
     </head>
     <body>
 
-        <?= $validation->listErrors() ?>
+        <?= validation_list_errors() ?>
 
         <?= form_open('form') ?>
 

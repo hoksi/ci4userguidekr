@@ -27,7 +27,7 @@
 
 1. v3 프로젝트에서 순차적 마이그레이션 이름을 사용한다면 타임스탬프로 마이그렝션 이름을 변경해야 합니다.
 2. 모든 마이그레이션 파일을 **app/Database/Migration** 폴더로 옮겨야 합니다.
-3. ``defined('BASEPATH') OR exit('No direct script access allowed');``\ 를 제거합니다.
+3. 만약 ``defined('BASEPATH') OR exit('No direct script access allowed');`` 라인이 존재한다면 제거합니다.
 4. <?php 태그 바로 아래 줄에 ``namespace App\Database\Migrations;``\ 를 추가합니다.
 5. ``namespace App\Database\Migrations;`` 아래에 ``use CodeIgniter\Database\Migration;``\ 을 추가합니다.
 6. ``extends CI_Migration``\ 을 ``extends Migration``\ 으로 대체합니다.

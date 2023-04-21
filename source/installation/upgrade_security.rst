@@ -12,7 +12,7 @@ Documentations
 - :doc:`CodeIgniter 4.X Security 문서 </libraries/security>`
 
 .. note::
-    :doc:`폼(form) 헬퍼 </helpers/form_helper>`\ 를 사용하고 CSRF 필터를 전역적으로 활성화하면 ``form_open()`` 함수는 자동으로 폼에 숨겨진 CSRF 필드를 삽입합니다. 따라서 직접 업그레이드할 필요가 없습니다.
+    :doc:`../helpers/form_helper`\ 를 사용하고 CSRF 필터를 전역적으로 활성화하면 :php:func:`form_open()` 함수는 자동으로 폼에 숨겨진 CSRF 필드를 삽입합니다. 따라서 직접 업그레이드할 필요가 없습니다.
 
 변경된 사항
 =====================

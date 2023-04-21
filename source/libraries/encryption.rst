@@ -25,7 +25,7 @@
 
 .. contents::
 	:local:
-	:depth: 2
+	:depth: 3
 
 .. _usage:
 
@@ -52,19 +52,90 @@ CodeIgniter의 모든 서비스와 마찬가지로 ``Config\Services``\ 를 통�
 
 위의 예는 ``app/Config/Encryption.php``\ 에 있는 구성 설정을 사용합니다.
 
-========== ====================================================
-Option     사용 가능한 값(기본값은 괄호).
-========== ====================================================
-key        암호화 키 스타터
-driver     선호하는 핸들러, ``OpenSSL`` or ``Sodium`` (``OpenSSL``)
-blockSize  SodiumHandler의 패딩 바이트 길이 (``16``)
-digest     메시지 다이제스트 알고리즘 (``SHA512``)
-========== ====================================================
+============== ==========================================================================
+옵션           가능한 값 (괄호 안에는 기본값)
+============== ==========================================================================
+key            암호화 키 스타터
+driver         선호하는 핸들러, 예: OpenSSL 또는 Sodium (``OpenSSL``)
+digest         메시지 다이제스트 알고리즘 (``SHA512``)
+blockSize      [**SodiumHandler** 전용] 바이트 단위의 패딩 길이 (``16``)
+cipher         [**OpenSSLHandler** 전용] 바이트 단위의 패딩 길이 (``16``)
+encryptKeyInfo [**OpenSSLHandler** 전용] 바이트 단위의 패딩 길이 (``16``)
+authKeyInfo    [**OpenSSLHandler** 전용] 바이트 단위의 패딩 길이 (``16``)
+rawData        [**OpenSSLHandler** 전용] 암호문이 원시(raw)인지 여부 (``true``)
+============== ==========================================================================
 
 자신의 구성 객체를 ``Services`` 호출에 전달하여 구성 파일의 설정을 바꿀 수 있습니다.
 ``$config`` 변수는 ``Config\Encryption`` 클래스의 인스턴스여야 합니다.
 
 .. literalinclude:: encryption/003.php
+
+.. _encryption-compatible-with-ci3:
+
+Configuration to Maintain Compatibility with CI3
+------------------------------------------------
+
+.. versionadded:: 4.3.0
+
+Since v4.3.0, you can decrypt data encrypted with CI3's Encryption.
+If you need to decrypt such data, use the following settings to maintain compatibility.
+
+.. literalinclude:: encryption/013.php
+
+Supported HMAC Authentication Algorithms
+----------------------------------------
+
+For HMAC message authentication, the Encryption library supports
+usage of the SHA-2 family of algorithms:
+
+=========== ==================== ============================
+Algorithm   Raw length (bytes)   Hex-encoded length (bytes)
+=========== ==================== ============================
+SHA512      64                   128
+SHA384      48                   96
+SHA256      32                   64
+SHA224      28                   56
+=========== ==================== ============================
+
+The reason for not including other popular algorithms, such as
+MD5 or SHA1 is that they are no longer considered secure enough
+and as such, we don't want to encourage their usage.
+If you absolutely need to use them, it is easy to do so via PHP's
+native `hash_hmac() <http://php.net/manual/en/function.hash-hmac.php>`_ function.
+
+Stronger algorithms of course will be added in the future as they
+appear and become widely available.
+
+.. _encryption-compatible-with-ci3:
+
+CI3와 호환성을 유지하기 위한 구성
+----------------------------------
+
+.. versionadded:: 4.3.0
+
+v4.3.0부터 CI3의 암호화로 암호화된 데이터를 복호화할 수 있습니다.
+이러한 데이터를 복호화해야 하는 경우 호환성을 유지하기 위해 다음 설정을 사용하십시오.
+
+.. literalinclude:: encryption/013.php
+
+지원되는 HMAC 인증 알고리즘
+----------------------------
+
+HMAC 메시지 인증을 위해 Encryption 라이브러리는 SHA-2 계열의 알고리즘 사용을 지원합니다.
+
+=========== ==================== ============================
+알고리즘    원본 길이 (바이트)   16진수 인코딩 길이 (바이트)
+=========== ==================== ============================
+SHA512      64                   128
+SHA384      48                   96
+SHA256      32                   64
+SHA224      28                   56
+=========== ==================== ============================
+
+MD5나 SHA1과 같은 다른 인기 있는 알고리즘을 포함하지 않은 이유는 더 이상 충분히 안전하다고 간주되지 않기 때문에 우리는 사용을 권장하고 싶지 않습니다.
+절대적으로 그들을 사용해야 한다면 PHP의 네이티브 `hash_hmac() <http://php.net/manual/en/function.hash-hmac.php>`_ 함수를 통해 사용할 수 있습니다.
+
+새로운 강력한 알고리즘이 만들어지고 널리 사용 가능해지면 향후에 추가될 것입니다.
 
 기본 행동
 ================
@@ -215,7 +286,7 @@ Class Reference
 
 		자세한 정보는 :ref:`configuration` 섹션을 참조하십시오.
 
-.. php:interface:: CodeIgniter\\Encryption\\EncrypterInterface
+.. php:interface:: CodeIgniter\Encryption\EncrypterInterface
 
 	.. php:method:: encrypt($data[, $params = null])
 

@@ -15,4 +15,4 @@ Upgrading from 4.1.7 to 4.1.8
 Breaking Changes
 ****************
 
-- 보안 문제로 ``API\ResponseTrait``\ 의 트레이트(trait) 메소드의 범위가 ``protected``\ 로 지정됩니다. 자세한 내용은 `보안 권고 <https://github.com/codeigniter4/CodeIgniter4/security/advisories/GHSA-7528-7jg5-6g62>`_\ 를 참조하세요.
+- 보안 문제로 ``API\ResponseTrait``\ 의 트레이트(trait) 메소드의 범위가 ``protected``\ 로 지정됩니다. 자세한 내용은 `보안 권고 GHSA-7528-7jg5-6g62 <https://github.com/codeigniter4/CodeIgniter4/security/advisories/GHSA-7528-7jg5-6g62>`_\ 를 참조하세요.

@@ -312,9 +312,11 @@ verify
 
 .. literalinclude:: curlrequest/032.php
 
+.. _curlrequest-version:
+
 version
 =======
 
-HTTP 프로토콜을 사용하도록 설정하려면 버전 번호를 사용하여 문자열 또는 실수(float)을 전달합니다 (일반적으로 1.0 또는 1.1, 2.0은 현재 지원되지 않습니다).
+HTTP 프로토콜을 사용하도록 설정하려면 버전 번호를 사용하여 문자열 또는 실수(float)을 전달합니다. (일반적으로 ``1.0``, ``1.1``\ 을 지원하며, ``2.0``\ 은 v4.3.0 이상부터 지원됩니다)
 
 .. literalinclude:: curlrequest/033.php

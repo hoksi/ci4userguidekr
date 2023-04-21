@@ -8,8 +8,8 @@
 `CodeIgniter 4 framework <https://github.com/codeigniter4/framework>`_  프레임워크 레파지토리에는 
 릴리스된 버전의 프레임워크가 있으며, 이는 Composer를 사용하지 않으려는 개발자를 위한 것입니다.
 
-``app`` 폴더안에서 앱을 개발하고, ``public`` 폴더는 웹 루트(root)가 됩니다. 
-``system`` 폴더안에 있는 내용은 변경하지 마십시오!
+**app** 폴더안에서 앱을 개발하고, **public** 폴더는 웹 루트(root)가 됩니다. 
+**system** 폴더안에 있는 내용은 변경하지 마십시오!
 
 .. note:: 이 방법은 `CodeIgniter 3 <https://codeigniter.com/userguide3/installation/index.html>`_\ 의 설치 방법과 비슷한 설치 방법입니다. 
 
@@ -35,7 +35,7 @@ Initial Configuration
 업그레이드
 ==========
 
-프레임워크의 새 사본을 다운로드한 다음 ``sysstem`` 폴더를 교체합니다.
+프레임워크의 새 사본을 다운로드한 다음 **sysstem** 폴더를 교체합니다.
 
 :doc:`업그레이드 지침 <upgrading>`\ 을 읽고 변경 사항 및 개선 사항을 확인하십시오.
 
@@ -47,7 +47,7 @@ Download and run.
 단점
 =====
 
-프레임워크 업데이트 시 병합 충돌이 있을수 있습니다.
+**프로젝트의 root, app, public, tests, writable 폴더**\ 의 파일 변경 사항을 확인하고 직접 병합해야 합니다.
 
 구조
 =====
@@ -63,4 +63,4 @@ Download and run.
 
 `번역 파일 <https://github.com/codeigniter4/translations/releases/latest>`_ 다운로드.
 
-다운로드한 zip 파일의 압축을 풀고 그 안에 있는 ``Language`` 폴더 내용을  ``app/Languages`` 폴더에 복사하십시오.
+다운로드한 zip 파일의 압축을 풀고 그 안에 있는 **Language** 폴더 내용을  **app/Languages** 폴더에 복사하십시오.

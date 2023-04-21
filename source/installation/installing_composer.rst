@@ -7,10 +7,14 @@ Composer로 설치
 
 Composer는 CodeIgniter4를 시스템에 여러 가지 방법으로 설치하여 사용할 수 있게해 줍니다.
 
+.. important:: CodeIgniter4는 Composer 2.0.14 이상이 필요합니다.
+
+.. note:: 만약 Composer에 익숙하지 않다면, 먼저 `Basic usage <https://getcomposer.org/doc/01-basic-usage.md>`_\ 를 읽는 것을 권장합니다..
+
 첫 번째 기술은 CodeIgniter4를 사용하여 새 웹앱의 기반으로 사용할 수 있는 스켈레톤(skeleton) 프로젝트를 만드는 방법을 설명합니다.
 두 번째 기술을 사용하면 CodeIgniter4를 기존 웹앱에 추가할 수 있습니다.
 
-.. note:: 만약 당신이 코드를 저장하거나 다른 사람들과 협업하기 위해 Git 저장소를 사용한다면, ``vendor`` 폴더는 일반적으로 "git ignored"\ 에 추가됩니다. 
+.. note:: 만약 당신이 코드를 저장하거나 다른 사람들과 협업하기 위해 Git 저장소를 사용한다면, **vendor** 폴더는 일반적으로 "git ignored"\ 에 추가됩니다. 
           이 경우 레파지토리(repository)에 있는 새 시스템으로 업그레이드 하고 싶다면 ``composer update``\ 를 실행하십시오.
 
 앱 스타터
@@ -24,7 +28,7 @@ Composer는 CodeIgniter4를 시스템에 여러 가지 방법으로 설치하여
 설치
 ----
 
-프로젝트 루트(root) 폴더에서 다음과 같이 입력합니다.
+**프로젝트 루트(root)** 폴더에서 다음과 같이 입력합니다.
 
 ::
 
@@ -38,15 +42,14 @@ Composer는 CodeIgniter4를 시스템에 여러 가지 방법으로 설치하여
     사용할 수 있는 기호는 ``/``, ``_``, ``.``, ``:``, ``\``\ 과 공백(space)입니다.
     따라서 ``(``, ``)`` 등과 같은 특수 문자가 포함된 폴더에 CodeIgniter를 설치하면 CodeIgniter가 작동하지 않습니다.
 
-phpunit과 관련된 composer 종속성이 필요하지 않다면 위 명령에 ``---no-dev`` 옵션을 추가합니다.
+.. important:: 프로덕션 서버에 배포할 때는 다음 명령어를 실행하는 것을 잊지 마세요.
+    
+    ::
 
-``---no-dev`` 옵션이 추가된 경우 composer는 프레임워크에 필요한 세 가지 신뢰할 수 있는 의존성 패키지만 설치합니다.
+    > composer install --no-dev
 
-기본 프로젝트 폴더를 "appstarter"로 지정 하는 설치 
-
-::
-
-    composer create-project codeigniter4/appstarter --no-dev
+    위 명령은 프로덕션 환경에서 필요하지 않은 개발용 Composer 패키지만 제거합니다.
+    이는 vendor 폴더 크기를 크게 줄일 수 있습니다.
 
 Initial Configuration
 ---------------------
@@ -75,9 +78,10 @@ Initial Configuration
 단점
 ----------
 
-업데이투 후 **project space** (root, app, public, writable) 에서 변경 사항을 확인해야 합니다.
+**프로젝트의 root, app, public, writable 폴더**\ 의 파일 변경 사항을 확인하고 직접 병합해야 합니다.
 
-
+.. note:: 프로젝트의 변경 내용 병합을 돕는 몇 가지 서드파티 CodeIgniter 모듈이 있습니다.
+    `Explore on Packagist <https://packagist.org/explore/?query=codeigniter4%20updates>`_.
 
 구조
 ---------
@@ -129,6 +133,15 @@ Installation
 
     > composer require codeigniter4/framework
 
+.. important:: 프로덕션 서버에 배포할 때 다음 명령을 실행하는 것을 잊지 마십시오.
+    
+    ::
+
+    > composer install --no-dev
+
+    위 명령은 프로덕션 환경에서 필요하지 않은 개발용 Composer 패키지만 제거합니다. 
+    vendor 폴더 크기를 크게 줄입니다.
+
 설정(Setup)
 ----------------
 
@@ -162,6 +175,10 @@ Initial Configuration
 -------------
 
 업데이투 후 **project space** (root, app, public, writable) 에서 변경 사항을 확인해야 합니다.
+
+.. note:: There are some third-party CodeIgniter modules available to assist
+    with merging changes to the project space:
+    `Explore on Packagist <https://packagist.org/explore/?query=codeigniter4%20updates>`_.
 
 구조
 -------------

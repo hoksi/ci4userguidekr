@@ -9,7 +9,9 @@ Documentations
 ==============
 
 - `CodeIgniter 3.X 데이터베이스 문서 <http://codeigniter.com/userguide3/database/index.html>`_
-- :doc:`CodeIgniter 4.X 데이터베이스 문서 </database/index>`
+- CI3의 `Database Caching <https://www.codeigniter.com/userguide3/database/caching.html>`_  기능이 제거되었습니다.
+- :doc:`Query Builder <../database/query_builder>`\ 의 메소드 이름은 camelCase로 변경되었으며, 쿼리를 실행하기 전에 초기화해야 합니다.
+
 
 변경된 사항
 =====================
@@ -39,7 +41,7 @@ Upgrade Guide
     - ``$this->db->select_max('age');``\ 를 ``$builder->selectMax('age');``\ 로
     - ``$this->db->join('comments', 'comments.id = blogs.id');``\ 를 ``$builder->join('comments', 'comments.id = blogs.id');``\ 로
     - ``$this->db->having('user_id',  45);``\ 를 ``$builder->having('user_id',  45);``\ 로
-
+6. CI4는 CI3에서 알려진 `Database Caching <https://www.codeigniter.com/userguide3/database/caching.html>`_ 레이어를 제공하지 않으므로, 결과를 캐시해야하는 경우 :doc:`../libraries/caching`\ 을 대신 사용하세요.
 
 Code Example
 ============
