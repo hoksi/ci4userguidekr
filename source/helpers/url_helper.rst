@@ -20,14 +20,17 @@ URL 헬퍼에는 URL 작업을 지원하는 기능이 포함되어 있습니다.
 
 .. php:function:: site_url([$uri = ''[, $protocol = null[, $altConfig = null]]])
 
-    :param    mixed            $uri: URI 문자열 또는 URI 세그먼트 배열
+    :param    array|string            $uri: URI 문자열 또는 URI 세그먼트 배열
     :param    string           $protocol: 프로토콜, 'http' or 'https'
     :param    \\Config\\App    $altConfig: 대체 구성
     :returns: Site URL
     :rtype:   string
 
-    구성 파일에 지정된 사이트 URL을 반환합니다.
-    index.php 파일 (또는 설정 파일에서 사이트 **indexPage**\ 로 설정 한 것)이 함수에 전달하는 URI 세그먼트와 마찬가지로 URL에 추가됩니다.
+        .. note:: v4.3.0 이후, Config\App::$allowedHostnames을 설정하면 현재 URL과 일치하는 경우 해당 URL에 호스트 이름이 설정된 상태로 반환됩니다.
+
+    구성 파일에서 지정한대로 사이트 URL을 반환합니다. 
+    **index.php** 파일(또는 구성 파일에서 사이트 ``Config\App::$indexPage``\ 로 설정한 것)이 URL에 추가되며, 함수에 전달하는 URI 세그먼트도 추가됩니다.
+
 
     URL이 변경될 때 페이지의 이식성이 향상되도록 로컬 URL을 생성해야 할 때 이 기능을 사용하는 것이 좋습니다.
 
@@ -50,16 +53,21 @@ URL 헬퍼에는 URL 작업을 지원하는 기능이 포함되어 있습니다.
 
 .. php:function:: base_url([$uri = ''[, $protocol = null]])
 
-    :param    mixed     $uri: URI 문자열 또는 URI 세그먼트 배열
+    :param    array|string     $uri: URI 문자열 또는 URI 세그먼트 배열
     :param    string    $protocol: 프로토콜, 'http' or 'https'
     :returns: Base URL
     :rtype:   string
+
+    .. note:: v4.3.0 이후, ``Config\App::$allowedHostnames``\ 을 설정하면 현재 URL과 일치하는 경우 해당 URL에 호스트 이름이 설정된 상태로 반환됩니다.
+
+    .. note:: 이전 버전에서는 인수 없이 호출하면 끝에 슬래시(``/``)가 없는 기본 URL을 반환했습니다.
+        버그가 수정되어 v4.3.2 이후에는 끝에 슬래시가 있는 기본 URL을 반환합니다.
 
     구성 파일에 지정된 사이트 base URL을 반환합니다.
     
     .. literalinclude:: url_helper/003.php
 
-    이 함수는 *indexPage*\ 를 추가하지 않고 :php:func:`site_url()`\ 과 같은 것을 반환합니다.
+    이 함수는 ``Config\App::$indexPage``\ 를 추가하지 않고 :php:func:`site_url()`\ 과 같은 것을 반환합니다.
 
     또한 :php:func:`site_url()`\ 과 같이 세그먼트를 문자열 또는 배열로 제공할 수 있습니다.
     
@@ -87,12 +95,20 @@ URL 헬퍼에는 URL 작업을 지원하는 기능이 포함되어 있습니다.
     :returns: 현재 URL
     :rtype:   string|URI
 
-    현재 보고있는 페이지의 전체 URL(세그먼트 포함)을 반환합니다.
-    그러나 보안상의 이유로 ``Config\App`` 설정을 기반으로 생성되며 브라우저 URL과 일치하지 않습니다.
+    현재 보고 있는 페이지의 전체 URL을 반환합니다.
+    문자열을 반환할 때 URL의 쿼리 및 프래그먼트 부분이 제거됩니다.
+    URI를 반환할 때는 쿼리 및 프래그먼트 부분이 보존됩니다.
 
-    .. note:: 이 함수를 호출하는 것은 ``site_url(uri_string());``\ 을 수행하는 것과 같습니다
+    그러나 보안상의 이유로, 브라우저 URL과 일치하지 않도록 ``Config\App`` 설정을 기반으로 만들어집니다.
+
+    v4.3.0부터 ``Config\App::$allowedHostnames``\ 을 설정하면 현재 URL이 일치하는 경우 해당 URL에 호스트 이름이 설정된 URL이 반환됩니다
+
+    .. note:: ``current_url()``\ 를 호출하는 것은 다음 작업을 수행하는 것과 동일합니다.
 
         .. literalinclude:: url_helper/006.php
+            :lines: 2-
+
+    .. important:: v4.1.2 이전에는 이 함수에 버그가 있어 ``Config\App::$indexPage`` 구성을 무시하는 문제가 있었습니다.
 
 .. important:: v4.1.2 이전 버전에서 이 함수는 ``App::$indexPage``\ 의 구성을 무시하는 버그가 있었습니다.
 
@@ -104,9 +120,9 @@ URL 헬퍼에는 URL 작업을 지원하는 기능이 포함되어 있습니다.
 
     사용자가 이전에 방문한 페이지의 전체 URL (세그먼트 포함)을 반환합니다.
 
-    .. note:: HTTP_REFERER 시스템 변수를 맹목적으로 신뢰하는 보안 문제로 인해 CodeIgniter는 사용 가능한 경우 이전에 방문한 페이지를 세션에 저장합니다.
+    .. note:: ``HTTP_REFERER`` 시스템 변수를 맹목적으로 신뢰하는 보안 문제로 인해 CodeIgniter는 사용 가능한 경우 이전에 방문한 페이지를 세션에 저장합니다.
         이를 통해 우리는 항상 알려진 신뢰할 수 있는 출처를 사용합니다.
-        세션이 로드되지 않았거나 사용할 수 없는 경우 안전한 HTTP_REFERER 버전이 사용됩니다.
+        세션이 로드되지 않았거나 사용할 수 없는 경우 안전한 ``HTTP_REFERER`` 버전이 사용됩니다.
 
 .. php:function:: uri_string([$relative = false])
 
@@ -114,7 +130,9 @@ URL 헬퍼에는 URL 작업을 지원하는 기능이 포함되어 있습니다.
     :returns: URI 문자열
     :rtype:   string
 
-    현재 URL의 경로 부분을 반환합니다.
+    현재 URL의 경로 부분을 baseURL을 기준으로 상대적으로 반환합니다.
+    
+    예를 들어, baseURL이 **http://some-site.com/**\ 이고 현재 URL이
         
     ::
 
@@ -126,20 +144,30 @@ URL 헬퍼에는 URL 작업을 지원하는 기능이 포함되어 있습니다.
 
         /blog/comments/123
 
-    또는 상대 파라미터(선택 사항)를 사용
+    baseURL이 **http://some-site.com/subfolder/**\ 이고 현재 URL이
     
     ::
-    
-        app.baseURL = http://some-site.com/subfolder/
 
-        uri_string(); // "/subfolder/blog/comments/123"
-        uri_string(true); // "blog/comments/123"
+        http://some-site.com/subfolder/blog/comments/123
+
+    함수 실행 결과
+    
+    ::
+
+        blog/comments/123
+
+    .. note:: 이전 버전에서는 매개변수 ``$relative = false``\ 가 정의되었습니다.
+        그러나 버그로 인해이 함수는 항상 baseURL과 관련된 경로를 반환했습니다.
+        v4.3.2부터이 매개 변수가 제거되었습니다.
+
+    .. note:: 이전 버전에서 baseURL로 이동하면이 함수는 ``/``\ 을 반환했습니다.
+        v4.3.2부터 버그가 수정되어 빈 문자열(``''``)을 반환합니다.
 
 .. php:function:: index_page([$altConfig = null])
 
-    :param    \Config\App    $altConfig: 사용할 대체 구성
-    :returns: 'index_page' 값
-    :rtype:   mixed
+    :param \\Config\\App $altConfig: 사용할 대체 구성
+    :returns: ``indexPage`` 값
+    :rtype:   string
 
     구성 파일에 지정된 사이트 **indexPage**\ 를 반환합니다.
 
@@ -163,7 +191,7 @@ URL 헬퍼에는 URL 작업을 지원하는 기능이 포함되어 있습니다.
     첫 번째 매개 변수는 URL에 추가할 세그먼트입니다.
     위의 :php:func:`site_url()` 함수와 마찬가지로 세그먼트는 문자열 또는 배열일 수 있습니다.
 
-    .. note:: 어플리케이션 내부에 링크를 작성하는 경우 base URL (`http://...`)을 포함하지 마십시오.
+    .. note:: 어플리케이션 내부에 링크를 작성하는 경우 base URL (``http://...```)을 포함하지 마십시오.
         base URL은 구성 파일에 지정된 정보에서 자동으로 추가됩니다.
         URL에 추가하려는 URI 세그먼트만 포함하십시오.
 
@@ -268,12 +296,12 @@ URL 헬퍼에는 URL 작업을 지원하는 기능이 포함되어 있습니다.
 
     .. literalinclude:: url_helper/016.php
 
-    .. note:: 인식되는 URL은 'www' 또는 '://'로 시작하는 URL입니다.
+    .. note:: 인식되는 URL은 ``www`` 또는 ``://``\ 로 시작하는 URL입니다.
 
 .. php:function:: url_title($str[, $separator = '-'[, $lowercase = false]])
 
     :param    string    $str: 입력 문자열
-    :param    string    $separator: 단어 구분 기호
+    :param    string    $separator: 단어 구분 기호 "(일반적으로 ``'-'`` 또는 ``'_'``)"
     :param    bool      $lowercase: 출력 문자열을 소문자로 변환할지 여부
     :returns: URL-formatted 문자열
     :rtype:   string
@@ -285,7 +313,7 @@ URL 헬퍼에는 URL 작업을 지원하는 기능이 포함되어 있습니다.
 
     두 번째 매개 변수는 단어 분리 문자를 결정합니다.
     기본적으로 대시가 사용됩니다.
-    기본 옵션은 **-** (대시) 또는 **_** (밑줄)입니다.
+    기본 옵션은 ``-`` (대시) 또는 ``_`` (밑줄)입니다.
 
     .. literalinclude:: url_helper/018.php
 
@@ -297,7 +325,7 @@ URL 헬퍼에는 URL 작업을 지원하는 기능이 포함되어 있습니다.
 php:function:: mb_url_title($str[, $separator = '-'[, $lowercase = false]])
 
     :param  string  $str: 입력 문자열
-    :param  string  $separator: 단어 구분 기호 (일반적으로 '-' or '_')
+    :param  string  $separator: 단어 구분 기호 (일반적으로 ``-`` 또는 ``_``)
     :param  bool    $lowercase: 출력 문자열을 소문자로 변환할지 여부를 지정
     :returns: URL-formatted 문자열
     :rtype: string
@@ -308,11 +336,11 @@ php:function:: mb_url_title($str[, $separator = '-'[, $lowercase = false]])
 .. php:function:: prep_url([$str = ''[, $secure = false]])
 
     :param    string   $str: URL 문자열
-    :param    boolean  $secure: true for https://
+    :param    boolean  $secure: true면 ``https://`` 
     :returns: 프로토콜 접두사 URL 문자열
     :rtype:   string
 
-    이 함수는 프로토콜 접두사가 URL에서 누락된 경우 *http://* 또는 *https://*\ 를 추가합니다.
+    이 함수는 프로토콜 접두사가 URL에서 누락된 경우 ``http://`` 또는 ``https://``\ 를 추가합니다.
 
     URL 문자열을 이렇게 함수에 전달합니다.
     
@@ -321,8 +349,8 @@ php:function:: mb_url_title($str[, $separator = '-'[, $lowercase = false]])
 
 .. php:function:: url_to($controller[, ...$args])
 
-    :param  string  $controller: 명명된 경로 또는 Controller::method
-    :param  mixed   ...$args: 라우트에 전달할 하나 이상의 매개변수
+    :param  string  $controller: 라우트 이름 또는 Controller::method
+    :param  mixed   ...$args: 라우트에 전달할 하나 이상의 매개변수. 마지막 매개변수를 사용하여 로케일을 설정할 수 있습니다.
     :returns: 절대 URL
     :rtype: string
 
@@ -337,20 +365,26 @@ php:function:: mb_url_title($str[, $separator = '-'[, $lowercase = false]])
     .. literalinclude:: url_helper/022.php
 
     뷰에 링크를 넣은 후 경로를 변경할 때 유용합니다.
+
+    v4.3.0부터 라우트에서 ``{locale}``\ 를 사용할 때, 마지막 매개변수로 로케일 값을 선택적으로 지정할 수 있습니다.
+
+    .. literalinclude:: url_helper/025.php
     
     자세한 내용은 :ref:`reverse-routing` 또는 :ref:`using-named-routes`\ 를 참조하세요.
 
 .. php:function:: url_is($path)
 
-    :param string $path: 현재 URI 경로인지 확인할 경로
+    :param string $path: 현재 URI 경로를 baseURL에 상대적으로 확인할 URL 경로
     :rtype: boolean
 
     현재 URL의 경로를 지정된 경로와 비교하여 일치하는지 확인합니다.
     
     .. literalinclude:: url_helper/023.php
 
-    위의 예는 ``http://example.com/admin``\ 과 일치합니다. 
-    "*" 와일드카드를 사용하여 URL의 다른 문자와 일치시킬 수 있습니다.
+    이는 **http://example.com/admin**\ 와 일치합니다.
+    만약 baseURL이 ``http://example.com/subdir/``\ 이라면 **http://example.com/subdir/admin**\ 와도 일치합니다.
+    
+    URL에서 다른 적용 가능한 문자를 일치시키기 위해 ``*`` 와일드카드를 사용할 수 있습니다.
     
     .. literalinclude:: url_helper/024.php
 

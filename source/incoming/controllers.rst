@@ -17,6 +17,8 @@
 생성하는 모든 컨트롤러는 ``BaseController`` 클래스를 확장해야 합니다.
 이 클래스는 모든 컨트롤러에서 사용할 수 있는 몇 가지 기능을 제공합니다.
 
+.. _controller-constructor:
+
 생성자(Constructor)
 *******************
 
@@ -139,6 +141,8 @@ $this->validateData()
 Auto Routing (개선)
 ************************
 
+.. versionadded:: 4.2.0
+
 v4.2.0부터 더 안전한 새로운 자동 라우팅이 도입되었습니다.
 
 .. note:: CodeIgniter 3에서 4.1.x까지 기본적으로 활성화된 Auto Routing에 익숙하다면 :ref:`ChangeLog v4.2.0 <v420-new-improved-auto-routing>`\ 에서 차이점을 확인할 수 있습니다.
@@ -208,19 +212,31 @@ BaseController는 구성 요소를 로드하고 모든 사용자가 필요로 �
 .. note:: 시스템은 정의된 경로에 대해 일치 항목을 찾지 못한 경우 **app/Controllers/**\ 의 폴더/파일에 대해 각 세그먼트를 일치시켜 컨트롤러와 URI를 일치시키려고 시도합니다.
     그렇기 때문에 폴더/파일은 반드시 대문자로 시작하고 나머지는 소문자로 시작해야 합니다.
 
+    다른 명명 규칙을 사용하고 싶다면 :ref:`Defined Route Routing <defined-route-routing>`\ 을 사용하여 수동으로 정의해야 합니다.
     다음은 `PSR-4: Autoloader`\ 에 기반으로 한 예입니다. 
 
     .. literalinclude:: controllers/012.php
 
-    다른 명명 규칙을 사용하고 싶다면 :ref:`Defined Route Routing <defined-route-routing>`\ 을 사용하여 수동으로 정의해야 합니다.
+메소드(Method)
+================
 
-메소드
-=========
+메소드 가시성
+-----------------
+
+HTTP 요청을 통해 실행 가능한 메소드를 정의할 때, 해당 메소드는 ``public``\ 으로 선언되어야 합니다.
+
+.. warning:: 보안상의 이유로 새로운 유틸리티 메소드는 ``protected`` 또는 ``private``\ 으로 선언해야 합니다.
+
+디폴트 메소드
+--------------
 
 위 예제에서 메소드 이름은 ``getIndex()``\ 입니다.
-URI의 **두 번째 세그먼트**\ 가 비어 있으면 (HTTP 동사 + ``Index()``) 메소드가 로드됩니다.
+(HTTP 동사 + ``Index()`` 메소드는 **디폴트 메소드**\ 라고 하며, URI의 **두 번째 세그먼트**\ 가 비어있을 경우 로드됩니다.
 
-**URI의 두 번째 세그먼트는 컨트롤러에서 호출할 메소드를 결정합니다.**
+일반적인 메소드
+----------------
+
+URI의 두 번째 세그먼트는 컨트롤러에서 호출되는 메소드를 결정합니다.
 
 컨트롤러에 새로운 메소드를 추가해 봅시다.
 
@@ -235,8 +251,6 @@ URI의 **두 번째 세그먼트**\ 가 비어 있으면 (HTTP 동사 + ``Index(
 
 새로운 메시지가 표시됩니다.
 
-.. warning:: 보안상의 이유로 모든 새로운 유틸리티 메소드는 ``protected`` 또는 ``private``\ 로 선언해야 합니다.
-
 메소드에 URI 세그먼트 전달
 ====================================
 
@@ -250,7 +264,7 @@ URI에 세 개 이상의 세그먼트가 포함되어 있으면 메소드에 매
 
 .. literalinclude:: controllers/022.php
 
-.. important:: :doc:`URI 라우팅 <routing>` 기능을 사용하는 경우 메소드에 전달 된 세그먼트가 다시 라우팅됩니다.
+.. note:: URI에 메소드 매개변수보다 더 많은 매개변수가 있는 경우, 자동 라우팅(개선된)은 해당 메소드를 실행하지 않으며 404 Not Found 오류가 발생합니다.
 
 기본 컨트롤러 정의
 =============================
@@ -378,11 +392,10 @@ BaseController는 구성 요소를 로드하고 모든 컨트롤러에 필요한
     시스템은 정의된 경로에 대해 일치 항목을 찾지 못한 경우 **app/Controllers/**\ 의 폴더/파일에 대해 각 세그먼트를 일치시켜 컨트롤러와 URI를 일치시키려고 시도합니다.
     그렇기 때문에 폴더/파일은 반드시 대문자로 시작하고 나머지는 소문자로 시작해야 합니다.
 
-     다음은 PSR-4 Autoloader를 기반으로 한 예입니다.
+    다른 명명 규칙을 원하면 :ref:`Defined Route Routing <defined-route-routing>`\ 을 사용하여 수동으로 정의해야 합니다.
+    다음은 PSR-4 Autoloader를 기반으로 한 예입니다.
 
     .. literalinclude:: controllers/012.php
-
-    다른 명명 규칙을 원하면 :ref:`Defined Route Routing <defined-route-routing>`\ 을 사용하여 수동으로 정의해야 합니다.
 
 메소드
 =======
@@ -480,6 +493,8 @@ CodeIgniter는 또한 :ref:`Defined Route Routing <defined-route-routing>`\ 을 
 
 메소드 호출 재정의
 **********************
+
+.. note:: **자동 라우팅(개선된)**\ 은 이 기능을 일부러 지원하지 않습니다.
 
 위에서 언급했듯이 URI의 두 번째 세그먼트는 일반적으로 컨트롤러에서 호출되는 메서드를 결정합니다.
 CodeIgniter는 ``_remap()`` 메서드를 사용하여 이 동작을 재정의할 수 있습니다.

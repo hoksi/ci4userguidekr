@@ -4,23 +4,7 @@ HTTP 메시지
 
 Message 클래스는 메시지 본문, 프로토콜 버전, 헤더 작업 유틸리티 및 컨텐츠 협상(content negotiation) 처리 방법을 포함하여 요청 및 응답에 공통적인 HTTP 메시지 부분에 대한 인터페이스를 제공합니다.
 
-이 클래스는 :doc:`Request Class </incoming/request>`\ 와 :doc:`Response Class </outgoing/response>`\ 의 상위 클래스입니다.
-컨텐츠 교섭 메소드와 같은 일부 메소드는 요청(Request)이나 응답(Response)에만 적용되고, 다른 메소드는 적용되지 않을수 있지만, 헤더 메소드를 함께 유지하기 위해 이 문서에 포함되었습니다.
-
-콘텐츠 협상(Content Negotiation)이란?
-========================================
-콘텐츠 협상(Content Negotiation)은, 동일한 리소스를 둘 이상의 콘텐츠 유형으로 서비스하도록 허용하고, 클라이언트가 자신에게 가장 적합한 데이터 유형을 요청할 수 있게 하는 HTTP 규격입니다.
-
-PNG 파일을 표시할 수 없는 브라우저는 GIF 또는 JPEG 이미지를 서버에 요청합니다. 
-서버는 클라이언트가 요청한 사용 가능한 파일 형식을 보고 지원하는 이미지 형식 중에서 가장 일치하는 항목을 선택합니다.
-이 경우엔 JPEG 이미지를 선택합니다.
-
-이 같은 협상은 네 가지 유형의 데이터에서 발생할 수 있습니다:
-
-* **Media/Document Type** - 이미지 형식이거나 HTML, XML, JSON.
-* **Character Set** - 문서의 문자 집합(character ) 설정. 일반적으로 UTF-8.
-* **Document Encoding** - 일반적으로 결과(result)에 사용된 압축 유형.
-* **Document Language** - 여러 언어를 지원하는 사이트의 경우, 이를 통해 반환할 항목을 결정하는 데 도움을 줍니다.
+이 클래스는 :doc:`Request Class <../incoming/request>`\ 와 :doc:`Response Class <../outgoing/response>` 두 클래스가 모두 상속하는 부모 클래스입니다.
 
 ***************
 Class Reference
@@ -60,7 +44,7 @@ Class Reference
         :returns: void
 
         SERVER 데이터에서 찾은 헤더를 스캔하고, 구문 분석하여 나중에 액세스할 수 있도록 저장합니다.
-        이는 :doc:`IncomingRequest Class </incoming/incomingrequest>` 클래스에서 현재 요청의 헤더를 사용 가능하게하는 데 사용됩니다.
+        이는 :doc:`IncomingRequest Class <../incoming/incomingrequest>` 클래스에서 현재 요청의 헤더를 사용 가능하게하는 데 사용됩니다.
 
         헤더는 ``HTTP_HOST``\ 와 같이 ``HTTP_``\ 로 시작하는 모든 SERVER 데이터입니다.
         각 메시지는 대문자와 밑줄 형식에서 첫 글자가 대문자인 단어(ucword)와 대시 형식으로 변환됩니다.

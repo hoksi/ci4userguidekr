@@ -33,13 +33,27 @@ Accessing the Request
 .. note:: ``isAJAX()`` 메소드는 ``X-Requested-With`` 헤더에 의존하며, JavaScript를 통한 XHR 요청은 경우에 따라 기본적으로 헤더가 전송되지 않습니다. (예: fetch). 
     이를 해결하는 방법에 대해서는 :doc:`AJAX 요청(Requests) </general/ajax>`\ 을 참조하십시오.
 
+.. _incomingrequest-is:
+
+is()
+====
+
+.. versionadded:: 4.3.0
+
+v4.3.0 이후로, ``is()`` 메소드를 사용할 수 있습니다. 이 메소드는 부울 값을 반환합니다.
+
+.. literalinclude:: incomingrequest/040.php
+
+getMethod()
+===========
+
 ``getMethod()`` 메소드를 이용하여 요청중인 HTTP 메소드를 확인할 수 있습니다.
 
 .. literalinclude:: incomingrequest/005.php
 
 이 메소드는 기본적으로 소문자(예 : ``get``, ``post``, 등)로 값을 반환합니다.
 
-.. note:: 반환값을 소문자로 변환하는 기능은 사용이 중지되었습니다.
+.. important:: 반환값을 소문자로 변환하는 기능은 사용이 중지되었습니다.
     이것은 앞으로의 버전에서 제거될 것이고, 이 방법은 PSR-7에 적합합니다.
 
 ``strtoupper()``\ 함수를 이용하여 대문자로 변환할 수 있습니다.
@@ -142,6 +156,10 @@ JSON에서 특정 데이터 가져 오기
 
 .. literalinclude:: incomingrequest/013.php
 
+``getRawInputVar()``\ 를 사용하여 원시 스트림에서 지정된 변수를 가져와 필터링할 수 있습니다.
+
+.. literalinclude:: incomingrequest/039.php
+
 입력 데이터 필터링
 ===================
 
@@ -154,7 +172,7 @@ POST 변수를 필터링하면 다음과 같습니다
 
 .. literalinclude:: incomingrequest/014.php
 
-.. important:: 두 번째 매개 변수로 전달된 필터 유형 지원은 위에서 언급한 모든 메소드중 ``getJSON()``\ 을 제외 합니다.
+.. important:: 두 번째 매개 변수로 전달된 필터 유형 지원은 위에서 언급한 모든 메소드중 ``getJSON()``\ 과 ``getRawInput()``\ 을 제외 합니다.
 
 헤더 검색
 ***********
@@ -363,7 +381,6 @@ Class Reference
 
     .. php:method:: getCookie([$index = null[, $filter = null[, $flags = null]]])
 
-        :noindex:
         :param  mixed   $index: COOKIE명
         :param  int     $filter: 적용할 필터 유형, 필터 목록은 `여기 <https://www.php.net/manual/en/filter.filters.php>`__\ 에서 찾을 수 있습니다.
         :param  int     $flags: 적용할 플래그, 플래그 목록은 `여기 <https://www.php.net/manual/en/filter.filters.flags.php>`__\ 에서 찾을 수 있습니다.
@@ -381,7 +398,6 @@ Class Reference
         .. note::  :doc:`Cookie Helper <../helpers/cookie_helper>` 함수 :php:func:`get_cookie()`\ 와 달리 이 메소드는 ``Config\Cookie::$prefix``\ 의 값이 앞에 추가되지 않습니다.
 
     .. php:method:: getServer([$index = null[, $filter = null[, $flags = null]]])
-		:noindex:
 
         :param  mixed   $index: Value name
         :param  int     $filter: 적용할 필터 유형, 필터 목록은 `여기 <https://www.php.net/manual/en/filter.filters.php>`__\ 에서 찾을 수 있습니다.
@@ -409,7 +425,7 @@ Class Reference
 
     .. php:method:: getPath()
 
-        :returns:	    ``$_SERVER['SCRIPT_NAME']``\ 에 상대적인 현재 URI 경로
+        :returns:	    baseURL의 상대적인 현재 URI 경로
         :rtype:	string
 
         ``IncomingRequest::$uri``\ 는 기본 URL에 대한 전체 앱 구성을 인식하지 못할 수 있으므로 "현재 URI"를 결정하는 가장 안전한 메소드입니다.
