@@ -82,6 +82,16 @@ Inflector 헬퍼에는 **영어** 단어를 복수, 단수, camel 등으로 변�
     
     .. literalinclude:: inflector_helper/007.php
 
+. php:function:: decamelize($string)
+
+    :param    string    $string: Input string
+    :returns:    String containing underscores between words
+    :rtype:    string
+
+    camelCase 또는 PascalCase로 작성된 여러 단어를 snake_case로 변환합니다.
+
+    .. literalinclude:: inflector_helper/007.php
+
 .. php:function:: humanize($string[, $separator = '_'])
 
     :param	string	$string: 입력 문자열

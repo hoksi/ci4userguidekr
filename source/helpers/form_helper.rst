@@ -8,15 +8,23 @@ The Form Helper file contains functions that assist in working with forms.
     :local:
     :depth: 2
 
+*************
+Configuration
+*************
+
+v4.3.0 이후로, ``form_helper`` 함수에서 void HTML 요소 (예: ``<input>``)는 기본적으로 HTML5 호환성을 갖도록 변경되었습니다. XHTML 호환성을 유지하려면 **app/Config/DocTypes.php**\ 에서 ``$html5`` 속성을 ``false``\ 로 설정해야 합니다.
+
+*******************
 헬퍼 로드
-===================
+*******************
 
 이 헬퍼는 다음 코드를 사용하여 로드됩니다.
 
 .. literalinclude:: form_helper/001.php
 
+*********************
 이스케이프 필드 값
-=====================
+*********************
 
 폼 요소내의 HTML과 따옴표와 같은 문자를 사용해야 할 때가 있습니다.
 안전하게 이를 처리하려면 :doc:`공통 함수 <../general/common_functions>`\ 의 :php:func:`esc()` 함수를 사용해야 합니다.
@@ -30,13 +38,14 @@ The Form Helper file contains functions that assist in working with forms.
 
 ::
 
-    <input type="text" name="myfield" value="<?= esc($string) ?>" />
+    <input type="text" name="myfield" value="<?= esc($string) ?>" >
 
 .. note:: 이 페이지에 나열된 폼 헬퍼 함수를 사용하고 값을 연관 배열로 전달하면 폼의 값이 자동으로 이스케이프되므로 :php:func:`esc()` 함수를 호출할 필요가 없습니다.
     문자열로 전달할 양식 요소를 직접 만드는 경우에만 사용하십시오.
 
+*******************
 사용 가능한 함수
-===================
+*******************
 
 사용 가능한 함수는 다음과 같습니다.
 
@@ -87,7 +96,7 @@ The Form Helper file contains functions that assist in working with forms.
 
             <form method="post" accept-charset="utf-8" action="http://example.com/index.php/email/send" class="email" id="myform">
 
-        CSRF 필터가 켜져 있으면 ``form_open()`` 은 폼의 시작 부분에 CSRF 필드를 생성합니다.
+        :ref:`CSRF <cross-site-request-forgery>` 필터가 켜져 있으면 ``form_open()`` 은 폼의 시작 부분에 CSRF 필드를 생성합니다.
         csrf_id를 $attribute 배열중 하나로 전달하여 이 필드의 ID를 지정할 수 있습니다.
 
         .. literalinclude:: form_helper/007.php
@@ -97,7 +106,7 @@ The Form Helper file contains functions that assist in working with forms.
         ::
 
             <form action="/u/sign-up" method="post" accept-charset="utf-8">
-            <input type="hidden" id="my-id" name="csrf_field" value="964ede6e0ae8a680f7b8eab69136717d" />
+            <input type="hidden" id="my-id" name="csrf_field" value="964ede6e0ae8a680f7b8eab69136717d">
 
         .. note:: CSRF 필드의 자동 생성을 사용하려면 CSRF 필터를 폼 페이지로 설정해야 합니다. 대부분 ``GET``\ 을  사용하여 요청됩니다.
 
@@ -114,8 +123,8 @@ The Form Helper file contains functions that assist in working with forms.
         ::
 
             <form method="post" accept-charset="utf-8" action="http://example.com/index.php/email/send">
-            <input type="hidden" name="username" value="Joe" />
-            <input type="hidden" name="member_id" value="234" />
+            <input type="hidden" name="username" value="Joe">
+            <input type="hidden" name="member_id" value="234">
 
 .. php:function:: form_open_multipart([$action = ''[, $attributes = ''[, $hidden = []]]])
 
@@ -407,7 +416,7 @@ The Form Helper file contains functions that assist in working with forms.
 
     ::
 
-        <input type="text" name="quantity" value="<?= set_value('quantity', '0'); ?>" size="50" />
+        <input type="text" name="quantity" value="<?= set_value('quantity', '0'); ?>" size="50">
 
     처음 로드할 때 위의 폼에 "0"\ 이 표시됩니다.
 
@@ -445,8 +454,8 @@ The Form Helper file contains functions that assist in working with forms.
 
         Example::
 
-        <input type="checkbox" name="mycheck" value="1" <?= set_checkbox('mycheck', '1'); ?> />
-        <input type="checkbox" name="mycheck" value="2" <?= set_checkbox('mycheck', '2'); ?> />
+        <input type="checkbox" name="mycheck" value="1" <?= set_checkbox('mycheck', '1'); ?>>
+        <input type="checkbox" name="mycheck" value="2" <?= set_checkbox('mycheck', '2'); ?>>
 
 .. php:function:: set_radio($field[, $value = ''[, $default = false]])
 
@@ -461,5 +470,67 @@ The Form Helper file contains functions that assist in working with forms.
 
     Example::
 
-        <input type="radio" name="myradio" value="1" <?= set_radio('myradio', '1', true); ?> />
-        <input type="radio" name="myradio" value="2" <?= set_radio('myradio', '2'); ?> />
+        <input type="radio" name="myradio" value="1" <?= set_radio('myradio', '1', true); ?>>
+        <input type="radio" name="myradio" value="2" <?= set_radio('myradio', '2'); ?>>
+
+.. php:function:: validation_errors()
+
+    .. versionadded:: 4.3.0
+
+    :returns:   유효성 검사 오류
+    :rtype:    array
+
+    Returns the validation errors. First, this function checks the validation errors
+    that are stored in the session. To store the errors in the session, you need to use ``withInput()`` with :php:func:`redirect() <redirect>`.
+
+    The returned array is the same as ``Validation::getErrors()``.
+    See :ref:`Validation <validation-redirect-and-validation-errors>` for details.
+
+    유효성 검사 오류를 반환합니다. 먼저, 이 함수는 세션에 저장된 유효성 검사 오류를 확인합니다. 
+    오류를 세션에 저장하려면 :php:func:`redirect() <redirect>`\ 와 함께 ``withInput()``\ 을 사용해야 합니다.
+    
+    반환된 배열은 ``Validation::getErrors()``\ 와 동일합니다.
+    자세한 내용은 :ref:`Validation <validation-redirect-and-validation-errors>`\ 을 참조하세요.
+
+    Example::
+
+        <?php $errors = validation_errors(); ?>
+
+.. php:function:: validation_list_errors($template = 'list')
+
+    .. versionadded:: 4.3.0
+
+    :param    string    $template: 유효성 검사 템플릿 이름
+    :returns:    유효성 검사 오류의 렌더링된 HTML
+    :rtype:    string
+
+    유효성 검사 오류의 렌더링된 HTML을 반환합니다.
+    
+    매개변수 ``$template``\ 은 유효성 검사 템플릿 이름입니다.
+    자세한 내용은 :ref:`validation-customizing-error-display`\ 을 참조하세요.
+    
+    이 함수는 내부적으로 :php:func:`validation_errors()`\ 를 사용합니다.
+
+    Example::
+
+        <?= validation_list_errors() ?>
+
+.. php:function:: validation_show_error($field, $template = 'single')
+
+    .. versionadded:: 4.3.0
+
+    :param    string    $field: 필드 이름
+    :param    string    $template: 유효성 검사 템플릿 이름
+    :returns:    포맷된 HTML에서 지정된 필드의 단일 오류
+    :rtype:    string
+
+    지정된 필드에 대한 단일 오류를 포맷된 HTML로 반환합니다.
+    
+    매개변수 ``$template``\ 은 유효성 검사 템플릿 이름입니다.
+    자세한 내용은 :ref:`validation-customizing-error-display`\ 을 참조하세요.
+    
+    이 함수는 내부적으로 :php:func:`validation_errors()`\ 를 사용합니다.
+
+    Example::
+
+        <?= validation_show_error('username') ?>
