@@ -1,50 +1,55 @@
 ############
-CLI 개요
+CLI Overview
 ############
 
-CodeIgniter4는 내장 명령 **spark**\ 와 유용한 명령 및 라이브러리를 제공합니다.
-spark 명령을 생성하고 CLI를 통해 컨트롤러를 실행할 수도 있습니다.
+CodeIgniter 4 provides built-in command **spark** and useful commands and library.
+You can also create spark commands, and run controllers via CLI.
 
 .. contents::
     :local:
     :depth: 2
 
-******************
-CLI는 무엇입니까?
-******************
+****************
+What is the CLI?
+****************
 
-명령줄 인터페이스는 컴퓨터와 상호 작용하는 텍스트 기반 메소드입니다.
-자세한 내용은 `위키백과 문서 <https://en.wikipedia.org/wiki/Command-line_interface>`_\ 를 확인하세요.
+The command-line interface is a text-based method of interacting with
+computers. For more information, check the `Wikipedia
+article <https://en.wikipedia.org/wiki/Command-line_interface>`_.
 
 *****************************
-왜 명령줄을 통해 실행합니까?
+Why Run via the Command-Line?
 *****************************
 
-명령줄에서 CodeIgniter를 실행하는 데는 여러 가지 이유가 있지만 항상 명확한 것은 아닙니다.
+There are many reasons for running CodeIgniter from the command-line,
+but they are not always obvious.
 
-- *wget* 또는 *curl*\ 을 사용할 필요 없이 cron 작업을 실행합니다.
-- 권한 설정, 캐시 폴더 정리, 백업 실행 등과 같은 작업을 수행할 수 있는 대화형 "작업(task)"을 만듭니다.
-- 다른 언어로 된 다른 응용 프로그램과 통합합니다. 예를 들어 임의의 C++ 스크립트는 하나의 명령을 호출하고 모델에서 코드를 실행할 수 있습니다!
+-  Run your cron-jobs without needing to use *wget* or *curl*.
+-  Make interactive "tasks" that can do things like set permissions,
+   prune cache folders, run backups, etc.
+-  Integrate with other applications in other languages. For example, a
+   random C++ script could call one command and run code in your models!
 
 ******************
-Spark 명령
+The Spark Commands
 ******************
 
-CodeIgniter는 공식 명령 **spark**\ 와 내장 명령을 제공합니다.
+CodeIgniter ships with the official command **spark** and built-in commands.
 
-spark를 실행하여 도움말을 볼 수 있습니다.
+You can run the spark and see the help:
 
-::
+.. code-block:: console
 
-    > php spark
+    php spark
 
-자세한 내용은 :doc:`spark_commands` 페이지를 참조하세요.
+See the :doc:`spark_commands` page for detailed information.
 
 ***************
-CLI 라이브러리
+The CLI Library
 ***************
 
-CLI 라이브러리는 CLI 인터페이스 작업을 간단하게 만들고, 여러 색상의 텍스트를 터미널 창에 출력하는 쉬운 방법을 제공합니다.
-또한 사용자에게 정보를 묻는 메시지를 표시하여 유연하고 스마트한 도구를 쉽게 구축할 수 있습니다.
+The CLI library makes working with the CLI interface simple.
+It provides easy ways to output text in multiple colors to the terminal window. It also
+allows you to prompt a user for information, making it easy to build flexible, smart tools.
 
-자세한 내용은 :doc:`CLI 라이브러리 </cli/cli_library>` 페이지를 참조하십시오.
+See the :doc:`CLI Library </cli/cli_library>` page for detailed information.

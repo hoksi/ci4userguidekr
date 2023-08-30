@@ -1,46 +1,85 @@
-##########################
-웹 페이지 캐싱(caching)
-##########################
+################
+Web Page Caching
+################
 
-CodeIgniter를 사용하면 최대 성능을 위해 페이지를 캐시할 수 있습니다.
+CodeIgniter lets you cache your pages in order to achieve maximum
+performance.
 
-CodeIgniter는 매우 빠르지만, 페이지에 표시되는 동적 정보의 양은 사용되는 서버 리소스, 메모리 및 처리 주기와 직접적으로 연관되어 페이지 로드 속도에 영향을 줍니다.
-페이지를 캐싱하면 페이지가 완전히 렌더링된 상태로 저장되므로 정적 웹 페이지와 유사한 성능을 얻을 수 있습니다.
+Although CodeIgniter is quite fast, the amount of dynamic information
+you display in your pages will correlate directly to the server
+resources, memory, and processing cycles utilized, which affect your
+page load speeds. By caching your pages, since they are saved in their
+fully rendered state, you can achieve performance much closer to that of
+static web pages.
 
 .. contents::
     :local:
     :depth: 2
 
-캐싱은 어떻게 작동합니까?
-=============================
+How Does Caching Work?
+======================
 
-캐싱은 페이지별로 활성화할 수 있으며 페이지를 캐시 상태를 유지해야 하는 시간을 설정할 수 있습니다.
-페이지가 처음 로드되면 현재 구성된 캐시 엔진을 사용하여 파일로 캐시됩니다.
-그 이후 페이지 로드시, 캐시 파일이 검색되어 요청하는 사용자의 브라우저로 전송됩니다.
-캐시가 만료된 경우 브라우저로 전송되기 전에 삭제되고 새로 고쳐집니다.
+Caching can be enabled on a per-page basis, and you can set the length
+of time that a page should remain cached before being refreshed. When a
+page is loaded for the first time, the page will be cached using the
+currently configured cache engine. On subsequent page loads, the cache
+will be retrieved and sent to the requesting user's browser. If it has
+expired, it will be deleted and refreshed before being sent to the
+browser.
 
-.. note:: 벤치 마크 태그는 캐시되지 않으므로 캐싱이 활성화된 경우에도 페이지 로드 속도를 볼 수 있습니다.
+.. note:: The Benchmark tag is not cached so you can still view your page
+    load speed when caching is enabled.
 
-캐싱 활성화
+Configuring Caching
+===================
+
+Setting Cache Engine
+--------------------
+
+Before using Web Page Caching, you must set the cache engine up by editing
+**app/Config/Cache.php**. See :ref:`libraries-caching-configuring-the-cache`
+for details.
+
+Setting $cacheQueryString
+-------------------------
+
+You can set whether or not to include the query string when generating the cache
+with ``Config\Cache::$cacheQueryString``.
+
+Valid options are:
+
+- ``false``: (default) Disabled. The query string is not taken into account; the
+  same cache is returned for requests with the same URI path but different query
+  strings.
+- ``true``: Enabled, take all query parameters into account. Be aware that this
+  may result in numerous cache generated for the same page over and over
+  again.
+- **array**: Enabled, but only take into account the specified list of query
+  parameters. E.g., ``['q', 'page']``.
+
+Enabling Caching
 ================
 
-캐싱을 사용하려면 컨트롤러 메소드에 다음 코드를 추가하세요.
+To enable caching, put the following tag in any of your controller
+methods:
 
 .. literalinclude:: caching/001.php
 
-여기서 ``$n``\ 은 페이지를 캐시 상태로 유지하려는 시간(**초**)입니다.
+Where ``$n`` is the number of **seconds** you wish the page to remain
+cached between refreshes.
 
-위의 코드는 메소드내 어디든 갈 수 있습니다.
-나타나는 순서의 영향을 받지 않으므로 가장 논리적으로 보이는 곳에 배치하십시오.
-코드가 있으면 페이지는 캐시되기 시작합니다.
+The above tag can go anywhere within a method. It is not affected by
+the order that it appears, so place it wherever it seems most logical to
+you. Once the tag is in place, your pages will begin being cached.
 
-.. important:: 출력(output)에 영향을 줄 수 있는 구성 옵션을 변경하면 캐시 파일을 수동으로 삭제해야 합니다.
+.. important:: If you change configuration options that might affect
+    your output, you have to manually delete your cache.
 
-.. note:: 캐시 파일을 작성하기 전에 **app/Config/Cache.php** 파일의 캐시 엔진을 설정해야 합니다
-
-캐시 삭제
+Deleting Caches
 ===============
 
-더 이상 캐시를 사용 하지 않기 위해 캐싱 코드를 제거하면, 파일이 만료될 때 캐시 파일은 갱신되지 않습니다.
+If you no longer wish to cache a page you can remove the caching tag and
+it will no longer be refreshed when it expires.
 
-.. note:: 태그를 제거해도 캐시는 즉시 삭제되지 않습니다. 정상적으로 만료되어야 합니다.
+.. note:: Removing the tag will not delete the cache immediately. It will
+    have to expire normally.

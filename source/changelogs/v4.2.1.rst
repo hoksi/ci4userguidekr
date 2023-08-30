@@ -15,5 +15,12 @@ BREAKING
 Behavior Changes
 ================
 
-- 제안된 확장자가 유효하지 않은 경우 MIME 유형에서 추측하는 파일 확장자가 변경되었습니다. 이전 버전은 추측이 조기에 종료되고 ``null``\ 을 반환했습니다. 이제 제안된 확장이 제공되고 유효하지 않은 경우 MIME 추측은 MIME 유형에 대한 확장 매핑을 사용하여 계속 확인합니다.
-- 접두사 이름이 붙은 쿠키와 접두사 없이 같은 이름의 쿠키가 있는 경우 이전 ``get_cookie()``\ 는 접두사 없이 쿠키를 반환하는 까다로운 동작을 했습니다. 이제 동작이 버그로 수정되어 변경되었습니다. 자세한 내용은 :ref:`업그레이드 <upgrade-421-get_cookie>`\ 를 참조하세요.
+- Guessing the file extension from the MIME type has been changed if the proposed extension is not valid. Previously, the guessing will early terminate and return ``null``. Now, if a proposed extension is given and is invalid, the MIME guessing will continue checking using the mapping of extension to MIME types.
+- If there is a cookie with a prefixed name and a cookie with the same name without a prefix, the previous ``get_cookie()`` had the tricky behavior of returning the cookie without the prefix. Now the behavior has been fixed as a bug, and has been changed. See :ref:`Upgrading <upgrade-421-get_cookie>` for details.
+
+Bugs Fixed
+**********
+
+See the repo's
+`CHANGELOG_4.2.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/changelogs/CHANGELOG_4.2.md>`_
+for a complete list of bugs fixed.

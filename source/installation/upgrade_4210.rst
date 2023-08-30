@@ -2,11 +2,11 @@
 Upgrading from 4.2.9 to 4.2.10
 ##############################
 
-설치 방법에 해당하는 업그레이드 지침을 참조하십시오.
+Please refer to the upgrade instructions corresponding to your installation method.
 
-- :ref:`Composer 설치 - App Starter 업그레이드 <app-starter-upgrading>`
-- :ref:`Composer 설치 - 기존 프로젝트의 CodeIgniter4 업그레이드 <adding-codeigniter4-upgrading>`
-- :ref:`수동 설치 업그레이드 <installing-manual-upgrading>`
+- :ref:`Composer Installation App Starter Upgrading <app-starter-upgrading>`
+- :ref:`Composer Installation Adding CodeIgniter4 to an Existing Project Upgrading <adding-codeigniter4-upgrading>`
+- :ref:`Manual Installation Upgrading <installing-manual-upgrading>`
 
 .. contents::
     :local:
@@ -15,11 +15,12 @@ Upgrading from 4.2.9 to 4.2.10
 Project Files
 *************
 
-버전 ``4.2.10``\ 은 프로젝트 파일의 실행 코드를 변경하지 않았습니다.
+Version 4.2.10 did not alter any executable code in project files.
 
 All Changes
 ===========
 
-다음은 **프로젝트 공간**\ 에서 변경사항이 있는 모든 파일의 목록입니다. 대부분은 런타임에 영향을 미치지 않는 간단한 주석 또는 형식입니다.
+This is a list of all files in the **project space** that received changes;
+many will be simple comments or formatting that have no effect on the runtime:
 
 * composer.json

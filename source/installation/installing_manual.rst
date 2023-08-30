@@ -1,66 +1,76 @@
-수동 설치
-#########
+Manual Installation
+###################
 
 .. contents::
     :local:
     :depth: 2
 
-`CodeIgniter 4 framework <https://github.com/codeigniter4/framework>`_  프레임워크 레파지토리에는 
-릴리스된 버전의 프레임워크가 있으며, 이는 Composer를 사용하지 않으려는 개발자를 위한 것입니다.
+The `CodeIgniter 4 framework <https://github.com/codeigniter4/framework>`_
+repository holds the released versions of the framework.
+It is intended for developers who do not wish to use Composer.
 
-**app** 폴더안에서 앱을 개발하고, **public** 폴더는 웹 루트(root)가 됩니다. 
-**system** 폴더안에 있는 내용은 변경하지 마십시오!
+Develop your app inside the **app** folder, and the **public** folder
+will be your public-facing document root. Do not change anything inside the **system**
+folder!
 
-.. note:: 이 방법은 `CodeIgniter 3 <https://codeigniter.com/userguide3/installation/index.html>`_\ 의 설치 방법과 비슷한 설치 방법입니다. 
+.. note:: This is the installation technique closest to that described
+   for `CodeIgniter 3 <https://codeigniter.com/userguide3/installation/index.html>`_.
 
-설치 방법
-=============
+Installation
+============
 
-`최신 버전 <https://github.com/CodeIgniter4/framework/releases/latest>`_\ 을 다운로드하고 프로젝트 
-루트(root)에 압축을 풀어주십시오.
+Download the `latest version <https://github.com/CodeIgniter4/framework/releases/latest>`_,
+and extract it to become your project root.
 
-.. note:: CodeIgniter 자동 로더(autoloader)는 특정 운영 체제의 파일 이름에 잘못된 특수 문자를 허용하지 않습니다.
-    사용할 수 있는 기호는 ``/``, ``_``, ``.``, ``:``, ``\``\ 과 공백(space)입니다.
-    따라서 ``(``, ``)`` 등과 같은 특수 문자가 포함된 폴더에 CodeIgniter를 설치하면 CodeIgniter가 작동하지 않습니다.
-
+.. note:: Before v4.4.0, CodeIgniter autoloader did not allow special
+    characters that are illegal in filenames on certain operating systems.
+    The symbols that can be used are ``/``, ``_``, ``.``, ``:``, ``\`` and space.
+    So if you installed CodeIgniter under the folder that contains the special
+    characters like ``(``, ``)``, etc., CodeIgniter didn't work. Since v4.4.0,
+    this restriction has been removed.
 
 Initial Configuration
 =====================
 
-설치 후 몇 가지 초기 구성이 필요합니다.
-자세한 내용은 :ref:`initial-configuration`\ 을 참조하세요.
+After installation, a few initial configurations are required.
+See :ref:`initial-configuration` for the detail.
 
 .. _installing-manual-upgrading:
 
-업그레이드
-==========
+Upgrading
+=========
 
-프레임워크의 새 사본을 다운로드한 다음 **sysstem** 폴더를 교체합니다.
+Download a new copy of the framework, and then replace the **system** folder.
 
-:doc:`업그레이드 지침 <upgrading>`\ 을 읽고 변경 사항 및 개선 사항을 확인하십시오.
+Read the :doc:`upgrade instructions <upgrading>`, and check Breaking Changes and Enhancements.
 
-장점
-=====
+Pros
+====
 
 Download and run.
 
-단점
-=====
+Cons
+====
 
-**프로젝트의 root, app, public, tests, writable 폴더**\ 의 파일 변경 사항을 확인하고 직접 병합해야 합니다.
+You need to check for file changes in the **project space**
+(root, app, public, tests, writable) and merge them by yourself.
 
-구조
-=====
+Structure
+=========
 
-설정 후 프로젝트의 폴더:
+Folders in your project after set up:
 
 - app, public, tests, writable, system
 
-번역 파일 설치
-===================
+Translations Installation
+=========================
 
-번역된 시스템 메시지를 다운로드하여 프로젝트에 추가하여 이용할 수 있습니다.
+If you want to take advantage of the system message translations,
+they can be added to your project in a similar fashion.
 
-`번역 파일 <https://github.com/codeigniter4/translations/releases/latest>`_ 다운로드.
+Download the `latest version of them <https://github.com/codeigniter4/translations/releases/latest>`_.
+Extract the downloaded zip, and copy the **Language** folder contents in it
+to your **app/Languages** folder.
 
-다운로드한 zip 파일의 압축을 풀고 그 안에 있는 **Language** 폴더 내용을  **app/Languages** 폴더에 복사하십시오.
+This would need to be repeated to incorporate any updates
+to the translations.

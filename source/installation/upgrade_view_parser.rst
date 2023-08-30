@@ -8,24 +8,23 @@ Upgrade View Parser
 Documentations
 ==============
 
-- `CodeIgniter 3.X Template Parser 문서 <http://codeigniter.com/userguide3/libraries/parser.html>`_
-- :doc:`CodeIgniter 4.X View Parser 문서 </outgoing/view_parser>`
+- `Template Parser Documentation CodeIgniter 3.X <http://codeigniter.com/userguide3/libraries/parser.html>`_
+- :doc:`View Parser Documentation CodeIgniter 4.X </outgoing/view_parser>`
 
-
-변경된 사항
+What has been changed
 =====================
-- Parser Library의 구현 및 로딩을 변경해야 합니다.
-- Views는 CI3에서 복사할 수 있습니다. 일반적으로 변경이 필요하지 않습니다.
+- You have to change the implementation and loading of the Parser Library.
+- The Views can copied from CI3. Usually no changes there are required.
 
 Upgrade Guide
 =============
-1. View Parser Library 사용시 ``$this->load->library('parser');``\ 를 ``$parser = service('parser');``\ 로 바꿉니다.
-2. 컨트롤러의 렌더 부분을 ``$this->parser->parse('blog_template', $data);``\ 에서 ``return $parser->setData($data)->render('blog_template');``\ 로 변경해야 합니다.
+1. Wherever you use the View Parser Library replace ``$this->load->library('parser');`` with ``$parser = service('parser');``.
+2. You have to change the render part in your controller from ``$this->parser->parse('blog_template', $data);`` to ``return $parser->setData($data)->render('blog_template');``.
 
 Code Example
 ============
 
-CodeIgniter Version 3.11
+CodeIgniter Version 3.x
 ------------------------
 
 .. literalinclude:: upgrade_view_parser/ci3sample/001.php

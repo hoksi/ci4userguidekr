@@ -1,164 +1,184 @@
-###############################
-데이터베이스 마이그레이션
-###############################
+###################
+Database Migrations
+###################
 
-마이그레이션은 체계적인 방식으로 데이터베이스를 변경할 수 있는 편리한 방법입니다.
-SQL을 직접 편집할 수 있지만 다른 개발자에게 실행해야 한다고 알려 주어야 하고, 배포할 때마다 프로덕션 시스템에 대해 어떤 변경 사항을 실행해야 하는지 추적해야 합니다.
+Migrations are a convenient way for you to alter your database in a
+structured and organized manner. You could edit fragments of SQL by hand
+but you would then be responsible for telling other developers that they
+need to go and run them. You would also have to keep track of which changes
+need to be run against the production machines next time you deploy.
 
-데이터베이스 테이블 **migrations**\ 은 이미 실행된 마이그레이션을 추적합니다.
-마이그레이션이 제대로 수행되었는지 확인하고 ``$migration->latest()``\ 를 호출하면 데이터베이스를 최근 상태로 전환합니다. 
-``$migration->setNamespace(null)->latest()``\ 를 사용하면 모든 네임스페이스에서 마이그레이션을 적용합니다.
+The database table **migrations** tracks which migrations have already been
+run, so all you have to do is make sure your migrations are in place and
+run the ``spark migrate`` command to bring the database up to the most recent
+state. You can also use ``spark migrate --all`` to
+include migrations from all namespaces.
 
 .. contents::
-  :local:
-  :depth: 2
+    :local:
+    :depth: 2
 
-***************************
-마이그레이션 파일 이름
-***************************
+********************
+Migration File Names
+********************
 
-각 마이그레이션은 수행된 방법에 따라 앞뒤로 숫자 순서에 따라 실행됩니다.
-각 마이그레이션은 마이그레이션이 생성될 때 타임스탬프를 사용하여 **YYYY-MM-DD-HHIISS** 형식 (예 : **2012-10-31-100537**)으로 번호가 매겨집니다.
-이렇게 하면 팀 환경에서 작업할 때 번호 충돌을 방지할 수 있습니다.
+Each Migration is run in numeric order forward or backwards depending on the
+method taken. Each migration is numbered using the timestamp when the migration
+was created, in **YYYY-MM-DD-HHIISS** format (e.g., **2012-10-31-100537**). This
+helps prevent numbering conflicts when working in a team environment.
 
-마이그레이션 파일의 접두사 뒤에 밑줄과 마이그레이션을 설명하는 이름이 붙습니다.
-연도, 월 및 날짜는 대시, 밑줄로 구분하거나 전혀 구분하지 않을 수 있습니다.
+Prefix your migration files with the migration number followed by an underscore
+and a descriptive name for the migration. The year, month, and date can be separated
+from each other by dashes, underscores, or not at all. For example:
 
 * 2012-10-31-100538_AlterBlogTrackViews.php
 * 2012_10_31_100539_AlterBlogAddTranslations.php
 * 20121031100537_AddBlog.php
 
-*************************
-마이그레이션 만들기
-*************************
+******************
+Create a Migration
+******************
 
-아래는 블로그가 있는 새 사이트의 첫 번째 마이그레이션입니다.
-모든 마이그레이션은 **app/Database/Migrations/** 디렉토리에 있으며 이름은 **2022-01-31-013057_AddBlog.php**\ 와 같습니다.
+This will be the first migration for a new site which has a blog. All
+migrations go in the **app/Database/Migrations/** directory and have names such
+as **2022-01-31-013057_AddBlog.php**.
 
 .. literalinclude:: migration/001.php
 
-데이터베이스 연결 및 데이터베이스 Forge 클래스는 각각 ``$this->db``\ 와 ``$this->forge``\ 를 통해 사용할 수 있습니다.
+The database connection and the database Forge class are both available to you through
+``$this->db`` and ``$this->forge``, respectively.
 
-커맨드 라인 호출을 사용하여 스켈레톤 마이그레이션 파일을 생성할 수 있으며, 이에 대한 자세한 내용은 아래를 참조하십시오.
-자세한 내용은 :ref:`command-line-tools`\ 의 **make:migration**\ 을 참조하세요.
+Alternatively, you can use a command-line call to generate a skeleton migration file.
+See **make:migration** in :ref:`command-line-tools` for more details.
 
-.. note:: 마이그레이션 클래스는 PHP 클래스이므로 클래스 이름은 모든 마이그레이션 파일에서 유일(unique)해야 합니다.
+.. note:: Since the migration class is a PHP class, the classname must be unique in every migration file.
 
-외래 키(Foreign Key)
-======================
+Foreign Keys
+============
 
-테이블에 외래 키가 포함되어 있으면 테이블과 컬럼을 삭제하려고 할 때 마이그레이션으로 인해 문제가 발생할 수 있습니다.
-마이그레이션을 실행하는 동안 외래 키 검사를 일시적으로 무시하려면 데이터베이스 연결에서 ``disableForeignKeyChecks()``\ 와 ``enableForeignKeyChecks ()`` 메소드를 사용하십시오.
+When your tables include Foreign Keys, migrations can often cause problems as you attempt to drop tables and columns.
+To temporarily bypass the foreign key checks while running migrations, use the ``disableForeignKeyChecks()`` and
+``enableForeignKeyChecks()`` methods on the database connection.
 
 .. literalinclude:: migration/002.php
 
-데이터베이스 그룹
-=======================
+Database Groups
+===============
 
-마이그레이션은 단일 데이터베이스 그룹에 대해서만 실행됩니다.
-**app/Config/Database.php**\ 에 여러 그룹이 정의되어 있으면 ``$defaultGroup``\ 에 지정된 그룹에 대해 마이그레이션이 실행됩니다.
-데이터베이스 그룹마다 다른 스키마가 필요할 수 있습니다.
-모든 일반 사이트 정보에 사용되는 하나의 데이터베이스와 미션 크리티컬 데이터에 사용되는 다른 데이터베이스가 있을 수 있습니다.
-마이그레이션에서 ``$DBGroup`` 속성을 설정하여 적절한 그룹에 대해서만 마이그레이션을 실행할 수 있습니다.
-이 이름은 데이터베이스 그룹의 이름과 정확히 일치해야합니다.
+A migration will only be run against a single database group. If you have multiple groups defined in
+**app/Config/Database.php**, then it will run against the ``$defaultGroup`` as specified
+in that same configuration file. There may be times when you need different schemas for different
+database groups. Perhaps you have one database that is used for all general site information, while
+another database is used for mission critical data. You can ensure that migrations are run only
+against the proper group by setting the ``$DBGroup`` property on your migration. This name must
+match the name of the database group exactly:
 
 .. literalinclude:: migration/003.php
 
-네임스페이스
-================
+Namespaces
+==========
 
-마이그레이션 라이브러리는 디렉토리 이름과 일치하는 ``$psr4`` 속성을 사용하여 **app/Config/Autoload.php** 내에 정의하거나 Composer와 같은 외부 소스에서 로드한 모든 네임스페이스를 자동으로 스캔할 수 있습니다.
-**Database/Migrations**\ 에서 찾은 모든 마이그레이션이 포함됩니다.
+The migration library can automatically scan all namespaces you have defined within
+**app/Config/Autoload.php** or loaded from an external source like Composer, using
+the ``$psr4`` property for matching directory names. It will include all migrations
+it finds in **Database/Migrations**.
 
-각 네임스페이스에는 고유한 버전 순서가 있으므로 다른 네임스페이스에 영향을 주지 않고 각 모듈(네임스페이스)을 업그레이드하고 다운그레이드할 수 있습니다.
+Each namespace has its own version sequence, this will help you upgrade and downgrade each module (namespace) without affecting other namespaces.
 
-예를 들어, Autoload 구성 파일에 다음 네임스페이스가 정의되어 있다고 가정합니다.
+For example, assume that we have the following namespaces defined in our Autoload
+configuration file:
 
 .. literalinclude:: migration/004.php
 
-**APPPATH/Database/Migrations** 와 **ROOTPATH/MyCompany/Database/Migrations**\ 에 있는 모든 마이그레이션을 찾습니다.
-따라서 재사용 가능한 모듈식 코드 스위트에 마이그레이션을 간편하게 포함할 수 있습니다.
-
-*************
-사용 예제
-*************
-
-아래 예제에는 **app/Controllers/Migrate.php**\ 에 스키마를 업데이트하는 간단한 코드가 있습니다.
-
-.. literalinclude:: migration/005.php
+This will look for any migrations located at both **APPPATH/Database/Migrations** and
+**ROOTPATH/MyCompany/Database/Migrations**. This makes it simple to include migrations in your
+re-usable, modular code suites.
 
 .. _command-line-tools:
 
 *******************
-Command-Line 툴
+Command-Line Tools
 *******************
-CodeIgniter는 마이그레이션 작업에 도움이되는 커맨드 라인에서 사용할 수있는 몇 가지 :doc:`명령 </cli/spark_commands>`\ 과 함께 제공됩니다.
-이러한 도구는 마이그레이션을 사용할 필요는 없지만 사용하려는 사람들이 쉽게 사용할 수 있습니다.
-이 도구는 주로 MigrationRunner 클래스에서 사용할 수 있는 동일한 메소드에 대한 액세스를 제공합니다.
+
+CodeIgniter ships with several :doc:`commands </cli/spark_commands>` that are available from the command line to help
+you work with migrations. These tools make things easier for those of you
+that wish to use them. The tools primarily provide access to the same methods that are available within the MigrationRunner class.
 
 migrate
 =======
 
-사용 가능한 모든 마이그레이션으로 데이터베이스 그룹을 마이그레이션
+Migrates a database group with all available migrations:
 
-::
+.. code-block:: console
 
-    > php spark migrate
+    php spark migrate
 
-다음 옵션과 함께 (migrate)를 사용할 수 있습니다:
+You can use (migrate) with the following options:
 
-- ``-g`` - 데이터베이스 그룹을 선택, 그렇지 않으면 기본 데이터베이스 그룹이 사용됩니다.
-- ``-n`` - 네임스페이스 선택, 그렇지 않으면 App 네임스페이스가 사용됩니다.
-- ``--all`` - 모든 네임스페이스를 최신 마이그레이션으로 마이그레이션합니다.
+- ``-g`` - to chose database group, otherwise default database group will be used.
+- ``-n`` - to choose namespace, otherwise (App) namespace will be used.
+- ``--all`` - to migrate all namespaces to the latest migration.
 
-다음 예제는 ``test`` 데이터베이스 그룹을 ``Acme\Blog`` 네임스페이스를 가진 데이터베이스 그룹으로 마이그레이션합니다.
+This example will migrate ``Acme\Blog`` namespace with any new migrations on the test database group:
 
-::
+For Unix:
 
-    > php spark migrate -g test -n 'Acme\Blog'
+.. code-block:: console
 
-``--all`` 옵션을 사용하면 실행되지 않은 마이그레이션을 찾기 위해 모든 네임스페이스를 검색합니다.
-이들은 모두 수집된 다음 생성된 날짜별로 그룹으로 정렬되며, 기본 어플리케이션과 모듈의 잠재적 충돌을 최소화합니다.
+    php spark migrate -g test -n Acme\\Blog
+
+For Windows:
+
+.. code-block:: console
+
+    php spark migrate -g test -n Acme\Blog
+
+When using the ``--all`` option, it will scan through all namespaces attempting to find any migrations that have
+not been run. These will all be collected and then sorted as a group by date created. This should help
+to minimize any potential conflicts between the main application and any modules.
 
 rollback
 ========
 
-모든 마이그레이션을 롤백하여 데이터베이스 그룹을 빈 슬레이트(blan slate)로 전환하고 마이그레이션 효과를 0으로 합니다.
+Rolls back all migrations, taking the database group to a blank slate, effectively migration 0:
 
-::
+.. code-block:: console
 
-  > php spark migrate:rollback
+  php spark migrate:rollback
 
-다음 옵션과 함께 (rollback)을 사용할 수 있습니다:
+You can use (rollback) with the following options:
 
-- ``-g`` - 데이터베이스 그룹 선택, 선택하지 않은 경우 기본(default) 데이터베이스 그룹을 사용합니다.
-- ``-b`` - 배치(batch) 버전 선택: 버전이 음수면 현재 버전을 기준으로 이전 버전 배치를 선택합니다.
-- ``-f`` -  바이패스 확인 질문을 강요, 프로덕션 환경에서만 질문합니다.
+- ``-g`` - to choose database group, otherwise default database group will be used.
+- ``-b`` - to choose a batch: natural numbers specify the batch.
+- ``-f`` - to force a bypass confirmation question, it is only asked in a production environment.
 
 refresh
 =======
 
-먼저 모든 마이그레이션을 롤백한 후 모두 마이그레이션하여 데이터베이스 상태를 새로 고칩니다.
+Refreshes the database state by first rolling back all migrations, and then migrating all:
 
-::
+.. code-block:: console
 
-  > php spark migrate:refresh
+  php spark migrate:refresh
 
-다음 옵션으로 (refresh)을 사용할 수 있습니다:
+You can use (refresh) with the following options:
 
-- ``-g`` - 데이터베이스 그룹 선택, 선택하지 않은 경우 기본(default) 데이터베이스 그룹을 사용합니다.
-- ``-n`` - 네임스페이스 선택, 선택하지 않은 경우 App 네임스페이스가 사용됩니다.
-- ``--all`` - 모든 네임스페이스 새로 고침
-- ``-f`` - 바이패스 확인 질문을 강요, 프로덕션 환경에서만 질문합니다.
+- ``-g`` - to choose database group, otherwise default database group will be used.
+- ``-n`` - to choose namespace, otherwise (App) namespace will be used.
+- ``--all`` - to refresh all namespaces.
+- ``-f`` - to force a bypass confirmation question, it is only asked in a production environment.
 
 status
 ======
 
-모든 마이그레이션 및 실행한 날짜와 시간의 목록 또는 실행되지 않은 경우 '--'를 표시합니다.
+Displays a list of all migrations and the date and time they ran, or '--' if they have not been run:
 
-::
+.. code-block:: console
 
-  > php spark migrate:status
+  php spark migrate:status
+
+  ...
+
   +----------------------+-------------------+-----------------------+---------+---------------------+-------+
   | Namespace            | Version           | Filename              | Group   | Migrated On         | Batch |
   +----------------------+-------------------+-----------------------+---------+---------------------+-------+
@@ -167,42 +187,45 @@ status
   | CodeIgniter\Settings | 2021-11-14-143905 | AddContextColumn      | default | 2022-04-06 01:23:08 | 1     |
   +----------------------+-------------------+-----------------------+---------+---------------------+-------+
 
-다음 옵션과 함께 (status)를 사용할 수 있습니다:
+You can use (status) with the following options:
 
-- ``-g`` - 데이터베이스 그룹을 선택, 그렇지 않으면 기본 데이터베이스 그룹 사용
+- ``-g`` - to choose database group, otherwise default database group will be used.
 
 make:migration
 ==============
 
-**app/Database/Migrations**\ 에 스켈레톤 마이그레이션 파일을 생성합니다.
-현재 타임 스탬프를 자동으로 추가합니다.
-클래스 이름은 파스칼 케이스 버전의 파일 이름입니다.
+Creates a skeleton migration file in **app/Database/Migrations**.
+It automatically prepends the current timestamp. The class name it
+creates is the Pascal case version of the filename.
 
-::
+.. code-block:: console
 
-  > php spark make:migration <class> [options]
+  php spark make:migration <class> [options]
 
+You can use (``make:migration``) with the following options:
 
-다음 옵션으로 (make:migration) 사용할 수 있습니다:
+- ``--namespace`` - Set root namespace. Default: ``APP_NAMESPACE``.
+- ``--suffix``    - Append the component title to the class name.
 
-- ``--session``   - 데이터베이스 세션에 대한 마이그레이션 파일을 생성합니다.
-- ``--table``     - 데이터베이스 세션에 사용할 테이블 이름입니다. 기본 값: ``ci_sessions``.
-- ``--dbgroup``   - 데이터베이스 세션에 사용할 데이터베이스 그룹입니다. 기본 값: ``default``.
-- ``--namespace`` - root namespace 설정. 기본 값: ``APP_NAMESPACE``.
-- ``--suffix``    - 클래스 이름에 구성 요소 제목을 추가합니다.
+The following options are also available to generate the migration file for
+database sessions:
 
-****************************
-마이그레이션 환경 설정
-****************************
+- ``--session``   - Generates the migration file for database sessions.
+- ``--table``     - Table name to use for database sessions. Default: ``ci_sessions``.
+- ``--dbgroup``   - Database group to use for database sessions. Default: ``default``.
 
-다음은 **app/Config/Migrations.php**\ 에서 사용 가능한 마이그레이션에 대한 모든 구성 옵션 표입니다.
+*********************
+Migration Preferences
+*********************
+
+The following is a table of all the config options for migrations, available in **app/Config/Migrations.php**.
 
 ========================== ====================== ========================== =============================================================
 Preference                 Default                Options                    Description
 ========================== ====================== ========================== =============================================================
-**enabled**                true                   true / false               마이그레이션을 활성화 또는 비활성화
-**table**                  migrations             None                       스키마 버전 번호를 저장하기 위한 테이블 이름
-**timestampFormat**        Y-m-d-His\_                                       마이그레이션을 만들 때 타임 스탬프에 사용할 형
+**enabled**                true                   true / false               Enable or disable migrations.
+**table**                  migrations             None                       The table name for storing the schema version number.
+**timestampFormat**        Y-m-d-His\_                                       The format to use for timestamps when creating a migration.
 ========================== ====================== ========================== =============================================================
 
 ***************
@@ -213,63 +236,63 @@ Class Reference
 
 .. php:class:: MigrationRunner
 
-	.. php:method:: findMigrations()
+    .. php:method:: findMigrations()
 
-		:returns:	마이그레이션 파일의 배열
-		:rtype:	array
+        :returns:    An array of migration files
+        :rtype:    array
 
-		**path** 속성에있 는 마이그레이션 파일 이름 배열이 반환됩니다.
+        An array of migration filenames are returned that are found in the ``path`` property.
 
-	.. php:method:: latest($group)
+    .. php:method:: latest($group)
 
-		:param	mixed	$group: 데이터베이스 그룹 이름, null이 사용되는 경우 기본 데이터베이스 그룹
-		:returns:	``true``\ 면 성공, ``flase``\ 면 실패
-		:rtype:	bool
+        :param    mixed    $group: database group name, if null default database group will be used.
+        :returns:    ``true`` on success, ``false`` on failure
+        :rtype:    bool
 
-		네임스페이스 (또는 모든 네임스페이스)에 대한 마이그레이션을 찾고 아직 실행되지 않은 마이그레이션을 결정하고, 버전(혼합된 네임스페이스) 순서대로 실행합니다.
+        This locates migrations for a namespace (or all namespaces), determines which migrations
+        have not yet been run, and runs them in order of their version (namespaces intermingled).
 
-	.. php:method:: regress($targetBatch, $group)
+    .. php:method:: regress($targetBatch, $group)
 
-		:param	int	$targetBatch: 이전 배치로 마이그레이션; 1+는 배치를 지정하고, 0은 모두 되돌리기, 음수는 상대 배치를 나타냅니다 (예 : -3은 "세 개의 배치를 의미합니다").
-		:param	?string	$group: 데이터베이스 그룹 이름, null이 사용되는 경우 기본 데이터베이스 그룹
-		:returns:	``true``\ 면 성공, ``flase``\ 면 실패 또는 이전 마이그레이션이 없음
-		:rtype:	bool
+        :param    int    $targetBatch: previous batch to migrate down to; 1+ specifies the batch, 0 reverts all, negative refers to the relative batch (e.g., -3 means "three batches back")
+        :param    ?string    $group: database group name, if null default database group will be used.
+        :returns:    ``true`` on success, ``false`` on failure or no migrations are found
+        :rtype:    bool
 
-		회기(Regress)를 사용하여 변경 사항을 배치별 이전 상태로 롤백할 수 있습니다.
+        Regress can be used to roll back changes to a previous state, batch by batch.
 
-		.. literalinclude:: migration/006.php
+        .. literalinclude:: migration/006.php
 
-	.. php:method:: force($path, $namespace, $group)
+    .. php:method:: force($path, $namespace, $group)
 
-		:param	mixed	$path:  유효한 마이그레이션 파일의 경로
-		:param	mixed	$namespace: 제공된 마이그레이션의 네임스페이스
-		:param	mixed	$group: 데이터베이스 그룹 이름, null이 사용되는 경우 기본 데이터베이스 그룹
-		:returns:	``true``\ 면 성공, ``flase``\ 면 실패
-		:rtype:	bool
+        :param    mixed    $path:  path to a valid migration file.
+        :param    mixed    $namespace: namespace of the provided migration.
+        :param    mixed    $group: database group name, if null default database group will be used.
+        :returns:    ``true`` on success, ``false`` on failure
+        :rtype:    bool
 
-		순서나 배치에 관계없이 단일 파일이 마이그레이션됩니다. 
-		이미 마이그레이션되었는지 여부에 따라 "up" 또는 "down" 메소드가 감지됩니다.
-		
-		.. note:: 이 메소드는 테스트에만 권장되며 데이터 일관성 문제가 발생할 수 있습니다.
+        This forces a single file to migrate regardless of order or batches. Method ``up()`` or ``down()`` is detected based on whether it has already been migrated.
 
-	.. php:method:: setNamespace($namespace)
+        .. note:: This method is recommended only for testing and could cause data consistency issues.
 
-	  :param  string|null  $namespace: 어플리케이션 네임스페이스. ``null``\ 은 모든 네임스페이스
-	  :returns:   MigrationRunner instance
-	  :rtype:     CodeIgniter\\Database\\MigrationRunner
+    .. php:method:: setNamespace($namespace)
 
-	  라이브러리에서 마이그레이션 파일을 찾아야 하는 네임스페이스를 설정합니다.
-	  
-	  .. literalinclude:: migration/007.php
+        :param  string|null  $namespace: application namespace. ``null`` is all namespaces.
+        :returns:   The current MigrationRunner instance
+        :rtype:     CodeIgniter\\Database\\MigrationRunner
 
-	  .. note:: ``null``\ 을 설정하면 모든 네임스페이스에서 마이그레이션 파일을 찾습니다.
+        Sets the namespace the library should look for migration files:
 
-	.. php:method:: setGroup($group)
+        .. literalinclude:: migration/007.php
 
-	  :param  string  $group: 데이터베이스 그룹 이름
-	  :returns:   MigrationRunner instance
-	  :rtype:     CodeIgniter\\Database\\MigrationRunner
+        .. note:: If you set ``null``, it looks for migration files in all namespaces.
 
-	  라이브러리에서 마이그레이션 파일을 찾을 그룹을 설정합니다.
-	  
-	  .. literalinclude:: migration/008.php
+    .. php:method:: setGroup($group)
+
+        :param  string  $group: database group name.
+        :returns:   The current MigrationRunner instance
+        :rtype:     CodeIgniter\\Database\\MigrationRunner
+
+        Sets the group the library should look for migration files:
+
+        .. literalinclude:: migration/008.php

@@ -1,18 +1,10 @@
-################
-뷰 셀(View Cell)
-################
+##########
+View Cells
+##########
 
-많은 응용 프로그램에서는 페이지 간이나 페이지의 다른 위치에서 반복해서 사용되는 작은 뷰 조각이 있습니다. 
-이러한 것들은 보통 도움말 상자, 탐색 컨트롤, 광고, 로그인 양식 등입니다. 
-CodeIgniter는 이러한 표시 블록의 로직을 View Cell 내에 캡슐화할 수 있도록 해줍니다. 
-이들은 기본적으로 다른 뷰에 포함될 수 있는 미니 뷰입니다. 
-셀별 디스플레이 로직을 처리하는 논리를 내장할 수 있습니다. 
-각 셀의 로직을 별도의 클래스로 분리하여 뷰를 더 가독성 있게 만들고 유지보수성을 높일 수 있습니다.
+Many applications have small view fragments that can be repeated from page to page, or in different places on the pages. These are often help boxes, navigation controls, ads, login forms, etc. CodeIgniter lets you encapsulate the logic for these presentation blocks within View Cells. They are basically mini-views that can be included in other views. They can have logic built in to handle any cell-specific display logic. They can be used to make your views more readable and maintainable by separating the logic for each cell into its own class.
 
-CodeIgniter는 두 가지 유형의 View Cell을 지원합니다. 
-Simple View Cell과 Controlled View Cell입니다. 
-Simple View Cell은 사용자가 선택한 클래스 및 메서드에서 생성할 수 있으며, 반환하는 문자열을 제외하고는 규칙을 따르지 않아도 됩니다. 
-Controlled View Cell은 ``Codeigniter\View\Cells\Cell`` 클래스를 확장한 클래스에서 생성해야 하며, 이를 통해 View Cell을 더 유연하고 빠르게 사용할 수 있도록 기능을 제공합니다.
+CodeIgniter supports two types of View Cells: simple and controlled. Simple View Cells can be generated from any class and method of your choice and does not have to follow any rules, except that it must return a string. Controlled View Cells must be generated from a class that extends ``Codeigniter\View\Cells\Cell`` class which provides additional capability making your View Cells more flexible and faster to use.
 
 .. contents::
     :local:
@@ -21,288 +13,151 @@ Controlled View Cell은 ``Codeigniter\View\Cells\Cell`` 클래스를 확장한 �
 .. _app-cells:
 
 *******************
-View Cell 호출
+Calling a View Cell
 *******************
 
-어떤 유형의 View Cell을 사용하더라도 ``view_cell()`` 도우미 메소드를 사용하여 어떤 뷰에서든 호출할 수 있습니다. 
-첫 번째 매개 변수는 호출할 클래스 및 메서드의 이름이며, 두 번째 매개 변수는 메서드에 전달할 매개 변수 배열입니다. 
-메소드는 문자열을 반환해야 하며, ``view_cell()`` 메소드가 호출된 뷰에 삽입됩니다.
+No matter which type of View Cell you are using, you can call it from any view by using the ``view_cell()`` helper function.
 
-::
+The first parameter is the name of the class and method to call, and the second parameter is an array of parameters to pass to the method:
 
-    <?= view_cell('App\Cells\MyClass::myMethod', ['param1' => 'value1', 'param2' => 'value2']); ?>
+.. literalinclude:: view_cells/001.php
 
-클래스의 이름이 전체 네임스페이스를 포함하지 않으면, ``App\Cells`` 네임스페이스에서 찾는 것으로 가정합니다. 
-따라서 다음 예제에서는 ``MyClass`` 클래스를 ``app/Cells/MyClass.php``\ 에서 찾으려고 시도합니다. 
-그러나 그곳에서 찾을 수 없으면, 모든 네임스페이스가 스캔되며, 각 네임스페이스의 ``Cells`` 하위 디렉토리에서 검색됩니다.
+The Cell method must return a string, which will be inserted into the view where the ``view_cell()`` function was called.
 
-::
+Namespace Omission
+==================
 
-    <?= view_cell('MyClass::myMethod', ['param1' => 'value1', 'param2' => 'value2']); ?>
+.. versionadded:: 4.3.0
 
-키/값 문자열로 매개 변수를 전달할 수 있습니다.
+If you do not include the full namespace for the class, it will assume in can be found in the ``App\Cells`` namespace. So, the following example would attempt to find the ``MyClass`` class in **app/Cells/MyClass.php**. If it is not found there, all namespaces will be scanned until it is found, searching within a **Cells** subdirectory of each namespace:
 
-::
+.. literalinclude:: view_cells/002.php
 
-    <?= view_cell('MyClass::myMethod', 'param1=value1, param2=value2'); ?>
+Passing Parameters as Key/Value String
+======================================
+
+You can also pass the parameters along as a key/value string:
+
+.. literalinclude:: view_cells/003.php
 
 ************
-Simple 셀
+Simple Cells
 ************
 
-Simple 셀은 선택한 메소드에서 문자열을 반환하는 클래스입니다. 
-간단한 알림 메시지 셀의 예는 다음과 같습니다.
+Simple Cells are classes that return a string from the chosen method. An example of a simple Alert Message cell might look like this:
 
-::
+.. literalinclude:: view_cells/004.php
 
-    namespace App\Cells;
+You would call it from within a view like:
 
-    class AlertMessage
-    {
-        public function show($params): string
-        {
-            return "<div class="alert alert-{$params['type']}">{$params['message']}</div>";
-        }
-    }
+.. literalinclude:: view_cells/005.php
 
-뷰 안에서 다음과 같이 호출할 수 있습니다.
+Additionally, you can use parameter names that match the parameter variables in the method for better readability.
+When you use it this way, all of the parameters must always be specified in the view cell call:
 
-::
+.. literalinclude:: view_cells/006.php
 
-    <?= view_cell('AlertMessage::show', ['type' => 'success', 'message' => 'The user has been updated.']); ?>
-
-또한, 매개변수 이름을 메소드 내의 변수명과 일치시켜 가독성을 높일 수도 있습니다.
-이 방식을 사용할 경우, 모든 매개변수는 뷰 셀을 호출할 때 항상 지정되어야 합니다.
-
-::
-
-    <?= view_cell('\App\Libraries\Blog::recentPosts', 'category=codeigniter, limit=5') ?>
-
-    public function recentPosts(string $category, int $limit)
-    {
-        $posts = $this->blogModel->where('category', $category)
-                                 ->orderBy('published_on', 'desc')
-                                 ->limit($limit)
-                                 ->get();
-
-        return view('recentPosts', ['posts' => $posts]);
-    }
+.. literalinclude:: view_cells/007.php
 
 .. _controlled-cells:
 
 ****************
-Controlled 셀
+Controlled Cells
 ****************
-
-Controlled Cell은 두 가지 주요 목표(셀을 가능한 빠르게 빌드하고, 뷰가 필요할 경우 추가적인 로직과 유연성을 제공)가 있습니다.
-클래스는 ``CodeIgniter\View\Cells\Cell``\ 을 확장해야 하고 같은 폴더 안에 뷰 파일이 있어야 합니다.
-규칙에 따라 클래스 이름은 PascalCase로 뷰 파일은 클래스 이름의 snake_cased로 만들어야 합니다.
-클래스 ``MyCell``\ 이 있다면, 뷰 파일은 ``my_cell.php``\ 여야 합니다.
-
-Controlled 셀 생성
-==========================
-
-가장 기본적인 수준에서, 클래스 내에서 구현해야 할 것은 public 속성입니다. 
-이러한 속성은 자동으로 뷰 파일에서 사용할 수 있게 됩니다. 
-위에서 소개한 AlertMessage를 Controlled Cell로 구현하는 방법은 다음과 같습니다.
-
-::
-
-    // app/Cells/AlertMessageCell.php
-    namespace App\Cells;
-
-    use CodeIgniter\View\Cells\Cell;
-
-    class AlertMessageCell extends Cell
-    {
-        public $type;
-        public $message;
-    }
-
-    // app/Cells/alert_message_cell.php
-    <div class="alert alert-<?= $type; ?>">
-        <?= $message; ?>
-    </div>
-
-.. _generating-cell-via-command:
-
-CLI를 통한 셀 생성
-===========================
 
 .. versionadded:: 4.3.0
 
-``php spark make:cell`` 명령을 사용하여 Controlled 셀을 CLI를 통해 생성할 수 있습니다.
-생성할 셀의 이름을 인수로 받습니다. 
-클래스 이름은 PascalCase로 작성해야 하며, 클래스와 뷰 파일은 ``app/Cells`` 디렉토리에 생성됩니다. 
+Controlled cells have two primary goals: to make it as fast as possible to build the cell, and provide additional logic and
+flexibility to your views, if they need it. The class must extend ``CodeIgniter\View\Cells\Cell``. They should have a view file
+in the same folder. By convention, the class name should be in PascalCase suffixed with ``Cell`` and the view should be
+the snake_cased version of the class name, without the suffix. For example, if you have a ``MyCell`` class, the view file
+should be ``my.php``.
 
-::
+.. note:: Prior to v4.3.5, the generated view file ends with ``_cell.php``. Though v4.3.5 and newer will generate view files
+    without the ``_cell`` suffix, existing view files will still be located and loaded.
 
-    > php spark make:cell AlertMessage
+Creating a Controlled Cell
+==========================
 
-다른 뷰 사용
+At the most basic level, all you need to implement within the class are public properties. These properties will be made available to the view file automatically. Implementing the AlertMessage from above as a Controlled Cell would look like this:
+
+.. literalinclude:: view_cells/008.php
+
+.. literalinclude:: view_cells/009.php
+
+.. literalinclude:: view_cells/010.php
+
+.. _generating-cell-via-command:
+
+Generating Cell via Command
+===========================
+
+You can also create a controlled cell via a built in command from the CLI. The command is ``php spark make:cell``. It takes one argument, the name of the cell to create. The name should be in PascalCase, and the class will be created in the **app/Cells** directory. The view file will also be created in the **app/Cells** directory.
+
+.. code-block:: console
+
+    php spark make:cell AlertMessageCell
+
+Using a Different View
 ======================
 
-클래스의 ``view`` 속성을 설정하여 사용자 지정 뷰 이름을 지정할 수 있습니다. 뷰는 일반적인 뷰처럼 위치해야 합니다.
+You can specify a custom view name by setting the ``view`` property in the class. The view will be located like any view would be normally:
 
-::
+.. literalinclude:: view_cells/011.php
 
-    namespace App\Cells;
-
-    use CodeIgniter\View\Cells\Cell;
-
-    class AlertMessage extends Cell
-    {
-        public $type;
-        public $message;
-
-        protected $view = 'my/custom/view';
-    }
-
-렌더링 사용자 지정
+Customize the Rendering
 =======================
 
-HTML 렌더링에 대해 더 많은 제어가 필요한 경우 ``render()`` 메소드를 구현할 수 있습니다.
-이 메소드를 사용하면 필요한 경우 추가 논리를 수행하고 뷰에 대한 추가 데이터를 전달할 수 있습니다. ``render()`` 메소드는 문자열을 반환해야 합니다.
-Controlled 셀(Cell)의 모든 기능을 활용하려면 일반적인 ``view()`` 헬퍼 함수 대신 ``$this->view()``\ 를 사용해야 합니다.
+If you need more control over the rendering of the HTML, you can implement a ``render()`` method. This method allows you to perform additional logic and pass extra data the view, if needed. The ``render()`` method must return a string. To take advantage of the full features of controlled Cells, you should use ``$this->view()`` instead of the normal ``view()`` helper function:
 
-::
-
-    namespace App\Cells;
-
-    use CodeIgniter\View\Cells\Cell;
-
-    class AlertMessage extends Cell
-    {
-        public $type;
-        public $message;
-
-        public function render(): string
-        {
-            return $this->view('my/custom/view', ['extra' => 'data']);
-        }
-    }
+.. literalinclude:: view_cells/012.php
 
 Computed Properties
 ===================
 
-하나 이상의 속성에 대해 추가 논리를 수행해야 하는 경우 계산된 속성을 사용할 수 있습니다. 
-이러한 경우 속성을 ``protected`` 또는 ``private``\ 로 설정하고 해당 속성 이름을 둘러싼 ``get``\ 과 ``Property``\ 로 구성된 public 메소드를 구현해야 합니다.
+If you need to perform additional logic for one or more properties you can use computed properties. These require setting the property to either ``protected`` or ``private`` and implementing a public method whose name consists of the property name surrounded by ``get`` and ``Property``:
 
-::
+.. literalinclude:: view_cells/013.php
 
-    namespace App\Cells;
+.. literalinclude:: view_cells/014.php
 
-    use CodeIgniter\View\Cells\Cell;
+.. literalinclude:: view_cells/015.php
 
-    class AlertMessage extends Cell
-    {
-        protected $type;
-        protected $message;
+.. important:: You can't set properties that are declared as private during cell
+    initialization.
 
-        public function getTypeProperty(): string
-        {
-            return $this->type;
-        }
-
-        public function getMessageProperty(): string
-        {
-            return $this->message;
-        }
-    }
-
-프리젠테이션 메소드
+Presentation Methods
 ====================
 
-때로는 뷰를 위해 추가 논리를 수행해야 하지만 매개변수로 전달하고 싶지 않은 경우 뷰 내부에서 호출되는 메소드를 구현할 수 있습니다.
+Sometimes you need to perform additional logic for the view, but you don't want to pass it as a parameter. You can implement a method that will be called from within the cell's view itself. This can help the readability of your views:
 
-::
+.. literalinclude:: view_cells/016.php
 
-    // app/Cells/RecentPostsCell.php
-    namespace App\Cells;
+.. literalinclude:: view_cells/017.php
 
-    use CodeIgniter\View\Cells\Cell;
-
-    class RecentPosts extends Cell
-    {
-        protected $posts;
-
-        public function linkPost($post)
-        {
-            return anchor('posts/' . $post->id, $post->title);
-        }
-    }
-
-    // app/Cells/recent_posts.php
-    <ul>
-        <?php foreach ($posts as $post): ?>
-            <li><?= $this->linkPost($post) ?></li>
-        <?php endforeach; ?>
-    </ul>
-
-설정 로직 수행
+Performing Setup Logic
 ======================
 
-뷰가 렌더링되기 전에 추가적인 논리를 수행해야 하는 경우, ``mount()`` 메소드를 구현할 수 있습니다.
-이 메소드는 클래스가 인스턴스화된 직후에 호출되며, 추가적인 속성을 설정하거나 다른 논리를 수행하는 데 사용할 수 있습니다.
+If you need to perform additional logic before the view is rendered, you can implement a ``mount()`` method. This method will be called just after the class is instantiated, and can be used to set additional properties or perform other logic:
 
-::
+.. literalinclude:: view_cells/018.php
 
-    namespace App\Cells;
+You can pass additional parameters to the ``mount()`` method by passing them as an array to the ``view_cell()`` helper function. Any of the parameters sent that match a parameter name of the ``mount()`` method will be passed in:
 
-    use CodeIgniter\View\Cells\Cell;
+.. literalinclude:: view_cells/019.php
 
-    class RecentPosts extends Cell
-    {
-        protected $posts;
-
-        public function mount()
-        {
-            $this->posts = model('PostModel')->getRecent();
-        }
-    }
-
-``mount()`` 메소드에 추가 매개변수를 전달하려면, ``view_cell()`` 헬퍼 함수에 배열 형태로 전달하면 됩니다.
-``mount()`` 메소드의 매개변수 이름과 일치하는 매개변수가 전송된 경우, 해당 매개변수가 전달됩니다.
-
-::
-
-    // app/Cells/RecentPosts.php
-    namespace App\Cells;
-
-    use CodeIgniter\View\Cells\Cell;
-
-    class RecentPosts extends Cell
-    {
-        protected $posts;
-
-        public function mount(?int $categoryId)
-        {
-            $this->posts = model('PostModel')
-                ->when($categoryId, function ($query, $category) {
-                    return $query->where('category_id', $categoryId);
-                })
-                ->getRecent();
-        }
-    }
-
-    // Called in main View:
-    <?= view_cell('RecentPosts::show', ['categoryId' => 5]); ?>
+.. literalinclude:: view_cells/020.php
 
 ************
 Cell Caching
 ************
 
-뷰 셀의 세 번째 매개 변수로 캐싱 시간(초)을 전달하여 뷰 셀 호출 결과를 캐시(cache)할 수 있습니다.
-구성(Config)에 정의된 캐시 엔진을 사용합니다.
+You can cache the results of the view cell call by passing the number of seconds to cache the data for as the
+third parameter. This will use the currently configured cache engine:
 
-::
+.. literalinclude:: view_cells/021.php
 
-    // Cache the view for 5 minutes
-    <?= view_cell('\App\Libraries\Blog::recentPosts', 'limit=5', 300) ?>
+You can provide a custom name to use instead of the auto-generated one if you like, by passing the new name
+as the fourth parameter:
 
-뷰 셀의 네 번째 매개 변수로 자동 생성 이름 대신 사용자 지정 이름을 제공할 수 있습니다.
-
-::
-
-    // Cache the view for 5 minutes
-    <?= view_cell('\App\Libraries\Blog::recentPosts', 'limit=5', 300, 'newcacheid') ?>
+.. literalinclude:: view_cells/022.php

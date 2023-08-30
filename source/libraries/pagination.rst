@@ -1,289 +1,313 @@
-#############################
-페이지네이션(Pagination)
-#############################
+##########
+Pagination
+##########
 
-CodeIgniter는 간단한 테마와 모델과 함께 작동하며, 단일 페이지에서 여러 페이지네이션(Pagination)을 지원할 수있는 매우 단순하지만 유연한 페이지네이션 라이브러리를 제공합니다.
+CodeIgniter provides a very simple, but flexible pagination library that is simple to theme, works with the model,
+and capable of supporting multiple paginators on a single page.
 
 .. contents::
     :local:
     :depth: 2
 
 *******************
-라이브러리 로드
+Loading the Library
 *******************
 
-CodeIgniter의 다른 서비스와 마찬가지로 ``Config\Services``\ 를 통해 로드할 수 있지만, 수동으로 로드할 필요는 없습니다.
+Like all services in CodeIgniter, it can be loaded via ``Config\Services``, though you usually will not need
+to load it manually:
 
 .. literalinclude:: pagination/001.php
 
 .. _paginating-with-models:
 
-***************
-모델 페이지이션
-***************
+**********************
+Paginating with Models
+**********************
 
-대부분의 경우 데이터베이스에서 검색한 결과를 페이지 지정을 위해 Pager 라이브러리를 사용하게 됩니다.
-:doc:`모델 </models/model>` 클래스를 사용할 때 내장된 ``paginate()`` 메소드를 사용하여 현재 배치 결과를 자동으로 검색하고 Pager 라이브러리를 컨트롤러에서 사용할 수 있도록 설정합니다.
-``page=X`` 쿼리 변수를 통해 현재 URL에서 표시해야 하는 현재 페이지를 읽습니다.
+In most cases, you will be using the Pager library in order to paginate results that you retrieve from the database.
+When using the :doc:`Model </models/model>` class, you can use its built-in ``paginate()`` method to automatically
+retrieve the current batch of results, as well as set up the Pager library so it's ready to use in your controllers.
+It even reads the current page it should display from the current URL via a ``page=X`` query variable.
 
-어플리케이션에서 페이지네이션된 사용자 목록을 제공하기 위한 컨트롤러의 메소드는 다음과 같습니다.
+To provide a paginated list of users in your application, your controller's method would look something like:
 
 .. literalinclude:: pagination/002.php
 
-이 예에서는 먼저 ``UserModel``\ 의 새 인스턴스를 만듭니다. 그런 다음 뷰에 보낼 데이터를 채웁니다.
-첫 번째 요소는 올바른 페이지에 대해 검색된 **users** 데이터베이스의 결과로 페이지당 10명의 사용자를 반환합니다.
-뷰에 보내야 하는 두 번째 항목은 Pager 인스턴스 자체입니다.
-편의상 모델은 사용된 인스턴스를 유지하기 위해 public 속성인 ``$pager``\ 에 저장합니다.
-그래서 우리는 뷰의 ``$pager`` 변수에 인스텀스를 할당합니다.
+In this example, we first create a new instance of our ``UserModel``. Then we populate the data to send to the view.
+The first element is the results from the database, **users**, which is retrieved for the correct page, returning
+10 users per page. The second item that must be sent to the view is the Pager instance itself. As a convenience,
+the Model will hold on to the instance it used and store it in the public property, ``$pager``. So, we grab
+that and assign it to the ``$pager`` variable in the view.
 
-.. important:: ``Model::paginate()`` 메소드가 **Model**\ 과 **쿼리빌더(QueryBuilder )** 메소드를 사용한다는 것을 이해하는 것이 중요합니다.
-    ``$db->query()``\ 로 쿼리를 실행하면 쿼리빌더로 연결되지 않기 때문에 ``$db->query()``\ 와 ``Model::paginate()``\ 를 함께 사용하면 **작동하지 않습니다**.
+Customizing Query for Pagination
+================================
 
-모델에서 쿼리빌더 조건을 정의하려면 다음을 수행합니다.
+To customize a query for pagination in a model, you can add
+:doc:`Query Builder <../database/query_builder>` methods before ``paginate()``
+method.
+
+Adding WHERE
+------------
+
+If you want to add WHERE conditions, you can specify conditions directly:
 
 .. literalinclude:: pagination/003.php
+    :lines: 2-
 
-뷰에서 결과 링크를 표시할 위치를 알려야 합니다.
+You can move the conditions to a separate method:
 
-::
+.. literalinclude:: pagination/017.php
+
+.. literalinclude:: pagination/018.php
+    :lines: 2-
+
+Adding JOIN
+-----------
+
+You can join another table:
+
+.. literalinclude:: pagination/016.php
+
+.. important:: It is important to understand that the ``Model::paginate()`` method
+    uses the **Model** and the **Query Builder** instance in the Model.
+    Therefore, trying to use ``Model::paginate()`` with :ref:`db-query`
+    **will not work** because ``$db->query()`` executes the query immediately
+    and is not associated with the Query Builder.
+
+If you need a complicated SQL query that you cannot write with Query Builder,
+try using :ref:`db-query` and `Manual Pagination`_.
+
+Displaying Pager Links
+======================
+
+Within the view, we then need to tell it where to display the resulting links::
 
     <?= $pager->links() ?>
 
-이것으로 페이지 지정은 끝났습니다. 
-Pager 클래스는 첫 페이지와 마지막 페이지 링크와 현재 페이지의 양쪽에 두 페이지 이상의 페이지에 대한 다음 및 이전 링크를 렌더링합니다.
+And that's all it takes. The Pager class will render First and Last page links, as well as Next and Previous links
+for any pages more than two pages on either side of the current page.
 
-Next(다음) 및 Previous(이전)의 라이브러리 패턴이 기존의 페이징 결과 방식에서 사용되는 것과 다르다는 점에 유의해야 합니다.
+It is important to be aware that the library pattern for Next and Previous is different from what is used in the traditional way of paging results.
 
-Next(다음) 및 Previous(이전)는 다음 또는 이전 페이지가 아닌 페이지 지정 구조에 표시될 링크 그룹에 연결됩니다.
+Next and Previous here is linked to the group of links to be displayed in the pagination structure, and not to the next or previous page of records.
 
-더 간단한 출력을 선호하는 경우 세부 정보 페이지 링크 대신 "Older"와 "Newer" 링크만 사용하는 ``simpleLinks()`` 메소드를 사용할 수 있습니다
-
-::
+If you prefer a simpler output, you can use the ``simpleLinks()`` method, which only uses "Older" and "Newer" links,
+instead of the details pagination links::
 
     <?= $pager->simpleLinks() ?>
 
-라이브러리의 링크 형식을 결정하는 뷰 파일을 로드하여 필요에 따라 간단하게 수정할 수 있습니다.
-출력을 완전히 사용자 정의하는 방법에 대한 자세한 내용은 아래를 참조하십시오.
+Behind the scenes, the library loads a view file that determines how the links are formatted, making it simple to
+modify to your needs. See below for details on how to completely customize the output.
 
-여러 결과 페이지네이션
+Paginating Multiple Results
 ===========================
 
-서로 다른 두 개의 결과 집합에서 링크를 제공해야 하는 경우 그룹 이름 페이지네이션 메소드에 전달하여 데이터를 별도로 유지할 수 있습니다
+If you need to provide links from two different result sets, you can pass group names to most of the pagination
+methods to keep the data separate:
 
 .. literalinclude:: pagination/004.php
 
-페이지 수동 설정
-================
+Setting Page Manually
+=====================
 
-반환할 결과 페이지를 지정해야 하는 경우 페이지를 세 번째 인수로 지정할 수 있습니다. 
-표시할 페이지를 제어하기 위해 기본 ``$_GET`` 변수와 다른 방법을 사용할 때 유용합니다.
+If you need to specify which page of results to return you can specify the page as the 3rd argument. This can be
+handy when you have a different manner than the default ``$_GET`` variable to control which page to show.
 
 .. literalinclude:: pagination/005.php
 
-페이지의 URI 세그먼트 지정
+Specifying the URI Segment for Page
 ===================================
 
-페이지 쿼리 매개 변수 대신 페이지 번호에 URI 세그먼트를 사용할 수 있습니다. 
-네 번째 인수로 사용할 세그먼트 번호를 지정하십시오.
-생성된 URI는 **https://domain.tld/foo/bar/?page=[pageNumber]** 대신 **https://domain.tld/foo/bar/[pageNumber]**\ 로 표시됩니다.
+It is also possible to use a URI segment for the page number, instead of the page query parameter. Simply specify the
+segment number to use as the fourth argument. URIs generated by the pager would then look
+like **https://domain.tld/foo/bar/[pageNumber]** instead of **https://domain.tld/foo/bar?page=[pageNumber]**.
 
 .. literalinclude:: pagination/006.php
 
-.. note:: ``$segment`` 값은 URI 세그먼트 수에 1을 더한 값보다 클 수 없습니다.
-
+Please note: ``$segment`` value cannot be greater than the number of URI segments plus 1.
 
 *****************
-수동 페이지네이션
+Manual Pagination
 *****************
 
-알려진 데이터를 기반으로 페이지네이션을 생성해야 하는 경우가 있을 수 있습니다.
-현재 페이지, 페이지당 결과 수, 총 항목 수를 각각 첫 번째, 두 번째, 세 번째 매개변수로 사용하는 ``makeLinks()`` 메소드를 사용하여 수동으로 링크를 만들 수 있습니다.
+You may find times where you just need to create pagination based on known data. You can create links manually
+with the ``makeLinks()`` method, which takes the current page, the number of results per page, and
+the total number of items as the first, second, and third parameters, respectively:
 
 .. literalinclude:: pagination/015.php
 
-기본적으로 링크는 일반적인 방식으로 일련의 링크를 표시하지만, 템플릿을 네 번째 매개 변수로 전달하여 페이지네이션에 사용되는 템플릿를 변경할 수 있습니다.
-자세한 내용은 다음 섹션에서 확인할 수 있습니다.
-
-::
+This will, by default, display the links in the normal manner, as a series of links, but you can change the display
+template used by passing in the name of the template as the fourth parameter. More details can be found in the following
+sections::
 
     $pager->makeLinks($page, $perPage, $total, 'template_name');
 
-페이지 쿼리 매개 변수 대신 페이지 번호에 URI 세그먼트를 사용할 수 있습니다. 
-``makeLinks()``\ 의 다섯 번째 매개 변수로 사용할 세그먼트 번호를 지정하십시오. 
-Pager에 의해 생성된 URI는 ``https://domain.tld/model?page=[pageNumber]`` 대신 ``https://domain.tld/model/[pageNumber]``\ 처럼 보입니다.
-
-::
+It is also possible to use a URI segment for the page number, instead of the page query parameter, as described in
+the previous section. Specify the segment number to use as the fifth parameter to ``makeLinks()``::
 
     $pager->makeLinks($page, $perPage, $total, 'template_name', $segment);
 
-.. note:: ``$segment`` 값은 URI 세그먼트 수에 1을 더한 값보다 클 수 없습니다.
+Please note: ``$segment`` value cannot be greater than the number of URI segments plus 1.
 
-한 페이지에 많은 Pager를 표시해야 하는 경우 그룹을 정의하는 추가 매개 변수가 도움됩니다.
+If you in need to show many pagers on one page then additional parameter which will define a group could be helpful:
 
 .. literalinclude:: pagination/007.php
 
-페이지네이션 라이브러리는 그룹 이름이 없거나 ``default`` 그룹이 지정되지 않은 경우 HTTP 쿼리의 **page** 쿼리 매개 변수를 사용합니다. 
-사용자 그룹을 지정할 때는 ``page_[groupName]``\ 을 사용합니다.
+Pagination library uses **page** query parameter for HTTP queries by default (if no group or ``default`` group name given) or ``page_[groupName]`` for custom group names.
 
-******************************
-예상된 쿼리만으로 페이지네이션
-******************************
+*************************************
+Paginating with Only Expected Queries
+*************************************
 
-기본적으로 모든 GET 쿼리는 페이지네이션 링크에 표시됩니다.
+By default, all GET queries are shown in the pagination links.
 
-예를 들어 URL **https://domain.tld?search=foo&order=asc&hello=i+am+here&page=2**\ 에 액세스할 때 다음과 같이 다른 링크와 함께 페이지 3의 링크를 생성할 수 있습니다.
+For example, when accessing the URL **https://domain.tld?search=foo&order=asc&hello=i+am+here&page=2**, the page 3 link can be generated, along with the other links, as follows:
 
 .. literalinclude:: pagination/008.php
 
-``only()`` 메소드는 이미 예상된 쿼리로만 사용하도록 제한할 수 있습니다
+The ``only()`` method allows you to limit this just to queries already expected:
 
 .. literalinclude:: pagination/009.php
 
-*page* 쿼리는 기본적으로 활성화되어 있으며, ``only()``\ 는 모든 페이지네이션 링크에서 작동합니다.
+The *page* query is enabled by default. And ``only()`` acts in all pagination links.
 
 *********************
-링크 사용자 정의
+Customizing the Links
 *********************
 
-뷰 구성
+View Configuration
 ==================
 
-링크가 페이지에 렌더링되면 뷰 파일을 사용하여 HTML을 표시합니다. 
-**app/Config/Pager.php**\ 를 편집하여 사용되는 뷰를 쉽게 변경할 수 있습니다
+When the links are rendered out to the page, they use a view file to describe the HTML. You can easily change the view
+that is used by editing **app/Config/Pager.php**:
 
 .. literalinclude:: pagination/010.php
 
-이 설정은 사용해야 하는 뷰의 별명과 :doc:`네임스페이스 뷰 경로 </outgoing/views>`\ 를 저장합니다.
-``default_full`` 과 ``default_simple`` 뷰는 각각 ``links()`` 와 ``simpleLinks()`` 메소드에서 사용됩니다.
-어플리케이션 전체에 표시되는 방식을 변경하려면 여기에 새로운 뷰를 할당하십시오.
+This setting stores the alias and :doc:`namespaced view paths </outgoing/views>` for the view that
+should be used. The ``default_full`` and ``default_simple`` views are used for the ``links()`` and ``simpleLinks()``
+methods, respectively. To change the way those are displayed application-wide, you could assign a new view here.
 
-예를 들어 Foundation CSS 프레임워크에서 작동하는 새로운 뷰 파일을 작성하고 해당 파일을 **app/Views/Pagers/foundation_full.php**\ 에 저장한다고 가정하십시오.
-
-**application** 디렉토리는 네임스페이스가 ``App``\ 이고 그 아래의 모든 디렉토리는 네임스페이스의 세그먼트에 직접 맵핑되므로 네임스페이스를 통해 뷰 파일을 다음과 같이 찾을 수 있습니다.
-
-::
+For example, say you create a new view file that works with the Foundation CSS framework, and
+you place that file at **app/Views/Pagers/foundation_full.php**. Since the **application** directory is
+namespaced as ``App``, and all directories underneath it map directly to segments of the namespace, you can locate
+the view file through it's namespace::
 
     'default_full' => 'App\Views\Pagers\foundation_full'
 
-표준 **app/Views** 디렉토리에 있기 때문에 ``view()`` 메소드가 파일 이름으로 찾을 수 있으므로, 네임스페이스를 지정할 필요가 없이, 하위 디렉토리와 파일 이름을 간단히 지정할 수 있습니다.
-
-::
+Since it is under the standard **app/Views** directory, though, you do not need to namespace it since the
+``view()`` method can locate it by filename. In that case, you can simply give the sub-directory and file name::
 
     'default_full' => 'Pagers/foundation_full'
 
-뷰를 작성하고 구성에서 설정하면 자동으로 사용됩니다.
-기존 템플릿을 교체하지 않아도 됩니다. 
-구성 파일에 필요한만큼 추가 템플릿을 만들 수 있습니다.
-일반적인 상황에서 어플리케이션의 프런트 엔드와 백엔드에 서로 다른 스타일이 필요합니다.
+Once you have created the view and set it in the configuration, it will automatically be used. You don't have to
+replace the existing templates. You can create as many additional templates as you need in the configuration
+file. A common situation would be needing different styles for the frontend and the backend of your application.
 
 .. literalinclude:: pagination/011.php
 
-일단 구성되면 ``links()``, ``simpleLinks()``, ``makeLinks()`` 메소드의 마지막 매개 변수로 지정할 수 있습니다
-
-::
+Once configured, you can specify it as a the last parameter in the ``links()``, ``simpleLinks()``, and ``makeLinks()``
+methods::
 
     <?= $pager->links('group1', 'front_full') ?>
     <?= $pager->simpleLinks('group2', 'front_full') ?>
     <?= $pager->makeLinks($page, $perPage, $total, 'front_full') ?>
 
-뷰 생성
+Creating the View
 =================
 
-새로운 뷸를 작성할 때 페이지네이션 링크 자체를 작성하는데 필요한 코드만 작성하면 됩니다.
-불필요한 줄 바꿈 div는 여러 곳에서 사용의 유용성을 제한하기 때문에 만들지 않아야 합니다.
-기존 ``default_full`` 템플릿를 복사하여 새로운 뷰를 작성하는 것이 가장 쉽습니다.
+When you create a new view, you only need to create the code that is needed for creating the pagination links themselves.
+You should not create unnecessary wrapping divs since it might be used in multiple places and you only limit their
+usefulness. It is easiest to demonstrate creating a new view by showing you the existing ``default_full`` template:
 
 .. literalinclude:: pagination/012.php
 
 setSurroundCount()
 ------------------
 
-첫 번째 줄의 ``setSurroundCount()`` 메소드는 현재 페이지 링크의 양쪽에 두 개의 링크를 표시할 것을 지정합니다.
-허용되는 단일 매개 변수는 표시할 링크 수입니다.
+In the first line, the ``setSurroundCount()`` method specifies than we want to show two links to either side of
+the current page link. The only parameter that it accepts is the number of links to show.
 
 hasPrevious() & hasNext()
 -------------------------
 
-이 두개의 메소드는 ``setSurroundCount()``\ 에 전달된 값을 기준으로 현재 페이지의 양쪽에 표시할 수 있는 링크가 더 있으면 부울 true를 리턴합니다. 
-예를 들어 20 페이지의 데이터가 있다고 가정해 봅시다.
-현재 페이지는 3 페이지입니다. 
-주변 수가 2이면 다음 링크가 목록에 나타납니다 : 1, 2, 3, 4, 5
-표시되는 첫 번째 링크는 1 페이지이므로 ``hasPrevious()``\ 는 페이지 0이 없기 때문에 **false**\ 를 반환합니다.
-그러나 ``hasNext()``\ 는 5 페이지 이후 15개의 추가 결과 페이지가 있으므로 **true**\ 를 반환합니다.
+These methods return a boolean true if there are more links that can be displayed on either side of the current page,
+based on the value passed to ``setSurroundCount()``. For example, let's say we have 20 pages of data. The current
+page is page 3. If the surrounding count is 2, then the following links would show up in the list: 1, 2, 3, 4, and 5.
+Since the first link displayed is page one, ``hasPrevious()`` would return **false** since there is no page zero. However,
+``hasNext()`` would return **true** since there are 15 additional pages of results after page five.
 
 getPrevious() & getNext()
 -------------------------
 
-이 메소드는 번호가 매겨진 링크의 양쪽에 이전 또는 다음 결과 페이지의 URL을 리턴합니다.
-예를 들어 현재 페이지가 5로 설정되어 있고 전후 링크(surroundCount)가 각각 2가 되도록 하면 다음과 같은 결과가 나타납니다.
+These methods return the URL for the previous or next pages of results on either side of the numbered links.
 
-::
+For example, you have the current page set at 5 and you want to have the links before and after (the surroundCount) to be 2 each, that will give you something like this::
 
     3  |  4  |  5  |  6  |  7
 
-``getPrevious()``\ 는 페이지 2의 URL을 반환합니다. ``getNext()``\ 는 페이지 8의 URL을 반환합니다.
+``getPrevious()`` returns the URL for page 2. ``getNext()`` returns the URL for page 8.
 
-4페이지와 6페이지를 가져오려면 ``getPreviousPage()``\ 와 ``getNextPage()``\ 를 사용하세요.
+If you want to get page 4 and page 6, use ``getPreviousPage()`` and ``getNextPage()`` instead.
 
 getFirst() & getLast()
 ----------------------
 
-``getPrevious()``, ``getNext()``\ 와 마찬가지로 첫 페이지와 마지막 페이지에 대한 링크를 리턴합니다.
+Much like ``getPrevious()`` and ``getNext()``, these methods return links to the first and last pages in the
+result set.
 
 links()
 -------
 
-번호가 매겨진 모든 링크에 대한 데이터 배열을 반환합니다.
-각 링크의 배열에는 링크의 URI, 제목, 숫자 및 링크가 현재/활성 링크인지 여부를 나타내는 부울(bool)이 포함됩니다.
+Returns an array of data about all of the numbered links. Each link's array contains the uri for the link, the
+title, which is just the number, and a boolean that tells whether the link is the current/active link or not:
 
 .. literalinclude:: pagination/013.php
 
-표준 페이지 지정 구조에 대해 제시된 코드에서 ``getPrevious()``\ 와 ``getNext()`` 메소드는 각각 이전과 다음 페이지 부여 그룹에 대한 연결을 얻기 위해 사용됩니다.
+In the code presented for the standard pagination structure, the methods ``getPrevious()`` and ``getNext()`` are used to obtain the links to the previous and next pagination groups respectively.
 
-현재 페이지를 기준으로 이전 페이지와 다음 페이지로 연결되는 페이지별 구조를 사용하려면 ``GetPrevious()``\ 와 ``GetNext()`` 메소드를 ``GetPrevious()``\ 와 ``GetNextPage()``\ 로 바꾸고 "HasPrevious()와 "HasNext()"로 바꾸면 됩니다.
+If you want to use the pagination structure where prev and next will be links to the previous and next pages based on the current page, just replace the ``getPrevious()`` and ``getNext()`` methods with ``getPreviousPage()`` and ``getNextPage()``, and the methods ``hasPrevious()`` and ``hasNext()`` by ``hasPreviousPage()`` and ``hasNextPage()`` respectively.
 
-다음 예제를 참조합니다.
+See following an example with these changes:
 
 .. literalinclude:: pagination/014.php
 
 hasPreviousPage() & hasNextPage()
 ---------------------------------
 
-이 메소드는 현재 표시되고 있는 현재 페이지 전후에 페이지에 대한 링크가 있는 경우 부울 true를 리턴합니다.
+This method returns a boolean true if there are links to a page before and after, respectively, the current page being displayed.
 
-차이점은 ``hasPreviousPage()``, ``hasNextPage()``\ 는 현재 페이지를 기준으로 하고 있고 ``hasPrevious()``, ``hasNext()``\ 는 ``setSurroundCount()``\ 에서 통과된 값을 기준으로 하여 현 페이지 전후로 표시할 링크 세트를 기반으로 한다는 것입니다.
+Their difference to ``hasPrevious()`` and ``hasNext()`` is that they are based on the current page while ``hasPrevious()`` and ``hasNext()`` are based on the set of links to be displayed before and after the current page based on the value passed in ``setSurroundCount()``.
 
 getPreviousPage() & getNextPage()
 ---------------------------------
 
-이 메소드는 번호가 지정된 링크의 양쪽에 있는 결과의 이전 페이지 또는 다음 페이지에 대한 URL을 반환하는 ``GetPrevious()``, ``GetNext()``\ 와 달리 현재 표시된 페이지와 관련하여 이전 페이지와 다음 페이지의 URL을 반환합니다. 
+These methods return a URL for the previous and next pages in relation to the current page being displayed, unlike ``getPrevious()`` and ``getNext()`` that return the URL for the previous or next pages of results on either side of the numbered links. See the previous paragraph for a full explanation.
 
-예를 들어 현재 페이지가 5로 설정되어 있고 전후 링크(surroundCount)가 각각 2가 되도록 하면 다음과 같은 결과가 나타납니다.
-
-::
+For example, you have the current page set at 5 and you want to have the links before and after (the surroundCount) to be 2 each, that will give you something like this::
 
     3  |  4  |  5  |  6  |  7
 
-``getPreviousPage()``\ 는 4페이지의 URL을 반환합니다. ``getNextPage()``\ 는 6페이지의 URL을 반환합니다.
+``getPreviousPage()`` returns the URL for page 4. ``getNextPage()`` returns the URL for page 6.
 
-URL 대신 페이지 번호를 원하는 경우 다음 메소드를 사용할 수 있습니다.
+If you want page numbers instead of URLs, you can use the following methods:
 
 getPreviousPageNumber() & getNextPageNumber()
 ---------------------------------------------
 
-이 메소드는 현재 표시되는 페이지와 관련하여 이전 또는 다음 페이지의 페이지 번호를 반환합니다.
+These methods return the page number for the previous or next pages in relation to the current page being displayed.
 
 getFirstPageNumber() & getLastPageNumber()
 ------------------------------------------
 
-이 메소드는 결과 집합의 첫 번째 페이지와 마지막 페이지로 페이지 번호를 반환합니다.
+These methods return page numbers to the first and last pages in the
+result set.
 
 getCurrentPageNumber()
 ----------------------
 
-이 메서드는 현재 페이지의 페이지 번호를 반환합니다.
+This method returns the page number of the current page.
 
 getPageCount()
 --------------
 
-이 메서드는 총 페이지 수를 반환합니다.
+This method returns total number of pages.

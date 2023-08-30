@@ -1,29 +1,30 @@
 #####################
-Entity 클래스 사용
+Using Entity Classes
 #####################
 
-CodeIgniter는 데이터베이스 계층에서 Entity 클래스를 1급 시민으로 지원하며, 완전히 선택적으로 사용할 수 있도록 유지합니다.
-일반적으로 리포지토리 패턴의 일부로 사용되지만 필요에 따라 :doc:`모델 </models/model>`\ 과 함께 직접 사용할 수 있습니다.
+CodeIgniter supports Entity classes as a first-class citizen in it's database layer, while keeping
+them completely optional to use. They are commonly used as part of the Repository pattern, but can
+be used directly with the :doc:`Model </models/model>` if that fits your needs better.
 
 .. contents::
     :local:
     :depth: 2
 
-Entity 사용법
-=================
+************
+Entity Usage
+************
 
-기본적으로 Entity 클래스는 단일 데이터베이스 행을 나타내는 클래스입니다.
-여기에는 데이터베이스 열을 나타내는 클래스 속성이 있으며, 해당 행에 대한 비즈니스 논리를 구현하기 위한 추가 방법을 제공합니다.
-여기에서 핵심은 지속 방법에 대해 전혀 모른다는 것입니다.
-지속방법에 대해서는 모델 또는 저장소 클래스의 책임입니다.
-이렇게하면 객체 저장 방법에 변화가 생길 경우 어플리케이션 전체에서 객체가 사용되는 방식을 변경할 필요가 없습니다.
-따라서 빠른 프로토 타이핑 단계에서 JSON 또는 XML 파일을 사용하여 객체를 저장한 다음 개념이 작동하는 것이 입증되면 데이터베이스로 쉽게 전환할 수 있습니다.
+At its core, an Entity class is simply a class that represents a single database row. It has class properties
+to represent the database columns, and provides any additional methods to implement the business logic for
+that row. The core feature, though, is that it doesn't know anything about how to persist itself. That's the
+responsibility of the model or the repository class. That way, if anything changes on how you need to save the
+object, you don't have to change how that object is used throughout the application. This makes it possible to
+use JSON or XML files to store the objects during a rapid prototyping stage, and then easily switch to a
+database when you've proven the concept works.
 
-매우 간단한 User Entity를 살펴보고이를 명확하게하는 데 도움이되는 방법을 살펴 보겠습니다.
+Let's walk through a very simple User Entity and how we'd work with it to help make things clear.
 
-다음 스키마를 가진 ``users``\ 라는 데이터베이스 테이블이 있다고 가정하십시오.
-
-::
+Assume you have a database table named ``users`` that has the following schema::
 
     id          - integer
     username    - string
@@ -31,238 +32,288 @@ Entity 사용법
     password    - string
     created_at  - datetime
 
-.. important:: ``attributes``\ 은 내부 사용을 위한 예약어입니다. 컬럼명으로 사용하면 Entity가 제대로 동작하지 않습니다.
+.. important:: ``attributes`` is a reserved word for internal use. If you use it as a column name, the Entity does not work correctly.
 
-Entity 클래스 만들기
--------------------------
+Create the Entity Class
+=======================
 
-이제 새 엔티티 클래스를 작성합니다.
-이러한 클래스를 저장할 기본 위치는 없으며, 기존 디렉토리 구조와 맞지 않기 때문에 **app/Entities**\ 에 새 디렉토리를 작성합니다.
-**app/Entities/User.php**\ 에 엔티티를 작성하십시오.
+Now create a new Entity class. Since there's no default location to store these classes, and it doesn't fit
+in with the existing directory structure, create a new directory at **app/Entities**. Create the
+Entity itself at **app/Entities/User.php**.
 
 .. literalinclude:: entities/001.php
 
-간단하지만 이것은 당신이 해야 할 모든 것입니다. 우리는 잠시 후 이를 더 유용하게 사용할 것입니다.
+At its simplest, this is all you need to do, though we'll make it more useful in a minute.
 
-모델 만들기
-----------------
+Create the Model
+================
 
-먼저 상호 작용을 위해 모델을 **app/Models/UserModel.php**\ 에 작성합니다.
+Create the model first at **app/Models/UserModel.php** so that we can interact with it:
 
 .. literalinclude:: entities/002.php
 
-모델의 모든 활동은 데이터베이스의 ``users`` 테이블을 사용합니다.
-``$allowedFields`` 속성은 클래스 외부에서 변경하려는 모든 필드를 포함하도록 설정했습니다.
-``id``, ``created_at``, ``updated_at`` 필드는 클래스 또는 데이터베이스에서 자동으로 처리되므로 변경하지 않습니다.
-마지막으로 Entity 클래스를 ``$returnType``\ 으로 설정했습니다.
-이를 통해 데이터베이스에서 행을 반환하는 모델의 모든 메소드가 일반 객체나 배열 대신 User Entity 클래스의 인스턴스를 반환합니다.
+The model uses the ``users`` table in the database for all of its activities. We've set the ``$allowedFields`` property
+to include all of the fields that we want outside classes to change. The ``id``, ``created_at``, and ``updated_at`` fields
+are handled automatically by the class or the database, so we don't want to change those. Finally, we've set our Entity
+class as the ``$returnType``. This ensures that all methods on the model that return rows from the database will return
+instances of our User Entity class instead of an object or array like normal.
 
-Entity 클래스 작업
------------------------------
+Working with the Entity Class
+=============================
 
-이제 모든 조각이 제자리에 배치되었으므로 다른 클래스와 마찬가지로 Entity 클래스로 작업합니다.
+Now that all of the pieces are in place, you would work with the Entity class as you would any other class:
 
 .. literalinclude:: entities/003.php
 
-``User`` 클래스는 열에 대한 속성을 설정하지 않았지만 여전히 공용 속성인 것처럼 열에 액세스할 수 있습니다.
-기본 클래스 ``CodeIgniter\Entity\Entity``\ 는 데이터베이스에서 개체를 만들거나, 가져온 후 변경된 열을 추적하여 ``isset()`` 또는 ``unset()``\ 으로 속성을 확인하는 기능을 제공합니다. 
+You may have noticed that the ``User`` class has not set any properties for the columns, but you can still
+access them as if they were public properties. The base class, ``CodeIgniter\Entity\Entity``, takes care of this for you, as
+well as providing the ability to check the properties with ``isset()``, or ``unset()`` the property, and keep track
+of what columns have changed since the object was created or pulled from the database.
 
-.. note:: Entity 클래스는 데이터를 ``$attributes`` 속성에 저장합니다.
+.. note:: The Entity class stores the data in the property ``$attributes``.
 
-User가 모델의 ``save()`` 메소드로 전달되면 자동으로 특성을 읽고 모델의 ``$allowedFields`` 속성에 나열된 열의 변경 사항을 저장합니다.
-또한 새 행을 만들거나 기존 행을 업데이트할지 여부도 알고 있습니다.
+When the User is passed to the model's ``save()`` method, it automatically takes care of reading the  properties
+and saving any changes to columns listed in the model's ``$allowedFields`` property. It also knows whether to create
+a new row, or update an existing one.
 
-.. note:: ``insert()``\ 를 호출할 때는 엔티티의 모든 값이 메소드로 전달되지만 ``update()``\ 를 호출하면 변경된 값만 전달됩니다.
+.. note:: When we are making a call to the ``insert()`` all the values from Entity are passed to the method, but when we
+    call the ``update()``, then only values that have changed are passed.
 
-빠르게 속성 채우기
---------------------------
+Filling Properties Quickly
+==========================
 
-Entity 클래스는 키/값 쌍 배열을 클래스에 전달하여 클래스 속성을 채울 수 있는 ``fill()`` 메소드도 제공합니다.
-배열의 모든 속성은 Entity에 설정됩니다.
-그러나 모델을 통해 저장할 때 ``$allowedFields``\ 에 명시된 필드만 실제 데이터베이스에 저장되므로 필드가 잘못 저장되는 것에 대해 걱정할 필요가 없습니다.
+The Entity class also provides a method, ``fill()`` that allows you to shove an array of key/value pairs into the class
+and populate the class properties. Any property in the array will be set on the Entity. However, when saving through
+the model, only the fields in ``$allowedFields`` will actually be saved to the database, so you can store additional data
+on your entities without worrying much about stray fields getting saved incorrectly.
 
 .. literalinclude:: entities/004.php
 
-생성자를 통하여 데이터를 전달할 수도 있으며, 인스턴스화 중에는 `fill()` 메소드를 통해 데이터를 전달합니다.
+You can also pass the data in the constructor and the data will be passed through the ``fill()`` method during instantiation.
 
 .. literalinclude:: entities/005.php
 
-대량 액세스 속성
--------------------------
+Bulk Accessing Properties
+=========================
 
-Entity 클래스는 ``toArray()``\ 와 ``toRawArray()`` 메소드를 통하여 사용 가능한 모든 속성을 배열로 추출할 수 있습니다.
-원시(raw) 버전을 사용하면 매직 "getter" 메소드와 캐스트(cast)를 우회할 수 있습니다. 
-두 메소드 모두 첫 번째 매개 변수를 사용하여 반환된 값을 변경된 값으로 필터링할지 여부를 지정하고, 최종 매개 변수를 사용하여 중첩된 엔티티 요소를 재귀적으로 만들수 있습니다.
+The Entity class has two methods to extract all available properties into an array: ``toArray()`` and ``toRawArray()``.
+Using the raw version will bypass magic "getter" methods and casts. Both methods can take a boolean first parameter
+to specify whether returned values should be filtered by those that have changed, and a boolean final parameter to
+make the method recursive, in case of nested Entities.
 
-비즈니스 로직 처리
-=======================
+***********************
+Handling Business Logic
+***********************
 
-위의 예제는 편리하지만 비즈니스 로직을 강화하는데 도움이 되지는 않습니다.
-기본 Entity 클래스는 특수한 메소드를 확인하고 속성을 직접 사용하는 대신 스마트한 ``__get()``\ 과 ``__set()`` 메소드를 구현하여 비즈니스 로직 또는 데이터 변환을 시행할 수 있습니다. 
+While the examples above are convenient, they don't help enforce any business logic. The base Entity class implements
+some smart ``__get()`` and ``__set()`` methods that will check for special methods and use those instead of using
+the attributes directly, allowing you to enforce any business logic or data conversion that you need.
 
-다음은 이를 사용하는 방법에 대한 몇 가지 예를 제공하기 위해 업데이트된 사용자 Entity입니다.
+Here's an updated User entity to provide some examples of how this could be used:
 
 .. literalinclude:: entities/006.php
 
-가장 먼저 알아야 할 것은 우리가 추가 한 메소드의 이름입니다.
-각각의 클래스는 snake_case로 작성된 컬럼 이름을 ``set`` 또는 ``get`` 접두사가 붙은 PascalCase로 변환합니다. 
-이 메소드는 직접 구문을 (예: ``$user->email``) 사용하여 클래스 속성을 설정하거나 검색할 때마다 자동으로 호출됩니다.
-다른 클래스에서 액세스하지 않으려면 메소드를 공개(public)하지 않아도됩니다.
-예를 들어, ``created_at`` 클래스 속성은 ``setCreatedAt()`` 와 ``getCreatedAt()`` 메소드를 통해 액세스됩니다.
+The first thing to notice is the name of the methods we've added. For each one, the class expects the snake_case
+column name to be converted into PascalCase, and prefixed with either ``set`` or ``get``. These methods will then
+be automatically called whenever you set or retrieve the class property using the direct syntax (i.e., ``$user->email``).
+The methods do not need to be public unless you want them accessed from other classes. For example, the ``created_at``
+class property will be accessed through the ``setCreatedAt()`` and ``getCreatedAt()`` methods.
 
-.. note:: 이 방법은 클래스 외부에서 속성에 액세스하려고 할 때만 작동합니다. 클래스 내부의 모든 메소드는 ``setX()``\ 와 ``getX()`` 메소드를 직접 호출해야 합니다.
+.. note:: This only works when trying to access the properties from outside of the class. Any methods internal to the
+    class must call the ``setX()`` and ``getX()`` methods directly.
 
-``setPassword()`` 메소드는 비밀번호가 항상 해시되도록 합니다.
+In the ``setPassword()`` method we ensure that the password is always hashed.
 
-``setCreatedAt()`` 메소드는 모델에서 받은 문자열을 DateTime 객체로 변환하여, 시간대가 UTC인지 확인하여 뷰어의 현재 시간대를 쉽게 변환합니다.
-``getCreatedAt()`` 메소드는 시간을 어플리케이션의 사용중인 시간대의 지정된 형식 문자열로 변환합니다.
+In ``setCreatedAt()`` we convert the string we receive from the model into a DateTime object, ensuring that our timezone
+is UTC so we can easily convert the viewer's current timezone. In ``getCreatedAt()``, it converts the time to
+a formatted string in the application's current timezone.
 
-이 예제는 상당히 간단하지만 Entity 클래스를 사용하여 비즈니스 로직 적용과 사용하기 편리한 객체를 만드는 매우 유연한 방법을 제공합니다.
+While fairly simple, these examples show that using Entity classes can provide a very flexible way to enforce
+business logic and create objects that are pleasant to use.
 
 .. literalinclude:: entities/007.php
 
-데이타 매핑
-================
+.. _entities-special-getter-setter:
 
-어플리케이션 개발중 기획이 변경되어 데이터베이스의 컬럼 이름이 더 이상 타당하지 않는 상황이 발생하거나,
-코딩 스타일이 camelCase 클래스 특성을 선호하지만 데이터베이스 스키마에 snake_case 이름이 필요하다는 것을 깨닫게되는 경우도 있습니다.
-이러한 상황은 Entity 클래스의 데이터 매핑 기능으로 쉽게 처리할 수 있습니다.
+Special Getter/Setter
+=====================
 
-다음 예처럼 어플리케이션 전체에서 사용되는 단순화된 사용자 Entity가 있다고 가정합니다.
+.. versionadded:: 4.4.0
+
+For example, if your Entity's parent class already has a ``getParent()`` method
+defined, and your Entity also has a column named ``parent``, when you try to add
+business logic to the ``getParent()`` method in your Entity class, the method is
+already defined.
+
+In such a case, you can use the special getter/setter. Instead of ``getX()``/``setX()``,
+set ``_getX()``/``_setX()``.
+
+In the above example, if your Entity has the ``_getParent()`` method, the method
+will be used when you get ``$entity->parent``, and the ``_setParent()`` method
+will be used when you set ``$entity->parent``.
+
+************
+Data Mapping
+************
+
+At many points in your career, you will run into situations where the use of an application has changed and the
+original column names in the database no longer make sense. Or you find that your coding style prefers camelCase
+class properties, but your database schema required snake_case names. These situations can be easily handled
+with the Entity class' data mapping features.
+
+As an example, imagine you have the simplified User Entity that is used throughout your application:
 
 .. literalinclude:: entities/008.php
 
-상사가 당신에게 와서 더 이상 사용자 이름을 사용하지 않으니, 로그인을 위해 이메일을 사용하도록 지시합니다.
-그러나 어플리케이션을 약간 개인화하기 위해 ``name`` 필드를 현재 사용 중인 사용자 이름이 아닌 사용자의 전체 이름을 나타내도록 변경해야 합니다.
-데이터베이스에서 문제를 정리하기 위해 마이그레이션을 수행하여 ``name`` 필드를 ``full_name`` 필드로 변경합니다.
+Your boss comes to you and says that no one uses usernames anymore, so you're switching to just use emails for login.
+But they do want to personalize the application a bit, so they want you to change the ``name`` field to represent a user's
+full name now, not their username like it does currently. To keep things tidy and ensure things continue making sense
+in the database you whip up a migration to rename the ``name`` field to ``full_name`` for clarity.
 
-이를 위해 User 클래스를 수정하는 방법은 두 가지가 있습니다.
-첫 번째 방법은 클래스 속성을 ``$name``\ 에서 ``$full_name``\ 으로 수정하고, 어플리케이션 전체를 변경합니다.
-두 번째 방법은 데이터베이스의 ``full_name`` 컬럼을 ``$name`` 속성에 매핑하고 Entity 변경을 수행합니다.
+Ignoring how contrived this example is, we now have two choices on how to fix the User class. We could modify the class
+property from ``$name`` to ``$full_name``, but that would require changes throughout the application. Instead, we can
+simply map the ``full_name`` column in the database to the ``$name`` property, and be done with the Entity changes:
 
 .. literalinclude:: entities/009.php
 
-새 데이터베이스 이름을 ``$datamap`` 배열에 추가하면 데이터베이스 컬럼에 액세스할 수 있는 클래스 속성을 클래스에 알릴 수 있습니다.
-배열의 키는 데이터베이스의 컬럼 이름이며, 배열의 값은 이를 맵핑할 클래스 속성입니다.
+By adding our new database name to the ``$datamap`` array, we can tell the class what class property the database column
+should be accessible through. The key of the array is class property to map it to, where the value in the array is the
+name of the column in the database.
 
-이 예에서는 모델이 사용자 클래스에서 ``full_name`` 필드를 설정할 때 실제로 해당 값을 클래스의 ``$name`` 속성에 할당하여 ``$user->name``\ 을 통해 설정하고 검색할 수 있습니다. 
-The value will still be accessible through the original ``$user->full_name``, also, as this is needed for the model to get the data back out and save it to the database. 
-모델이 데이터를 가져 와서 데이터베이스에 저장하는데 필요하기 때문에 ``$user->full_name``\ 을 통해 값에 계속 액세스할 수 있습니다.
-그러나 ``unset``\ 과 ``isset``\ 은 원래 이름인 ``full_name``\ 이 아닌 매핑된 속성 ``$name``\ 에서만 작동합니다.
+In this example, when the model sets the ``full_name`` field on the User class, it actually assigns that value to the
+class' ``$name`` property, so it can be set and retrieved through ``$user->name``. The value will still be accessible
+through the original ``$user->full_name``, also, as this is needed for the model to get the data back out and save it
+to the database. However, ``unset()`` and ``isset()`` only work on the mapped property, ``$user->name``, not on the database column name,
+``$user->full_name``.
 
-.. note:: 데이터 매핑을 사용할 때 데이터베이스 열 이름에 대해 ``set*()``\ 와 ``get*()`` 메소드를 정의해야 합니다.
-    이 예에서는 ``setFullName()``\ 와 ``getFullName()``\ 을 정의해야 합니다.
+.. note:: When you use Data Mapping, you must define ``set*()`` and ``get*()`` method
+    for the database column name. In this example, you must define ``setFullName()`` and
+    ``getFullName()``.
 
-뮤테이터(Mutators)
-====================
+********
+Mutators
+********
 
-데이타 뮤테이터
------------------
+Date Mutators
+=============
 
-기본적으로 Entity 클래스는 `created_at`, `updated_at`, `deleted_at` 이라는 필드를 데이터를 설정하거나 검색할 때마다 :doc:`Time </libraries/time>` 인스턴스로 변환합니다.
-Time 클래스는 변하지 않고, 지역화된 방식으로 많은 유용한 메소드를 제공합니다.
+By default, the Entity class will convert fields named `created_at`, `updated_at`, or `deleted_at` into
+:doc:`Time </libraries/time>` instances whenever they are set or retrieved. The Time class provides a large number
+of helpful methods in an immutable, localized way.
 
-``$dates`` 속성에 이름을 추가하여 자동으로 변환할 특성을 정의할 수 있습니다
+You can define which properties are automatically converted by adding the name to the ``$dates`` property:
 
 .. literalinclude:: entities/010.php
 
-이제 이러한 속성중 하나가 설정되면 **app/Config/App.php**\ 에 설정된대로 어플리케이션의 현재 시간대를 사용하여 Time 인스턴스로 변환됩니다.
+Now, when any of those properties are set, they will be converted to a Time instance, using the application's
+current timezone, as set in **app/Config/App.php**:
 
 .. literalinclude:: entities/011.php
 
 .. _entities-property-casting:
 
-속성 캐스팅
-----------------
+Property Casting
+================
 
-``$casts`` 속성을 사용하여 엔티티의 속성을 공통 데이터 유형으로 변환하도록 지정할 수 있습니다.
-이 옵션은 키가 클래스 속성의 이름이고 값은 캐스트해야 하는 데이터 유형인 배열이어야합니다.
-캐스팅은 값을 읽을 때만 영향을 줍니다. 엔티티나 데이터베이스의 영구적인 값에 영향을 주는 변환이 발생하지 않습니다.
-속성은 다음 데이터 형식중 하나로 캐스팅할 수 있습니다: **integer**, **float**, **double**, **string**, **boolean**, **object**, **array**, **datetime**, **timestamp**, **uri**, **int-bool**.
-유형의 시작 부분에 물음표를 추가하면 특성을 null 입력 가능으로 표시합니다. 예 : **?string**, **?integer**.
+You can specify that properties in your Entity should be converted to common data types with the ``$casts`` property.
+This option should be an array where the key is the name of the class property, and the value is the data type it
+should be cast to.
 
-.. note:: v4.3.0 부터 **int-bool**\ 을 사용할 수 있습니다.
+Property casting affects both read (get) and write (set), but some types affect
+only read (get).
 
-다음 예는 User Entity의 ``is_banned`` 속성을 boolean으로 캐스팅합니다.
+Scalar Type Casting
+-------------------
+
+Properties can be cast to any of the following data types:
+**integer**, **float**, **double**, **string**, **boolean**, **object**, **array**, **datetime**, **timestamp**, **uri** and **int-bool**.
+Add a question mark at the beginning of type to mark property as nullable, i.e., **?string**, **?integer**.
+
+.. note:: **int-bool** can be used since v4.3.0.
+
+For example, if you had a User entity with an ``is_banned`` property, you can cast it as a boolean:
 
 .. literalinclude:: entities/012.php
 
-Array/Json 캐스팅
+Array/Json Casting
 ------------------
 
-Array/Json 캐스팅은 직렬화된 배열 또는 JSON을 저장하는 필드에 특히 유용합니다.
-캐스팅할 때는:
+Array/Json casting is especially useful with fields that store serialized arrays or json in them. When cast as:
 
-* **array**, 자동으로 직렬화 해제(unserialized)
-* **json**, ``json_decode($value, false)`` 값으로 자동 설정
-* **json-array**, ``json_decode($value, true)`` 값으로 자동 설정
+* an **array**, they will automatically be unserialized,
+* a **json**, they will automatically be set as an value of ``json_decode($value, false)``,
+* a **json-array**, they will automatically be set as an value of ``json_decode($value, true)``,
 
-속성 값을 설정할 때 속성을 캐스팅할 수있는 나머지 데이터 형식과 달리:
+when you set the property's value.
+Unlike the rest of the data types that you can cast properties into, the:
 
-* **array**, serialize 하여 캐스트,
-* **json** 과 **json-array**, json_encode 함수를 사용하여 캐스트
+* **array** cast type will serialize,
+* **json** and **json-array** cast will use json_encode function on
 
-속성이 값이 설정될 때마다
+the value whenever the property is set:
 
 .. literalinclude:: entities/013.php
 
 .. literalinclude:: entities/014.php
 
-CSV 캐스팅
+CSV Casting
 -----------
 
-단순한 값으로 구성된 단순 배열을 직렬화하거나, JSON 문자열로 인코딩하는 것이 원래 구조보다 더 복잡해 질수 있습니다. 
-대안으로 CSV(쉼표로 구분된 값)로 캐스팅하면 공간을 적게 사용하고 사람이 더 쉽게 읽을 수 있는 문자열이 만들어집니다.
+If you know you have a flat array of simple values, encoding them as a serialized or JSON string
+may be more complex than the original structure. Casting as Comma-Separated Values (CSV) is
+a simpler alternative will result in a string that uses less space and is more easily read
+by humans:
 
 .. literalinclude:: entities/015.php
 
-데이터베이스에 "red,yellow,green"\ 로 저장됨
+Stored in the database as "red,yellow,green":
 
 .. literalinclude:: entities/016.php
 
-.. note:: CSV로 캐스팅은 PHP의 내장 함수 ``implode``\ 와 ``explode`` 함수를 사용하며 모든 값이 쉼표가 없는 문자열이라고 가정합니다. 
-    더 복잡한 데이터를 캐스팅하려면 ``array`` 또는 ``json``\ 을 사용합니다.
+.. note:: Casting as CSV uses PHP's internal ``implode`` and ``explode`` methods and assumes all values are string-safe and free of commas. For more complex data casts try ``array`` or ``json``.
 
-커스텀 캐스팅
+Custom Casting
 --------------
 
-데이터를 가져오고 설정하는 고유한 변환 유형을 정의할 수 있습니다.
+You can define your own conversion types for getting and setting data.
 
-처음에는 사용자 유형에 대한 처리기 클래스를 만들어야 합니다.
-클래스가 **app/Entities/Cast** 디렉토리에 위치한다고 가정합니다.
+At first you need to create a handler class for your type.
+Let's say the class will be located in the **app/Entities/Cast** directory:
 
 .. literalinclude:: entities/017.php
 
-이제 등록해야 합니다.
+Now you need to register it:
 
 .. literalinclude:: entities/018.php
 
-
-값을 가져오거나 설정할 때 값을 변경할 필요가 없는 경우 메소드를 구현하지 마십시오.
+If you don't need to change values when getting or setting a value. Then just don't implement the appropriate method:
 
 .. literalinclude:: entities/019.php
 
-**Parameters**
+Parameters
+----------
 
-한 가지 유형으로 충분하지 않다면, 추가 매개 변수를 사용할 수 있습니다.
-추가 매개 변수는 대괄호로 표시되고 쉼표로 나열됩니다.
-
-**type[param1, param2]**
+In some cases, one type is not enough. In this situation, you can use additional parameters.
+Additional parameters are indicated in square brackets and listed with a comma
+like ``type[param1, param2]``.
 
 .. literalinclude:: entities/020.php
 
 .. literalinclude:: entities/021.php
 
-.. note:: 캐스팅 유형이 nullable ``?bool``\ 로 표시되어 있고 전달 된 값이 null이 아닌 경우 값이 ``nullable``\ 인 매개 변수가 캐스팅 유형 처리기에 전달됩니다.
-    캐스팅 유형에 사전 정의된 매개 변수가 있는 경우 목록 끝에 ``nullable``\ 이 추가됩니다.
+.. note:: If the casting type is marked as nullable ``?bool`` and the passed value is not null, then the parameter with
+    the value ``nullable`` will be passed to the casting type handler.
+    If casting type has predefined parameters, then ``nullable`` will be added to the end of the list.
 
-변경된 속성 확인
-==================
+*******************************
+Checking for Changed Attributes
+*******************************
 
-속성의 이름을 이용하여 엔티티 속성이 작성된 이후로 변경되었는지 확인할 수 있습니다.
+You can check if an Entity attribute has changed since it was created. The only parameter is the name of the
+attribute to check:
 
 .. literalinclude:: entities/022.php
 
-전체 엔티티의 변경 여부를 확인하고 싶다면 매개 변수를 생략하십시오.
+Or to check the whole entity for changed values omit the parameter:
 
 .. literalinclude:: entities/023.php

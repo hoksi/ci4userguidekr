@@ -1,160 +1,342 @@
-###################
-팩토리(Factories)
-###################
+#########
+Factories
+#########
 
 .. contents::
     :local:
-    :depth: 2
+    :depth: 3
 
-소개
+Introduction
 ************
 
-팩토리란 무엇입니까?
-=====================
+What are Factories?
+===================
 
-:doc:`./services`\ 와 마찬가지로 **팩토리(Factories)**\ 도 클래스 간에 객체 인스턴스를 전달할 필요 없이 코드를 간결하면서도 최적의 상태로 유지하도록 도와주는 자동 로딩의 확장입니다.
+Like :doc:`./services`, **Factories** are an extension of autoloading that helps keep your code
+concise yet optimal, without having to pass around object instances between classes.
 
-가장 간단한 방법으로, 팩토리는 클래스 인스턴스를 만들고 어디에서나 액세스할 수 있는 일반적인 방법을 제공합니다.
-이는 객체 상태를 재사용하고 앱 전체에 여러 인스턴스를로드하여 메모리로드를 줄일 수있는 좋은 방법입니다.
-이렇게 하면 개체를 재사용하여 여러 인스턴스가 앱에 로드되지 않도록하여 메모리 로드를 줄일 수 있습니다.
+Factories are similar to CodeIgniter 3's ``$this->load`` in the following points:
 
-펙토리는 모든 클래스(class)를 로드할 수 있지만, 가장 좋은 예는 공통 데이터를 처리하거나 전송할 때 사용되는 클래스입니다.
-프레임워크는 ``Config`` 클래스를 사용할 때 올바른 구성이 로드되도록 하기 위해 내부적으로 팩토리를 사용합니다.
+- Load a class
+- Share the loaded class instance
 
-서비스와의 차이점
+At its
+simplest, Factories provide a common way to create a class instance and access it from
+anywhere. This is a great way to reuse object states and reduce memory load from keeping
+multiple instances loaded across your app.
+
+Any class can be loaded by Factories, but the best examples are those classes that are used
+to work on or transmit common data. The framework itself uses Factories internally, e.g., to
+make sure the correct configuration is loaded when using the ``Config`` class.
+
+Differences from Services
 =========================
 
-팩토리는 인스턴스화할 구체적인 클래스 이름을 필요로하며 반환할 인스턴스의 클래스를 변경할 수 없고, 인스턴스를 생성하는 코드도 없습니다.
+Factories require a concrete class name to instantiate and do not have code to create instances.
 
-따라서 팩토리는 많은 종속성이 필요한 복잡한 인스턴스를 생성하는데 적합하지 않습니다.
+So, Factories are not good for creating a complex instance that needs many dependencies,
+and you cannot change the class of the instance to be returned.
 
-반면 서비스는 인스턴스를 생성하는 코드가 있으므로, 다른 서비스나 클래스 인스턴스가 필요한 복잡한 인스턴스를 생성할 수 있습니다.
-서비스를 받을 때 서비스에는 클래스 이름이 아닌 서비스 이름이 필요하므로, 클라이언트 코드를 변경하지 않고도 반환된 인스턴스를 변경할 수 있습니다.
+On the other hand, Services have code to create instances, so it can create a complex instance
+that needs other services or class instances. When you get a service, Services require a service name,
+not a class name, so the returned instance can be changed without changing the client code.
 
-.. _factories-example:
+.. _factories-loading-class:
 
-Example
-=======
+Loading Classes
+***************
 
-``Models``\ 를 예로 들어 보겟습니다.
-팩토리 클래스의 매직 정적 메소드인 ``Factories::models()``\ 를 사용하여 모델의 특정 팩토리에 액세스할 수 있습니다.
+Loading a Class
+===============
 
-기본적으로 팩토리는 먼저 매직 정적 메서드 이름에 해당하는 경로를 ``App`` 네임스페이스에서 검색합니다.
-``Factories::models()``\ 는 **Models/** 경로를 검색합니다.
+Take a look at **Models** as an example. You can access the Factory specific to Models
+by using the magic static method of the Factories class, ``Factories::models()``.
 
-다음 코드는 ``App\Models\UserModel``\ 이 있는 경우 인스턴스가 반환됩니다.
+The static method name is called *component*.
+
+.. _factories-passing-classname-without-namespace:
+
+Passing Classname without Namespace
+-----------------------------------
+
+If you pass a classname without a namespace, Factories first searches in the
+``App`` namespace for the path corresponding to the magic static method name.
+``Factories::models()`` searches the **app/Models** directory.
+
+Passing Short Classname
+^^^^^^^^^^^^^^^^^^^^^^^
+
+In the following code, if you have ``App\Models\UserModel``, the instance will be returned:
 
 .. literalinclude:: factories/001.php
 
-또는 특정 클래스를 요청할 수도 있습니다.
+If you don't have ``App\Models\UserModel``, it searches for ``Models\UserModel`` in all namespaces.
 
-.. literalinclude:: factories/002.php
-
-``Blog\Models\UserModel``\ 만 있는 경우 인스턴스가 반환됩니다.
-그러나 ``App\Models\UserModel``\ 과 ``Blog\Models\UserModel``\ 이 모두 있는 경우 ``App\Models\UserModel``\ 의 인스턴스가 반환됩니다.
-
-``Blog\Models\UserModel``\ 을 얻으려면 ``preferApp`` 옵션을 비활성화해야 합니다.
-
-.. literalinclude:: factories/010.php
-
-자세한 내용은 :ref:`factories-options`\ 를 참조하세요.
-
-다음은 코드의 어느 곳에서나 동일한 클래스를 요청할 때 팩토리는 이전과 같이 인스턴스를 다시 얻을 수 있는지 확인합니다.
+Next time you ask for the same class anywhere in your code, Factories will be sure
+you get back the instance as before:
 
 .. literalinclude:: factories/003.php
 
-편의 함수
+Passing Short Classname with Sub-directories
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you want to load a class in sub directories, you use the ``/`` as a separator.
+The following code loads **app/Libraries/Sub/SubLib.php** if it exists:
+
+.. literalinclude:: factories/013.php
+   :lines: 2-
+
+Passing Full Qualified Classname
+--------------------------------
+
+You could also request a full qualified classname:
+
+.. literalinclude:: factories/002.php
+   :lines: 2-
+
+It returns the instance of ``Blog\Models\UserModel`` if it exists.
+
+.. note:: Prior to v4.4.0, when you requested a full qualified classname,
+    if you had only ``Blog\Models\UserModel``, the instance would be returned.
+    But if you had both ``App\Models\UserModel`` and ``Blog\Models\UserModel``,
+    the instance of ``App\Models\UserModel`` would be returned.
+
+    If you wanted to get ``Blog\Models\UserModel``, you needed to disable the
+    option ``preferApp``:
+
+    .. literalinclude:: factories/010.php
+       :lines: 2-
+
+Convenience Functions
 *********************
 
-어디서든 항상 사용할 수 있는 Factory에 대한 두 가지 단축 함수가 제공됩니다.
+Two shortcut functions for Factories have been provided. These functions are always available.
+
+.. _factories-config:
 
 config()
 ========
 
-첫 번째는 Config 클래스의 새 인스턴스를 반환하는 ``config()``\ 입니다. 
-유일한 필수 매개변수는 클래스 이름입니다.
+The first is :php:func:`config()` which returns a new instance of a Config class. The only required parameter is the class name:
 
 .. literalinclude:: factories/008.php
 
 model()
 =======
 
-두 번째 함수인 :php:func:`model()`\ 은 Model 클래스의 새 인스턴스를 반환합니다. 
-유일한 필수 매개변수는 클래스 이름입니다.
+The second function, :php:func:`model()` returns a new instance of a Model class. The only required parameter is the class name:
 
 .. literalinclude:: factories/009.php
 
-팩토리 파라메터
+.. _factories-defining-classname-to-be-loaded:
+
+Defining Classname to be Loaded
+*******************************
+
+.. versionadded:: 4.4.0
+
+You could define a classname to be loaded before loading the class with
+the ``Factories::define()`` method:
+
+.. literalinclude:: factories/014.php
+   :lines: 2-
+
+The first parameter is a component. The second parameter is a class alias
+(the first parameter to Factories magic static method), and the third parameter
+is the true full qualified classname to be loaded.
+
+After that, if you load ``Myth\Auth\Models\UserModel`` with Factories, the
+``App\Models\UserModel`` instance will be returned:
+
+.. literalinclude:: factories/015.php
+   :lines: 2-
+
+Factory Parameters
 ******************
 
-``Factories``\ 는 두 번째 매개변수로 옵션 값의 배열(아래 설명)을 사용합니다.
-이러한 지시문은 각 구성 요소에 대해 구성된 기본 옵션을 재정의합니다.
+``Factories`` takes as a second parameter an array of option values (described below).
+These directives will override the default options configured for each component.
 
-동시에 전달된 모든 매개 변수가 클래스 생성자에 전달되므로 클래스 인스턴스를 쉽게 구성할 수 있습니다.
-아래 예는 앱이 인증을 위해 별도의 데이터베이스를 사용하고, 사용자 레코드에 액세스하려는 시도가 항상 해당 연결을 통과하는지 확인합니다.
+Any more parameters passed at the same time will be forwarded on to the class
+constructor, making it easy to configure your class instance on-the-fly. For example, say
+your app uses a separate database for authentication and you want to be sure that any attempts
+to access user records always go through that connection:
 
 .. literalinclude:: factories/004.php
 
-이제 ``UserModel``\ 이 ``Factories``\ 에서 로드될 때마다 대체 데이터베이스 연결을 사용하는 클래스 인스턴스를 반환하게 됩니다.
+Now any time the ``UserModel`` is loaded from ``Factories`` it will in fact be returning a
+class instance that uses the alternate database connection.
 
 .. _factories-options:
 
-팩토리 옵션
+Factories Options
+*****************
+
+The default behavior might not work for every component. For example, say your component
+name and its path do not align, or you need to limit instances to a certain type of class.
+Each component takes a set of options to direct discovery and instantiation.
+
+========== ============== ============================================================ ===================================================
+Key        Type           Description                                                  Default
+========== ============== ============================================================ ===================================================
+component  string or null The name of the component (if different than the static      ``null`` (defaults to the component name)
+                          method). This can be used to alias one component to another.
+path       string or null The relative path within the namespace/folder to look for    ``null`` (defaults to the component name,
+                          classes.                                                     but makes the first character uppercase)
+instanceOf string or null A required class name to match on the returned instance.     ``null`` (no filtering)
+getShared  boolean        Whether to return a shared instance of the class or load a   ``true``
+                          fresh one.
+preferApp  boolean        Whether a class with the same basename in the App namespace  ``true``
+                          overrides other explicit class requests.
+========== ============== ============================================================ ===================================================
+
+.. note:: Since v4.4.0, ``preferApp`` works only when you request
+    :ref:`a classname without a namespace <factories-passing-classname-without-namespace>`.
+
+Factories Behavior
 ******************
 
-기본 동작은 모든 구성 요소에서 작동하지 않을 수 있습니다.
-구성 요소 이름과 해당 경로가 일치하지 않거나, 특정 클래스로 인스턴스를 제한해야 하는 경우가 좋은 예입니다.
-각 구성 요소는 검색 및 인스턴스화를 위한 일련의 옵션을 사용합니다.
+Options can be applied in one of three ways (listed in ascending priority):
 
-========== ============== ==================================================================================================================== ===================================================
-Key        Type           Description                                                                                                          Default
-========== ============== ==================================================================================================================== ===================================================
-component  string or null 정적 메서드와 다른 경우 구성 요소의 이름. 한 구성 요소와 다른 구성 요소의 별칭을 지정하는 데 사용할 수 있습니다.     ``null`` (defaults to the component name)
-path       string or null 클래스를 찾을 네임스페이스/폴더의 상대 경로                                                                          ``null`` (defaults to the component name)
-instanceOf string or null 반환된 인스턴스에서 일치하는 필수 클래스 이름                                                                        ``null`` (no filtering)
-getShared  boolean        클래스의 공유 인스턴스를 반환할지 또는 새로 로드할지 여부                                                            ``true``
-preferApp  boolean        App 네임스페이스의 기본 이름이 동일한 클래스가 다른 명시적 클래스 요청을 재정의하는지 여부                           ``true``
-========== ============== ==================================================================================================================== ===================================================
+* A configuration class ``Config\Factory`` with a property that matches the name of a component.
+* The static method ``Factories::setOptions()``.
+* Passing options directly at call time with a parameter.
 
-팩토리 동작
-******************
-
-옵션은 세 가지 방법 중 하나로 적용할 수 있습니다.(우선순위가 높은순으로 나열)
-
-* 구성 요소의 이름과 일치하는 속성이 있는 구성 클래스 ``Config\Factory``
-* 정적 메서드 ``Factories::setOptions()``
-* 매개 변수를 사용하여 호출시 직접 옵션을 전달
-
-구성
+Configurations
 ==============
 
-기본 구성 요소 옵션을 설정하려면 **app/Config/Factory.php**\ 에 구성 요소 이름과 일치하는 배열 속성으로 옵션을 제공합니다.
-예를 들어, 팩토리별로 **Filters**\ 를 생성하려는 경우 구성 요소 이름은 ``filters``가 됩니다.
-그리고 각 필터가 CodeIgniter의 ``FilterInterface``\ 를 구현하는 클래스의 인스턴스인지 확인하려면 **app/Config/Factory.php** 파일이 다음과 같을 수 있습니다.
+To set default component options, create a new Config files at **app/Config/Factory.php**
+that supplies options as an array property that matches the name of the component.
+
+Example: Filters Factories
+--------------------------
+
+For example, if you want to create **Filters** by Factories, the component name wll be ``filters``.
+And if you want to ensure that each filter is an instance of a class which implements CodeIgniter's ``FilterInterface``,
+your **app/Config/Factory.php** file might look like this:
 
 .. literalinclude:: factories/005.php
 
-이제 ``Factories::filters('SomeFilter')``\ 와 같은 코드로 필터를 생성할 수 있으며 반환된 인스턴스는 CodeIgniter의 필터가 될 것입니다.
+Now you can create a filter with code like ``Factories::filters('SomeFilter')``,
+and the returned instance will surely be a CodeIgniter's filter.
 
-이렇게 하면 네임스페이스에 관련 없는 "Filters" 경로가 있는 타사 모듈과 충돌을 방지할 수 있습니다.
+This would prevent conflict of an third-party module which happened to have an
+unrelated ``Filters`` path in its namespace.
 
-setOptions 메소드
+Example: Library Factories
+--------------------------
+
+If you want to load your library classes in the **app/Libraries** directory with
+``Factories::library('SomeLib')``, the path `Libraries` is different from the
+default path `Library`.
+
+In this case, your **app/Config/Factory.php** file will look like this:
+
+.. literalinclude:: factories/011.php
+
+Now you can load your libraries with the ``Factories::library()`` method:
+
+.. literalinclude:: factories/012.php
+   :lines: 2-
+
+setOptions Method
 =================
 
-``Factories`` 클래스는 런타임 옵션 구성을 허용하는 정적 메소드가 있습니다. 
-``setOptions()`` 메소드를 사용하여 원하는 옵션 배열을 제공하면, 기본값과 병합되고 다음 호출을 위해 옵션이 저장됩니다.
+The ``Factories`` class has a static method to allow runtime option configuration: simply
+supply the desired array of options using the ``setOptions()`` method and they will be
+merged with the default values and stored for the next call:
 
 .. literalinclude:: factories/006.php
 
-파라메터 옵션
+Parameter Options
 =================
 
-``Factories``\ 의 매직 정적 호출은 옵션 값의 배열을 두 번째 매개 변수로 삼습니다.
-이러한 지시문은 각 구성 요소에 대해 구성된 저장된 옵션을 재정의하며, 호출시 필요한 항목을 정확하게 얻기 위해 사용할 수 있습니다.
-입력은 각 재정의 값에 대한 키로 옵션 이름이 포함된 배열이어야 합니다.
+``Factories``'s magic static call takes as a second parameter an array of option values.
+These directives will override the stored options configured for each component and can be
+used at call time to get exactly what you need. The input should be an array with option
+names as keys to each overriding value.
 
-기본적으로 ``Factories``\ 는 구성 요소의 공유 인스턴스를 찾으려고 합니다.
-매직 정적 호출에 두 번째 매개 변수를 추가하면 해당 호출에 대하여 새 인스턴스를 반환할지 아니면 공유 인스턴스를 반환할지 제어할 수 있습니다.
+For example, by default ``Factories`` assumes that you want to locate a shared instance of
+a component. By adding a second parameter to the magic static call, you can control whether
+that single call will return a new or shared instance:
 
 .. literalinclude:: factories/007.php
    :lines: 2-
+
+.. _factories-config-caching:
+
+Config Caching
+**************
+
+.. versionadded:: 4.4.0
+
+To improve performance, Config Caching has been implemented.
+
+Prerequisite
+============
+
+.. important:: Using this feature when the prerequisites are not met will prevent
+    CodeIgniter from operating properly. Do not use this feature in such cases.
+
+- To use this feature, the properties of all Config objects instantiated in
+  Factories must not be modified after instantiation. Put another way, the Config
+  classes must be an immutable or readonly classes.
+- By default, every Config class that is cached must implement ``__set_state()``
+  method.
+
+How It Works
+============
+
+- Save the all Config instances in Factories into a cache file before shutdown,
+  if the state of the Config instances in Factories changes.
+- Restore cached Config instances before CodeIgniter initialization if a cache
+  is available.
+
+Simply put, all Config instances held by Factories are cached immediately prior
+to shutdown, and the cached instances are used permanently.
+
+How to Update Config Values
+===========================
+
+Once stored, the cached versions never expire. Changing a existing Config file
+(or changing Environment Variables for it) will not update the cache nor the Config
+values.
+
+So if you want to update Config values, update Config files or Environment Variables
+for them, and you must manually delete the cache file.
+
+You can use the ``spark cache:clear`` command:
+
+.. code-block:: console
+
+    php spark cache:clear
+
+Or simply delete the **writable/cache/FactoriesCache_config** file.
+
+How to Enable Config Caching
+============================
+
+Uncomment the following code in **public/index.php**::
+
+    --- a/public/index.php
+    +++ b/public/index.php
+    @@ -49,8 +49,8 @@ if (! defined('ENVIRONMENT')) {
+     }
+
+     // Load Config Cache
+    -// $factoriesCache = new \CodeIgniter\Cache\FactoriesCache();
+    -// $factoriesCache->load('config');
+    +$factoriesCache = new \CodeIgniter\Cache\FactoriesCache();
+    +$factoriesCache->load('config');
+     // ^^^ Uncomment these lines if you want to use Config Caching.
+
+     /*
+    @@ -79,7 +79,7 @@ $app->setContext($context);
+     $app->run();
+
+     // Save Config Cache
+    -// $factoriesCache->save('config');
+    +$factoriesCache->save('config');
+     // ^^^ Uncomment this line if you want to use Config Caching.
+
+     // Exits the application, setting the exit code for CLI-based applications

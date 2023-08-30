@@ -1,67 +1,88 @@
 ##############################
-여러 환경 처리(Handling)
+Handling Multiple Environments
 ##############################
 
-개발자는 종종 어플리케이션이 개발 환경과 프로덕션 환경에 따라 다른 방식으로 시스템이 동작하길 원합니다.
-자세한 오류 출력이 좋은 예인데, 어플리케이션을 개발하는 동안 유용하지만 "서비스"중일 때는 이로 인해 보안 문제가 발생할 수 있습니다.
-개발 환경에서는 프로덕션 환경에서 사용하지 않는 추가 도구를 로드 할 수도 있습니다.
+Developers often desire different system behavior depending on whether
+an application is running in a development or production environment.
+For example, verbose error output is something that would be useful
+while developing an application, but it may also pose a security issue
+when "live". In development environments, you might want additional
+tools loaded that you don't in production environments, etc.
 
 .. contents::
     :local:
-    :depth: 2
+    :depth: 3
+
+************************
+The Defined Environments
+************************
+
+By default, CodeIgniter has three environments defined.
+
+- ``production`` for production
+- ``development`` for development
+- ``testing`` for PHPUnit testing
+
+.. important:: The environment ``testing`` is reserved for PHPUnit testing. It
+    has special conditions built into the framework at various places to assist
+    with that. You can't use it for your development.
+
+If you want another environment, e.g., for staging, you can add custom environments.
+See `Adding Environments`_.
+
+*******************
+Setting Environment
+*******************
 
 .. _environment-constant:
 
-ENVIRONMENT 상수
+The ENVIRONMENT Constant
 ========================
 
-기본적으로 CodeIgniter에는 ``ENVIRONMENT`` 상수가 ``$_SERVER['CI_ENVIRONMENT']``\ 에 제공된 값을 사용하도록 설정되어 있으며, 그렇지 않은 경우 ``production`` 값을 기본 값으로 설정합니다.
-서버 설정에 따라 여러 가지 방법으로 설정할 수 있습니다.
+To set your environment, CodeIgniter comes with the ``ENVIRONMENT`` constant.
+If you set ``$_SERVER['CI_ENVIRONMENT']``, the value will be used,
+otherwise defaulting to ``production``.
 
-.. note:: PHPUit 테스트에는 환경 ``testing``\ 이 특별합니다.
-    이를 지원하기 위해 여러 곳의 프레임워크에 특수 조건이 내장되어 있습니다.
-    개발에는 사용할 수 없습니다.
-
-.. note:: ``spark env`` 명령으로 현재 환경을 확인할 수 있습니다.
-    
-    ::
-
-    > php spark env
+This can be set in several ways depending on your server setup.
 
 .env
 ----
 
-변수를 설정하는 가장 간단한 방법은 :doc:`.env 파일 </general/configuration>`\ 입니다.
+The simplest method to set the variable is in your :ref:`.env file <dotenv-file>`.
 
 .. code-block:: ini
 
     CI_ENVIRONMENT = development
 
-.. note:: ``spark env`` 명령으로 **.env** 파일의 ``CI_ENVIRONMENT`` 값을 변경할 수 있습니다.
-    
-    ::
+.. note:: You can change the ``CI_ENVIRONMENT`` value in **.env** file by ``spark env`` command:
 
-    > php spark env production
+    .. code-block:: console
+
+        php spark env production
 
 .. _environment-apache:
 
 Apache
 ------
 
-``.htaccess`` 파일 또는 `SetEnv <https://httpd.apache.org/docs/2.2/mod/mod_env.html#setenv>`_\ 를 사용하여 Apache 변수를 설정할 수 있습니다.
+This server variable can be set in your **.htaccess** file or Apache
+config using `SetEnv <https://httpd.apache.org/docs/2.4/mod/mod_env.html#setenv>`_.
 
 .. code-block:: apache
 
     SetEnv CI_ENVIRONMENT development
 
+
 .. _environment-nginx:
 
-nginx
+Nginx
 -----
 
-nginx에서는 ``fastcgi_params``\ 를 통해 환경 변수를 전달해야 `$_SERVER` 변수 아래 표시됩니다.
-이와 같은 방법을 사용하면 `env`\ 를 사용하여 전체 서버에 대해 설정하는 대신, 가상 호스트 수준에서만 작동하도록 할 수 있습니다.
-서버 구성을 다음과 같이 수정합니다:
+Under Nginx, you must pass the environment variable through the ``fastcgi_params``
+in order for it to show up under the ``$_SERVER`` variable. This allows it to work on the
+virtual-host level, instead of using `env` to set it for the entire server, though that
+would work fine on a dedicated server. You would then modify your server config to something
+like:
 
 .. code-block:: nginx
 
@@ -76,29 +97,65 @@ nginx에서는 ``fastcgi_params``\ 를 통해 환경 변수를 전달해야 `$_S
         }
     }
 
-nginx 및 기타 서버에서 이 대체 방법을 사용할 수 있으며, 이를 사용하지 않고 서버의 IP 주소를 기반으로 상수를 설정할 수 있습니다.
+Alternative methods are available for Nginx and other servers, or you can
+remove this logic entirely and set the constant based on the server's IP address
+(for instance).
 
-이 상수를 이용하면 프레임워크 기본 동작에 영향을 주고, 개발할 때 실행중인 환경을 구별할 수 있습니다.
+In addition to affecting some basic framework behavior (see the next
+section), you may use this constant in your own development to
+differentiate between which environment you are running in.
 
-부팅 파일
-------------
+*******************
+Adding Environments
+*******************
 
-CodeIgniter를 실행하려면 사용중인 환경 이름과 일치하는 PHP 파일이 **APPPATH/Config/Boot** 아래에 있어야 합니다.
-이 파일에는 오류 표시 설정, 추가 개발자 도구 로드등 사용중인 환경에 맞는 모든 사용자 정의가 포함될 수 있습니다.
-다음 파일은 CodeIgniter 설치시 자동으로 생성되며, 실행시 시스템에 의해 자동으로 로드됩니다:
+To add custom environments, you just need to add boot files for them.
+
+Boot Files
+==========
+
+CodeIgniter requires that a PHP script matching the environment's name is located
+under **APPPATH/Config/Boot**. These files can contain any customizations that
+you would like to make for your environment, whether it's updating the error display
+settings, loading additional developer tools, or anything else. These are
+automatically loaded by the system. The following files are already created in
+a fresh install:
 
 * development.php
 * production.php
 * testing.php
 
-프레임워크 동작에 미치는 영향
-=====================================
+For example, if you want to add ``staging`` environment for staging, all you need
+to do is:
 
-이 섹션에서는 ENVIRONMENT 상수가 CodeIgniter 시스템에는 사용되는 곳과 동작에 어떻게 영향을 미치는지 설명합니다.
+1. copy **APPPATH/Config/Boot/production.php** to **staging.php**.
+2. customize settings in **staging.php** if you want.
 
-오류보고
----------------
+**********************************
+Confirming the Current Environment
+**********************************
 
-ENVIRONMENT 상수를 ``development`` 값으로 설정하면 모든 PHP 오류에 대해 웹브라우저에 렌더링됩니다.
-반대로, ENVIRONMENT 상수를 ``production``\ 으로 설정하면 모든 오류 출력이 비활성화됩니다.
-프로덕션에서 오류보고를 비활성화하는 것이 :doc:`좋은 보안 관행 </concepts/security>`\ 입니다.
+To confirm the current environment, simply echo the constant ``ENVIRONMENT``.
+
+You can also check the current environment by ``spark env`` command:
+
+.. code-block:: console
+
+    php spark env
+
+*************************************
+Effects on Default Framework Behavior
+*************************************
+
+There are some places in the CodeIgniter system where the ``ENVIRONMENT``
+constant is used. This section describes how default framework behavior
+is affected.
+
+Error Reporting
+===============
+
+Setting the ``ENVIRONMENT`` constant to a value of ``development`` will cause
+all PHP errors to be rendered to the browser when they occur.
+Conversely, setting the constant to ``production`` will disable all error
+output. Disabling error reporting in production is a
+:doc:`good security practice </concepts/security>`.

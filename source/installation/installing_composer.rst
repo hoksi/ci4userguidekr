@@ -1,202 +1,254 @@
-Composer로 설치
-###############################################################################
+Composer Installation
+#####################
 
 .. contents::
     :local:
     :depth: 2
 
-Composer는 CodeIgniter4를 시스템에 여러 가지 방법으로 설치하여 사용할 수 있게해 줍니다.
+Composer can be used in several ways to install CodeIgniter4 on your system.
 
-.. important:: CodeIgniter4는 Composer 2.0.14 이상이 필요합니다.
+.. important:: CodeIgniter4 requires Composer 2.0.14 or later.
 
-.. note:: 만약 Composer에 익숙하지 않다면, 먼저 `Basic usage <https://getcomposer.org/doc/01-basic-usage.md>`_\ 를 읽는 것을 권장합니다..
+.. note:: If you are not familiar with Composer, we recommend you read
+    `Basic usage <https://getcomposer.org/doc/01-basic-usage.md>`_ first.
 
-첫 번째 기술은 CodeIgniter4를 사용하여 새 웹앱의 기반으로 사용할 수 있는 스켈레톤(skeleton) 프로젝트를 만드는 방법을 설명합니다.
-두 번째 기술을 사용하면 CodeIgniter4를 기존 웹앱에 추가할 수 있습니다.
+The first technique describes creating a skeleton project
+using CodeIgniter4, that you would then use as the base for a new webapp.
+The second technique described below lets you add CodeIgniter4 to an existing
+webapp,
 
-.. note:: 만약 당신이 코드를 저장하거나 다른 사람들과 협업하기 위해 Git 저장소를 사용한다면, **vendor** 폴더는 일반적으로 "git ignored"\ 에 추가됩니다. 
-          이 경우 레파지토리(repository)에 있는 새 시스템으로 업그레이드 하고 싶다면 ``composer update``\ 를 실행하십시오.
+.. note:: If you are using a Git repository to store your code, or for
+   collaboration with others, then the **vendor** folder would normally
+   be "git ignored". In such a case, you will need to do a ``composer update``
+   when you clone the repository to a new system.
 
-앱 스타터
-=============
+App Starter
+===========
 
-`CodeIgniter 4 app starter <https://github.com/codeigniter4/appstarter>`_ 레파지토리는 
-프레임워크의 최신 버전에 대한 composer 의존성과 함께 골격(skeleton) 어플리케이션을 보유하고 있습니다.
+The `CodeIgniter 4 app starter <https://github.com/codeigniter4/appstarter>`_
+repository holds a skeleton application, with a composer dependency on
+the latest released version of the framework.
 
-이 설치 방법은 새로운 CodeIgniter4 기반 프로젝트를 시작하고자 하는 개발자에게 적합합니다.
-
-설치
-----
-
-**프로젝트 루트(root)** 폴더에서 다음과 같이 입력합니다.
-
-::
-
-    > composer create-project codeigniter4/appstarter project-root
-
-위와 같이하면 "project-root" 폴더가 생성됩니다.
-
-"project-root"\ 를 생략하면 "appstarter" 폴더가 생성되며, 이 폴더의 이름은 바꿀 수 있습니다.
-
-.. note:: CodeIgniter 자동 로더(autoloader)는 특정 운영 체제의 파일 이름에 잘못된 특수 문자를 허용하지 않습니다.
-    사용할 수 있는 기호는 ``/``, ``_``, ``.``, ``:``, ``\``\ 과 공백(space)입니다.
-    따라서 ``(``, ``)`` 등과 같은 특수 문자가 포함된 폴더에 CodeIgniter를 설치하면 CodeIgniter가 작동하지 않습니다.
-
-.. important:: 프로덕션 서버에 배포할 때는 다음 명령어를 실행하는 것을 잊지 마세요.
-    
-    ::
-
-    > composer install --no-dev
-
-    위 명령은 프로덕션 환경에서 필요하지 않은 개발용 Composer 패키지만 제거합니다.
-    이는 vendor 폴더 크기를 크게 줄일 수 있습니다.
-
-Initial Configuration
----------------------
-
-설치 후 몇 가지 초기 구성이 필요합니다.
-자세한 내용은 :ref:`initial-configuration`\ 을 참조하세요.
-
-.. _app-starter-upgrading:
-
-업그레이드
---------------
-
-새 릴리즈가 있을 때마다 프로젝트 루트에서 다음 입력합니다.
-
-::
-
-    > composer update 
-
-:doc:`업그레이드 지침 <upgrading>`\ 을 읽고 변경 사항 및 개선 사항을 확인하십시오.
-
-장점
-----------
-
-간단한 설치; 쉬운 업데이트.
-
-단점
-----------
-
-**프로젝트의 root, app, public, writable 폴더**\ 의 파일 변경 사항을 확인하고 직접 병합해야 합니다.
-
-.. note:: 프로젝트의 변경 내용 병합을 돕는 몇 가지 서드파티 CodeIgniter 모듈이 있습니다.
-    `Explore on Packagist <https://packagist.org/explore/?query=codeigniter4%20updates>`_.
-
-구조
----------
-
-설정 후 프로젝트의 폴더:
-
-- app, public, tests, writable 
-- vendor/codeigniter4/framework/system
-
-Latest Dev
-=================
-
-App Starter 저장소에는 현재 안정 릴리스와 프레임워크의 최신 개발 지점간에 Composer 소스를 전환하는 ``builds`` 스크립트가 제공됩니다.
-불안정할 수 있지만 출시되지 않은 최신 변경 사항을 적용해보고 싶은 개발자는 이 스크립트를 사용하십시오.
-
-`개발 사용자 가이드 <https://codeigniter4.github.io/CodeIgniter4/>`_\ 는 온라인으로 액세스 할 수 있습니다.
-이는 릴리스된 사용자 가이드와 다르며 개발 브랜치와 관련이 있다는 점을 유의하십시오.
-
-프로젝트 루트(root) 폴더에서 다음 명령을 입력하십시오.
-
-::
-
-    > php builds developmen
-
-위의 명령은 **composer.json**\ 을 업데이트하여 작업 저장소의 ``develop`` 브렌치(branch)를 가리키고 구성 및 XML 파일의 해당 경로를 업데이트합니다.
-
-이러한 변경 사항을 되돌리려면 다음 명령을 입력하십시오.
-
-::
-
-    > php builds release
-
-
-``builds`` 명령을 사용한 후에는 반드시 ``composer update``\ 를 실행하여 vendor 폴더를 최신 빌드와 동기화해야 합니다.
-
-기존 프로젝트에 CodeIgniter4 추가
-===================================
-
-"수동 설치"\ 에 설명된 것과 동일한 CodeIgniter4 프레임워크를 Composer를 사용하여 기존 프로젝트에 추가할 수도 있습니다.
+This installation technique would suit a developer who wishes to start
+a new CodeIgniter4 based project.
 
 Installation
 ------------
 
-앱은 ``app`` 폴더 안에서 개발하고, 웹 루트(root)는 ``public`` 폴더를 지정하십시오.
+In the folder above your project root:
 
-프로젝트 루트(root)에서 다음 명령어를 입력하십시오.
+.. code-block:: console
 
-::
+    composer create-project codeigniter4/appstarter project-root
 
-    > composer require codeigniter4/framework
+The command above will create a **project-root** folder.
 
-.. important:: 프로덕션 서버에 배포할 때 다음 명령을 실행하는 것을 잊지 마십시오.
-    
-    ::
+If you omit the "project-root" argument, the command will create an
+"appstarter" folder, which can be renamed as appropriate.
 
-    > composer install --no-dev
+.. note:: Before v4.4.0, CodeIgniter autoloader did not allow special
+    characters that are illegal in filenames on certain operating systems.
+    The symbols that can be used are ``/``, ``_``, ``.``, ``:``, ``\`` and space.
+    So if you installed CodeIgniter under the folder that contains the special
+    characters like ``(``, ``)``, etc., CodeIgniter didn't work. Since v4.4.0,
+    this restriction has been removed.
 
-    위 명령은 프로덕션 환경에서 필요하지 않은 개발용 Composer 패키지만 제거합니다. 
-    vendor 폴더 크기를 크게 줄입니다.
+.. important:: When you deploy to your production server, don't forget to run the
+    following command:
 
-설정(Setup)
-----------------
+    .. code-block:: console
 
-    1. ``app``, ``public``, ``tests``, ``writable`` 폴더를 ``vendor/codeigniter4/framework``\ 에서 프로젝트 루트(root)로 복사
-    2. ``env``, ``phpunit.xml.dist``, ``spark`` 파일을 ``vendor/codeigniter4/framework``\ 에서 프로젝트 루트로 복사
-    3. **app/Config/Paths.php**\ 의 ``$systemDirectory`` 속성을 조정하여 공급업체를 참조(예: ``ROOTPATH . '/vendor/codeigniter4/framework/system'``)합니다.
+        composer install --no-dev
+
+    The above command will remove the Composer packages only for development
+    that are not needed in the production environment. This will greatly reduce
+    the vendor folder size.
 
 Initial Configuration
 ---------------------
 
-몇 가지 초기 구성이 필요합니다.
-자세한 내용은 :ref:`initial-configuration`\ 을 참조하세요.
+After installation, a few initial configurations are required.
+See :ref:`initial-configuration` for the details.
 
-.. _adding-codeigniter4-upgrading:
+.. _app-starter-upgrading:
 
-업그레이드
----------------
+Upgrading
+---------
 
-새 릴리즈가 있을 때마다 프로젝트 루트의 커맨드 라인에서 다음 명령을 입력하십시오.::
+Whenever there is a new release, then from the command line in your project root:
 
-    > composer update
+.. code-block:: console
 
-:doc:`업그레이드 지침 <upgrading>`\ 을 읽고 변경 사항 및 개선 사항을 확인하십시오.
+    composer update
 
-장점
--------------
+Read the :doc:`upgrade instructions <upgrading>`, and check Breaking Changes and Enhancements.
 
-비교적 간단한 설치, 쉬운 업데이트.
+Pros
+----
 
-단점
--------------
+Simple installation; easy to update.
 
-업데이투 후 **project space** (root, app, public, writable) 에서 변경 사항을 확인해야 합니다.
+Cons
+----
+
+You still need to check for file changes in the **project space**
+(root, app, public, writable) and merge them after updating.
 
 .. note:: There are some third-party CodeIgniter modules available to assist
     with merging changes to the project space:
     `Explore on Packagist <https://packagist.org/explore/?query=codeigniter4%20updates>`_.
 
-구조
--------------
+Structure
+---------
 
-설정 후 프로젝트의 폴더:
+Folders in your project after set up:
 
 - app, public, tests, writable
 - vendor/codeigniter4/framework/system
 
-번역된 시스템 메시지 설치
-============================
+Latest Dev
+----------
 
-번역된 시스템 메시지를 이용하려면 프레임워크 설치와 비슷한 방식으로 프로젝트에 추가할 수 있습니다.
+The App Starter repo comes with a ``builds`` scripts to switch Composer sources between the
+current stable release and the latest development branch of the framework. Use this script
+for a developer who is willing to live with the latest unreleased changes, which may be unstable.
 
-프로젝트 루트(root)에서 다음 명령을 입력하십시오.
+The `development user guide <https://codeigniter4.github.io/CodeIgniter4/>`_ is accessible online.
+Note that this differs from the released user guide, and will pertain to the
+develop branch explicitly.
 
-::
+Update for Latest Dev
+^^^^^^^^^^^^^^^^^^^^^
 
-    > composer require codeigniter4/translations
+In your project root:
 
-업데이트된 내용은 ``composer update``\ 를 실행할 때마다 프레임워크와 함께 업데이트됩니다.
+.. code-block:: console
+
+    php builds development
+
+The command above will update **composer.json** to point to the ``develop`` branch of the
+working repository, and update the corresponding paths in config and XML files.
+
+After using the ``builds`` command be sure to run ``composer update`` to sync your vendor
+folder with the latest target build. Then, check the :doc:`upgrading` and update project
+files if necessary.
+
+Next Minor Version
+^^^^^^^^^^^^^^^^^^
+
+If you want to use the next minor version branch, after using the ``builds`` command
+edit **composer.json** manually.
+
+If you try the ``4.4`` branch, change the version to ``4.4.x-dev``::
+
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "codeigniter4/codeigniter4": "4.4.x-dev"
+    },
+
+And run ``composer update`` to sync your vendor
+folder with the latest target build. Then, check the Upgrading Guide
+(**user_guide_src/source/installation/upgrade_{version}.rst**) and
+update project files if necessary.
+
+Revert to Stable Release
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+To revert the changes run:
+
+.. code-block:: console
+
+    php builds release
+
+Adding CodeIgniter4 to an Existing Project
+==========================================
+
+The same `CodeIgniter 4 framework <https://github.com/codeigniter4/framework>`_
+repository described in "Manual Installation" can also be added to an
+existing project using Composer.
+
+Installation
+------------
+
+Develop your app inside the ``app`` folder, and the ``public`` folder
+will be your document root.
+
+In your project root:
+
+.. code-block:: console
+
+    composer require codeigniter4/framework
+
+.. important:: When you deploy to your production server, don't forget to run the
+    following command:
+
+.. code-block:: console
+
+    composer install --no-dev
+
+    The above command will remove the Composer packages only for development
+    that are not needed in the production environment. This will greatly reduce
+    the vendor folder size.
+
+Setting Up
+----------
+
+    1. Copy the **app**, **public**, **tests** and **writable** folders from **vendor/codeigniter4/framework** to your project root
+    2. Copy the **env**, **phpunit.xml.dist** and **spark** files, from **vendor/codeigniter4/framework** to your project root
+    3. You will have to adjust the ``$systemDirectory`` property in **app/Config/Paths.php** to refer to the vendor one, e.g., ``__DIR__ . '/../../vendor/codeigniter4/framework/system'``.
+
+Initial Configuration
+---------------------
+
+A few initial configurations are required.
+See :ref:`initial-configuration` for the details.
+
+.. _adding-codeigniter4-upgrading:
+
+Upgrading
+---------
+
+Whenever there is a new release, then from the command line in your project root::
+
+.. code-block:: console
+
+    composer update
+
+Read the :doc:`upgrade instructions <upgrading>`, and check Breaking Changes and Enhancements.
+
+Pros
+----
+
+Relatively simple installation; easy to update.
+
+Cons
+----
+
+You still need to check for file changes in the **project space**
+(root, app, public, writable) after updating.
+
+.. note:: There are some third-party CodeIgniter modules available to assist
+    with merging changes to the project space:
+    `Explore on Packagist <https://packagist.org/explore/?query=codeigniter4%20updates>`_.
+
+Structure
+---------
+
+Folders in your project after set up:
+
+- app, public, tests, writable
+- vendor/codeigniter4/framework/system
+
+Translations Installation
+=========================
+
+If you want to take advantage of the system message translations,
+they can be added to your project in a similar fashion.
+
+From the command line inside your project root:
+
+.. code-block:: console
+
+    composer require codeigniter4/translations
+
+These will be updated along with the framework whenever you do a ``composer update``.

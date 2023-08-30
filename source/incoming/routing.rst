@@ -1,753 +1,896 @@
-###################
-URI 라우팅(Routing)
-###################
+###########
+URI Routing
+###########
 
 .. contents::
     :local:
-    :depth: 2
+    :depth: 3
 
-라우팅이란?
+What is URI Routing?
 ********************
 
-URI 라우팅은 URI를 컨트롤러의 메소드와 연결합니다.
+URI Routing associates a URI with a controller's method.
 
-CodeIgniter에는 두 가지 종류의 라우팅이 있습니다. 하나는 **Defined Route Routing**\ 이고 다른 하나는 **Auto Routing**\ 입니다.
-정의된 경로 라우팅을 사용하여 경로를 수동으로 정의할 수 있으며, 유연한 URL을 허용합니다.
-자동 라우팅(Auto Routing)은 규칙에 따라 HTTP 요청을 자동으로 라우팅하고 해당 컨트롤러 메서드를 실행합니다. 
-수동으로 경로를 정의할 필요가 없습니다.
+CodeIgniter has two kinds of routing. One is **Defined Route Routing**, and the other is **Auto Routing**.
+With Defined Route Routing, you can define routes manually. It allows flexible URL.
+Auto Routing automatically routes HTTP requests based on conventions and execute the corresponding controller methods. There is no need to define routes manually.
 
-먼저 정의된 경로 라우팅을 살펴보겠습니다. 자동 라우팅을 사용하려면 :ref:`auto-routing-improved`\ 를 참조하세요.
+First, let's look at Defined Route Routing. If you want to use Auto Routing, see :ref:`auto-routing-improved`.
 
 .. _defined-route-routing:
 
-자신만의 라우팅 규칙 설정
-==============================
+Setting Routing Rules
+*********************
 
-라우팅 규칙은 **app/Config/Routes.php** 파일에 정의되어 있습니다.
-여기에서 고유한 라우팅 기준을 지정할 수 있는 RouteCollection 클래스(``$routes``)의 인스턴스를 생성하는 것을 볼 수 있습니다.
-경로는 자리 표시자(placeholders) 또는 정규식을 사용하여 지정할 수 있습니다.
+Routing rules are defined in the **app/Config/Routes.php** file. In it you'll see that
+it creates an instance of the RouteCollection class (``$routes``) that permits you to specify your own routing criteria.
+Routes can be specified using placeholders or Regular Expressions.
 
-경로를 지정할 때 HTTP 동사에 해당하는 메소드(요청 메소드)를 선택합니다.
-GET 요청이 예상되면 ``get()`` 메서드를 사용합니다.
+When you specify a route, you choose a method to corresponding to HTTP verbs (request method).
+If you expect a GET request, you use the ``get()`` method:
 
 .. literalinclude:: routing/001.php
 
-경로(route)는 왼쪽의 URI 경로(``/``)를 사용하여 컨트롤러에 전달되어야 하는 모든 매개변수와 함께 오른쪽의 컨트롤러 및 메서드(``Home::index``)에 매핑합니다.
-컨트롤러와 메서드는 ``Users::list``\ 와 같이 클래스와 메서드를 이중 콜론(::)으로 구분하여 정적 메서드를 사용하는 것과 같은 방식으로 나열해야 합니다.
-해당 메서드에 매개 변수를 전달해야 하는 경우 메서드 이름 뒤에 슬래시로 구분하여 나열됩니다.
+A route takes the **Route Path** (URI path relative to the BaseURL. ``/``) on the left,
+and maps it to the **Route Handler** (controller and method ``Home::index``) on the right,
+along with any parameters that should be passed to the controller.
+
+The controller and method should
+be listed in the same way that you would use a static method, by separating the class
+and its method with a double-colon, like ``Users::list``.
+
+If that method requires parameters to be
+passed to it, then they would be listed after the method name, separated by forward-slashes:
 
 .. literalinclude:: routing/002.php
 
 Examples
 ========
 
-다음은 기본적인 몇 가지 라우팅 예입니다.
+Here are a few basic routing examples.
 
-첫 번째 세그먼트에 **journals**\ 라는 단어가 포함된 URL은 ``\App\Controllers\Blogs`` 클래스의 기본 메소드인 ``index()``\ 로 매핑됩니다.
+A URL containing the word **journals** in the first segment will be mapped to the ``\App\Controllers\Blogs`` class,
+and the default method, which is usually ``index()``:
 
 .. literalinclude:: routing/006.php
 
-"blog/joe" 세그먼트가 포함된 URL은 ``\App\Controllers\Blogs`` 클래스의 ``users()`` 메소드로 매핑됩니다. ID는 ``34``\ 로 설정됩니다.
+A URL containing the segments **blog/joe** will be mapped to the ``\App\Controllers\Blogs`` class and the ``users()`` method.
+The ID will be set to ``34``:
 
 .. literalinclude:: routing/007.php
 
-URL의 첫 번째 세그먼트가 **product**\ 면 두 번째 세그먼트 값에 상관없이 ``\App\Controllers\Catalog`` 클래스의 ``productLookup()`` 메서드에 매핑됩니다.
+A URL with **product** as the first segment, and anything in the second will be mapped to the ``\App\Controllers\Catalog`` class
+and the ``productLookup()`` method:
 
 .. literalinclude:: routing/008.php
 
-첫 번째 세그먼트가 **product**\ 이고 두 번째로 숫자가 있는 URL은 ``\App\Controllers\Catalog`` 클래스의 ``productLookupByID()`` 메소드로 매핑되고, 
-두 번째 세그먼트의 숫자를 메소드 변수에 전달합니다.
+A URL with **product** as the first segment, and a number in the second will be mapped to the ``\App\Controllers\Catalog`` class
+and the ``productLookupByID()`` method passing in the match as a variable to the method:
 
 .. literalinclude:: routing/009.php
 
-
-HTTP 동사(verbs)
+HTTP verb Routes
 ================
 
-모든 표준 HTTP 동사(GET, POST, PUT, DELETE, OPTIONS, etc)를 사용할 수 있습니다.
+You can use any standard HTTP verb (GET, POST, PUT, DELETE, OPTIONS, etc):
 
 .. literalinclude:: routing/003.php
 
-``match()`` 메소드에 배열로 전달하여 경로가 일치해야 하는 여러 동사를 제공할 수 있습니다.
+You can supply multiple verbs that a route should match by passing them in as an array to the ``match()`` method:
 
 .. literalinclude:: routing/004.php
 
-컨트롤러의 네임스페이스
-========================
+Specifying Route Handlers
+=========================
 
-컨트롤러 이름이 ``\``\ 로 시작하지 않으면 :ref:`routing-default-namespace`\ 가 앞에 추가됩니다.
+Controller's Namespace
+----------------------
+
+When you specify a controller and method name as a string, if a controller is
+written without a leading ``\``, the :ref:`routing-default-namespace` will be
+prepended:
 
 .. literalinclude:: routing/063.php
 
-시작 부분에 ``\``\ 를 넣으면 정규화된 클래스 이름으로 처리됩니다.
+If you put ``\`` at the beginning, it is treated as a fully qualified class name:
 
 .. literalinclude:: routing/064.php
 
-``namespace`` 옵션으로 네임스페이스를 지정할 수 있습니다.
+You can also specify the namespace with the ``namespace`` option:
 
 .. literalinclude:: routing/038.php
 
-자세한 내용은 :ref:`assigning-namespace`\ 를 참조하세요.
-
-자리 표시자(Placeholder)
-===========================
-
-일반적으로 경로(route)는 다음과 같습니다
-
-.. literalinclude:: routing/005.php
-
-경로에서 첫 번째 매개 변수는 일치할 URI이고, 두 번째 매개 변수는 라우팅해야 하는 대상입니다.
-위의 예제는 URL 경로의 첫 번째 세그먼트가 "product"\ 이고 두 번째 세그먼트에 숫자가 있으면 "App\Catalog" 클래스의 "productLookup" 메소드로 라우팅됩니다.
-
-자리 표시자는 단순히 정규식 패턴을 나타내는 문자열입니다.
-라우팅 프로세스가 진행되는 동안 이러한 자리 표시자는 정규식 값으로 대체됩니다.
-이들은 주로 가독성을 위해 사용됩니다.
-
-경로에서 사용할 수있는 자리 표시자는 다음과 같습니다.
-
-============ ===========================================================================================================
-Placeholders Description
-============ ===========================================================================================================
-(:any)       해당 시점부터 URI 끝까지의 모든 문자와 일치하며, 여기에는 여러 URI 세그먼트가 포함될 수 있습니다.
-(:segment)   결과를 단일 세그먼트로 제한하는 슬래시(``/``)를 제외한 모든 문자와 일치합니다.
-(:num)       모든 정수와 일치합니다.
-(:alpha)     모든 알파벳 문자와 일치합니다
-(:alphanum)  영문자, 정수 문자열, 둘의 조합과 일치합니다.
-(:hash)      ``(:segment)``\ 와 같습니다. 그러나 hashded id를 사용합니다.
-============ ===========================================================================================================
-
-.. note:: ``{locale}`` :doc:`현지화(localization) </outgoing/localization>`\ 에 사용하도록 예약되어 있으므로 자리 표시자 또는 경로의 다른 부분으로 사용할 수 없습니다.
-
-하나의 ``(:any)``\ 가 있는 경우 URL의 여러 세그먼트와 일치합니다.
-
-.. literalinclude:: routing/010.php
-
-위의 경로는 **product/123**, **product/123/456**, **product/123/456/789** 등과 일치합니다.
-컨트롤러를 구현할 때는 최대 매개 변수를 고려해야 합니다.
-
-.. literalinclude:: routing/011.php
-
-.. important:: ``(:any)`` 뒤에 자리 표시자를 두지 마십시오. 컨트롤러 메서드에 전달되는 매개변수의 수가 변경될 수 있습니다.
-
-여러 세그먼트를 일치시키는 것이 의도된 동작이 아니라면 경로를 정의할 때 ``(:segment)``\ 를 사용합니다.
-
-.. literalinclude:: routing/012.php
-
-위의 경로는 **product/123**\ 만 일치하고 다른 예(product/123/456, product/123/456/789 등)는 404 오류가 발생합니다.
-
-
-.. warning:: ``add()`` 방식은 편리하지만, 아래 설명된 더 안전한 HTTP-verb-based 경로(route) 사용을 권장합니다.
-    :doc:`CSRF protection </libraries/security>`\ 은 *GET** 요청을 보호하지 않으므로, ``add()`` 메서드에 지정된 URI를 GET 메서드로 액세스할 경우 CSRF protection이 작동하지 않습니다.
-
-.. note:: HTTP-verb-based 경로(route)를 사용하면 현재 요청 방법과 일치하는 경로만 저장되므로 일치하는 경로를 찾을 때 검색할 경로가 줄어들어 성능이 약간 향상됩니다.
+See :ref:`assigning-namespace` for details.
 
 Array Callable Syntax
-=====================
+---------------------
 
 .. versionadded:: 4.2.0
 
-v4.2.0부터 배열 호출 가능 구문(array callable syntax)을 사용하여 컨트롤러를 지정할 수 있습니다.
+Since v4.2.0, you can use array callable syntax to specify the controller:
 
 .. literalinclude:: routing/013.php
    :lines: 2-
 
-또는 ``use`` 키워드 사용:
+Or using ``use`` keyword:
 
 .. literalinclude:: routing/014.php
    :lines: 2-
 
-자리 표시자가 있는 경우 지정된 순서대로 매개변수를 자동으로 설정합니다.
+If you forget to add ``use App\Controllers\Home;``, the controller classname is
+interpreted as ``Config\Home``, not ``App\Controllers\Home`` because
+**app/Config/Routes.php** has ``namespace Config;`` at the top.
+
+.. note:: When you use Array Callable Syntax, the classname is always interpreted
+    as a fully qualified classname. So :ref:`routing-default-namespace` and
+    :ref:`namespace option <assigning-namespace>` have no effect.
+
+Array Callable Syntax and Placeholders
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If there are placeholders, it will automatically set the parameters in the specified order:
 
 .. literalinclude:: routing/015.php
    :lines: 2-
 
-그러나 경로(route)에 정규식을 사용하는 경우 자동 구성 매개변수가 올바르지 않을 수 있습니다.
-이러한 경우 매개변수를 수동으로 지정합니다.
+But the auto-configured parameters may not be correct if you use regular expressions in routes.
+In such a case, you can specify the parameters manually:
 
 .. literalinclude:: routing/016.php
    :lines: 2-
 
-맞춤(custom) 자리 표시자
-==========================
+Using Closures
+--------------
 
-가독성을 위해 경로(route) 파일에 사용자 정의 자리 표시자를 만들어 사용할 수 있습니다.
-
-``addPlaceholder()`` 메소드를 사용하여 새로운 자리 표시자를 추가합니다.
-첫 번째 매개 변수는 자리 표시자로 사용될 문자열입니다.
-두 번째 매개 변수는 정규식 패턴입니다.
-경로(route)를 추가하기 전에 호출해야 합니다.
-
-.. literalinclude:: routing/017.php
-
-정규식
-===================
-
-원하는 경우 정규식을 사용하여 라우팅 규칙을 정의할 수 있습니다.
-역 참조와 마찬가지로 유효한 정규식이 허용됩니다.
-
-.. important:: Note: 역 참조를 사용하는 경우 이중 백 슬래시 구문 대신 달러($) 구문을 사용해야합니다.
-    일반적인 RegEx 경로는 다음과 같습니다.
-
-    .. literalinclude:: routing/018.php
-
-위의 예에서, **products/shirts/123**\ 과 유사한 URI는 ``Products`` 컨트롤러 클래스의 ``show()`` 메소드를 호출하고 세그먼트가 첫 번째 및 두 번째 세그먼트가 인수로 전달됩니다.
-
-정규 표현식을 사용하면 일반적으로 여러 세그먼트 사이의 구분 기호를 나타내는 슬래시(``/``)가 포함된 세그먼트를 잡을 수도 있습니다.
-
-사용자가 웹 어플리케이션의 비밀번호로 보호된 영역에 액세스하고 로그인한 후 동일한 페이지로 다시 리디렉션하려는 경우 이 예제가 유용할 수 있습니다.
-
-.. literalinclude:: routing/019.php
-
-정규 표현식에 대해 더 배우고 싶은 사람들에게 `regular-expressions.info <https://www.regular-expressions.info/>`_\ 가 좋은 출발점이 될 수 있습니다.
-
-.. :: 자리표시자(placeholder)를 정규식과 혼합하여 일치시킬 수도 있습니다.
-
-클로저(Closure)
-==================
-
-경로가 매핑되는 대상으로 익명 함수(anonymous function) 또는 클로저를 사용할 수 있습니다.
-이 기능은 사용자가 해당 URI를 방문할 때 실행됩니다.
-작은 작업을 빠르게 실행하거나 간단히 뷰만 표시하는 데 편리합니다.
+You can use an anonymous function, or Closure, as the destination that a route maps to. This function will be
+executed when the user visits that URI. This is handy for quickly executing small tasks, or even just showing
+a simple view:
 
 .. literalinclude:: routing/020.php
 
+Specifying Route Paths
+======================
+
+Placeholders
+------------
+
+A typical route might look something like this:
+
+.. literalinclude:: routing/005.php
+
+In a route, the first parameter contains the URI to be matched, while the second parameter
+contains the destination it should be routed to. In the above example, if the literal word
+"product" is found in the first segment of the URL path, and a number is found in the second segment,
+the ``Catalog`` class and the ``productLookup`` method are used instead.
+
+Placeholders are simply strings that represent a Regular Expression pattern. During the routing
+process, these placeholders are replaced with the value of the Regular Expression. They are primarily
+used for readability.
+
+The following placeholders are available for you to use in your routes:
+
+============ ===========================================================================================================
+Placeholders Description
+============ ===========================================================================================================
+(:any)       will match all characters from that point to the end of the URI. This may include multiple URI segments.
+(:segment)   will match any character except for a forward slash (``/``) restricting the result to a single segment.
+(:num)       will match any integer.
+(:alpha)     will match any string of alphabetic characters
+(:alphanum)  will match any string of alphabetic characters or integers, or any combination of the two.
+(:hash)      is the same as ``(:segment)``, but can be used to easily see which routes use hashed ids.
+============ ===========================================================================================================
+
+.. note:: ``{locale}`` cannot be used as a placeholder or other part of the route, as it is reserved for use
+    in :doc:`localization </outgoing/localization>`.
+
+Note that a single ``(:any)`` will match multiple segments in the URL if present. For example the route:
+
+.. literalinclude:: routing/010.php
+
+will match **product/123**, **product/123/456**, **product/123/456/789** and so on. The implementation in the
+Controller should take into account the maximum parameters:
+
+.. literalinclude:: routing/011.php
+
+.. important:: Do not put any placeholder after ``(:any)``. Because the number of
+    parameters passed to the controller method may change.
+
+If matching multiple segments is not the intended behavior, ``(:segment)`` should be used when defining the
+routes. With the examples URLs from above:
+
+.. literalinclude:: routing/012.php
+
+will only match **product/123** and generate 404 errors for other example.
+
+Custom Placeholders
+-------------------
+
+You can create your own placeholders that can be used in your routes file to fully customize the experience
+and readability.
+
+You add new placeholders with the ``addPlaceholder()`` method. The first parameter is the string to be used as
+the placeholder. The second parameter is the Regular Expression pattern it should be replaced with.
+This must be called before you add the route:
+
+.. literalinclude:: routing/017.php
+
+Regular Expressions
+-------------------
+
+If you prefer you can use regular expressions to define your routing rules. Any valid regular expression
+is allowed, as are back-references.
+
+.. important:: Note: If you use back-references you must use the dollar syntax rather than the double backslash syntax.
+    A typical RegEx route might look something like this:
+
+    .. literalinclude:: routing/018.php
+
+In the above example, a URI similar to **products/shirts/123** would instead call the ``show()`` method
+of the ``Products`` controller class, with the original first and second segment passed as arguments to it.
+
+With regular expressions, you can also catch a segment containing a forward slash (``/``), which would usually
+represent the delimiter between multiple segments.
+
+For example, if a user accesses a password protected area of your web application and you wish to be able to
+redirect them back to the same page after they log in, you may find this example useful:
+
+.. literalinclude:: routing/019.php
+
+For those of you who don't know regular expressions and want to learn more about them,
+`regular-expressions.info <https://www.regular-expressions.info/>`_ might be a good starting point.
+
+.. note:: You can also mix and match placeholders with regular expressions.
+
 .. _view-routes:
 
-Views
-=====
+View Routes
+===========
 
 .. versionadded:: 4.3.0
 
-만약 로직이 없는 뷰를 렌더링하고 싶다면, ``view()`` 메소드를 사용할 수 있습니다.
-이는 항상 GET 요청으로 처리됩니다. 
-이 메소드는 두 번째 매개변수로 로드할 뷰의 이름을 받습니다.
+If you just want to render a view out that has no logic associated with it, you can use the ``view()`` method.
+This is always treated as GET request.
+This method accepts the name of the view to load as the second parameter.
 
 .. literalinclude:: routing/065.php
 
-만약 라우트에 플레이스홀더(placeholder)를 사용한다면, 뷰 안에서 ``$segments``\ 라는 특별한 변수를 통해 접근할 수 있습니다.
-플레이스홀더는 라우트 안에 나타나는 순서대로 인덱싱된 배열로 사용할 수 있습니다.
+If you use placeholders within your route, you can access them within the view in a special variable, ``$segments``.
+They are available as an array, indexed in the order they appear in the route.
 
 .. literalinclude:: routing/066.php
 
 .. _redirecting-routes:
 
-라우트 리디렉션
+Redirecting Routes
 ==================
 
-서비스를 오래 동안 유지한 사이트는 페이지가 이동되기 마련입니다.
-라우트의 ``addRedirect()`` 메소드를 사용하면 이전 경로를 다른 경로로 리디렉션(redirect)할 수 있습니다.
-첫 번째 매개 변수는 이전 경로의 URI 패턴입니다.
-두 번째 매개 변수는 리디렉션할 새 URI 또는 명명된 경로(route)명입니다.
-세 번째 매개 변수는 리디렉션과 함께 전송되어야 하는 HTTP 상태 코드입니다.
-기본값은 임시 리디렉션을 뜻하는 ``302``\ 이며  대부분의 경우 권장됩니다
+Any site that lives long enough is bound to have pages that move. You can specify routes that should redirect
+to other routes with the ``addRedirect()`` method. The first parameter is the URI pattern for the old route. The
+second parameter is either the new URI to redirect to, or the name of a named route. The third parameter is
+the HTTP status code that should be sent along with the redirect. The default value is ``302`` which is a temporary
+redirect and is recommended in most cases:
 
 .. literalinclude:: routing/022.php
 
-.. note:: v4.2.0 부터 ``addRedirect()`` 자리 표시자를 사용할 수 있습니다.
+.. note:: Since v4.2.0, ``addRedirect()`` can use placeholders.
 
-페이지 로드중 요청(request) 경로가 리디렉션 경로와 일치하면 컨트롤러를 로드하기 전에 사용자는 새 페이지로 리디렉션됩니다.
+If a redirect route is matched during a page load, the user will be immediately redirected to the new page before a
+controller can be loaded.
 
-라우트 그룹화
-===============
+Environment Restrictions
+========================
 
-``group()`` 메소드를 사용하여 경로를 그룹화 할 수 있습니다.
-그룹 이름은 그룹 내부에 정의된 경로 앞에 나타나는 세그먼트가 됩니다.
-이렇게 하면 관리자 영역을 구축할 때와 같이 시작 문자열을 공유하는 광범위한 경로 작성에 필요한 입력(typing)을 줄일 수 있습니다.
-
-.. literalinclude:: routing/023.php
-
-이것은 **users**\ 와 **blog** URI를 접두사 **admin**\ 을 사용하여 **/admin/users**\ 와 **/admin/blog**\ 로 만들어 줍니다.
-
-콜백 전에 :ref:`assigning-namespace`\ 처럼 그룹에 옵션을 할당해야 하는 경우
-
-.. literalinclude:: routing/024.php
-
-위 예는 **/api/users** URI를 사용하여 ``App\API\v1\Users`` 컨트롤러에 대한 리소스 경로(route)를 처리합니다.
-
-라우트 그룹에 특정 :doc:`filter <filters>`\ 를 사용할 수도 있습니다.
-필터를 사용하면 컨트롤러 전후에 필터를 실행하며, 인증이나 api 로깅에 유용합니다.
-
-.. literalinclude:: routing/025.php
-
-필터 값은 **app/Config/Filters.php**\ 에 정의된 별칭(aliase)중 하나와 일치해야 합니다.
-
-필요한 경우 그룹 내에 그룹을 중첩하여 보다 세밀한 구성을 할 수 있습니다.
-
-.. literalinclude:: routing/026.php
-
-위 예는 URL을 **admin/users/list**\ 로 처리할 것입니다. 
-
-.. note:: 외부 ``group()``\ 에 전달된 옵션(예: ``namespace``\ 와 ``filter``)은 내부 ``group()`` 옵션과 병합(merge)되지 않습니다.
-
-필터 또는 네임스페이스, 하위 도메인 등과 같은 다른 경로 구성 옵션을 적용하기 위해 경로를 그룹화할 수 있습니다. 
-그룹에 접두사를 추가할 필요 없이 접두사 대신 빈 문자열을 전달할 수 있으며, 그룹의 경로는 그룹이 존재하지 않았지만 주어진 경로 구성 옵션을 사용하여 라우팅됩니다.
-
-.. literalinclude:: routing/027.php
-
-환경 제한(Restrictions)
-===========================
-
-특정 환경에서만 볼 수있는 일련의 경로를 만들 수 있습니다.
-이를 통해 개발자는 테스트나 프로덕션 서버에서 접근할 수 없지만 로컬 컴퓨터에서 개발자만 사용할 수 있는 도구를 만들 수 있습니다.
-``environment()`` 메소드에 환경 이름을 전달하여 이를 정의할 수 있습니다.
-이렇게 폐쇄적으로 정의한 모든 경로는 주어진 환경에서만 액세스할 수 있습니다.
+You can create a set of routes that will only be viewable in a certain environment. This allows you to create
+tools that only the developer can use on their local machines that are not reachable on testing or production servers.
+This can be done with the ``environment()`` method. The first parameter is the name of the environment. Any
+routes defined within this closure are only accessible from the given environment:
 
 .. literalinclude:: routing/028.php
 
-.. _reverse-routing:
+Routes with any HTTP verbs
+==========================
 
-리버스(Reverse) 라우팅
-========================
+.. warning:: While the ``add()`` method seems to be convenient, it is recommended to always use the HTTP-verb-based
+    routes, described above, as it is more secure. If you use the :doc:`CSRF protection </libraries/security>`, it does not protect **GET**
+    requests. If the URI specified in the ``add()`` method is accessible by the GET method, the CSRF protection
+    will not work.
 
-리버스 라우팅은 링크와 연결해야 하는 모든 매개변수뿐만 아니라, 컨트롤러와 메소드를 정의하고, 라우터가 현재 경로를 조회하도록 할 수 있습니다.
-이렇게 하면 어플리케이션 코드를 업데이트하지 않고도 경로 정의를 변경할 수 있습니다. 이것은 일반적으로 링크를 만들기 위해 뷰에서 사용됩니다.
-
-예를 들어, 연결하려는 사진 갤러리에 대한 경로가 있는 경우 :php:func:`url_to()` 헬퍼 함수를 사용하여 사용해야 하는 경로를 가져올 수 있습니다. 첫 번째 매개변수는 정규화된 컨트롤러 및 메소드입니다.
-첫 번째 매개 변수는 초기 경로 자체를 작성할 때 사용하는 것과 같이 정규화된 컨트롤러 및 메소드이며 이중 콜론(``::``)으로 구분합니다.
-경로로 전달되어야하는 모든 매개 변수는 다음 매개 변수에 전달됩니다.
-
-.. literalinclude:: routing/029.php
-
-.. _using-named-routes:
-
-명명된 경로 사용
-==================
-
-어플리케이션의 취약성을 낮추기 위해 경로 이름을 지정할 수 있습니다.
-이렇게하면 나중에 호출할 수있는 경로에 이름이 적용되며, 경로 정의가 변경되더라도 :php:func:`route_to()`\ 로 구축된 어플리케이션의 모든 링크를 수정하지 않아도 계속 작동합니다.
-경로 이름과 함께 ``as`` 옵션을 전달하여 경로 이름을 지정합니다.
-
-.. literalinclude:: routing/030.php
-
-이렇게 하면 뷰를 더 읽기 쉽게 만들 수 있는 이점도 있습니다.
-
-모든(any) HTTP 동사(verbs)가 있는 경로(route)
-==============================================
-
-.. warning:: ``add()`` 방식이 편리하지만, 위에서 설명한 HTTP 동사 기반 경로를 사용하는 것이 더 안전합니다.
-    :doc:`CSRF 보호 </libraries/security>`\ 는 **GET** 요청에 대해 보호하지 않으므로, ``add()`` 메소드에 지정된 URI가 GET 메소드로 액세스 가능한 경우 CSRF 보호가 작동하지 않습니다.
-
-모든 HTTP 동사에 대해 ``add()`` 메소드를 사용하여 경로(route)를 정의할 수 있습니다.
+It is possible to define a route with any HTTP verbs.
+You can use the ``add()`` method:
 
 .. literalinclude:: routing/031.php
 
-.. note:: HTTP 동사 기반 경로를 사용하면 현재 요청 방법과 일치하는 경로만 저장되므로, 검색할 일치 항목 경로가 줄어들어 성능이 약간 향상됩니다.
+.. note:: Using the HTTP-verb-based routes will also provide a slight performance increase, since
+    only routes that match the current request method are stored, resulting in fewer routes to scan through
+    when trying to find a match.
 
-다중 경로 매핑
+Mapping Multiple Routes
 =======================
 
-한 번에 여러 경로에 대해 매핑하려면 ``add()`` 메소드보다 ``map()`` 메소드를 사용하는것이 편리합니다.
-추가해야 할 각 경로에 대해 ``add()`` 메소드를 여러번 호출하는 대신 배열로 경로(route)를 정의한 다음 이를 ``map()`` 메소드에 매개 변수로 전달할 수 있습니다.
+.. warning:: The ``map()`` method is not recommended as well as ``add()``
+    because it calls ``add()`` internally.
+
+While the ``add()`` method is simple to use, it is often handier to work with multiple routes at once, using
+the ``map()`` method. Instead of calling the ``add()`` method for each route that you need to add, you can
+define an array of routes and then pass it as the first parameter to the ``map()`` method:
 
 .. literalinclude:: routing/021.php
 
 .. _command-line-only-routes:
 
-커맨드 라인(command-line) 전용 라우트
-===============================================
+Command-Line Only Routes
+========================
 
-``cli()`` 메서드를 사용하여 명령줄에서만 작동하고 웹 브라우저에서는 액세스할 수 없는 라우트를 만들 수 있습니다.
-HTTP 동사 기반 라우트 메소드로 생성된 모든 라우트는 CLI에서도 액세스할 수 없지만 ``add()`` 메소드로 생성된 라우트는 명령줄에서 계속 사용할 수 있습니다.
+.. note:: It is recommended to use Spark Commands for CLI scripts instead of calling controllers via CLI.
+    See the :doc:`../cli/cli_commands` page for detailed information.
+
+Any route created by any of the HTTP-verb-based
+route methods will also be inaccessible from the CLI, but routes created by the ``add()`` method will still be
+available from the command line.
+
+You can create routes that work only from the command-line, and are inaccessible from the web browser, with the
+``cli()`` method:
 
 .. literalinclude:: routing/032.php
 
-.. note::CLI를 통해 컨트롤러를 호출하는 대신 CLI 스크립트에 Spark 명령을 사용하는 것이 좋습니다.
-    자세한 내용은 :doc:`../cli/cli_commands` 페이지를 참조하십시오.
+.. warning:: If you enable :ref:`auto-routing-legacy` and place the command file in **app/Controllers**,
+    anyone could access the command with the help of Auto Routing (Legacy) via HTTP.
 
-.. warning:: :ref:`auto-routing-legacy`\ 을 활성화하고 명령 파일이 **app/Controllers**\ 에 있으면 자동 라우팅(Legacy)으로 HTTP를 통해 CLI 명령에 액세스할 수 있습니다.
+Global Options
+**************
 
-.. note:: CLI 라우트 대신 Spark Commands를 사용하는 것이 권장됩니다. 자세한 정보는 :doc:`../cli/spark_commands` 페이지를 참조하십시오.
-
-전역 옵션
-==============
-
-경로(route)를 만드는 모든 메소드(add, get, post, :doc:`resource <restful>` etc)는 생성된 경로를 수정하거나 추가로 제한할 수 있는 옵션을 배열로 취할 수 있습니다.
-``$options`` 배열은 항상 마지막 매개 변수(parameter)입니다
+All of the methods for creating a route (``get()``, ``post()``, :doc:`resource() <restful>` etc) can take an array of options that
+can modify the generated routes, or further restrict them. The ``$options`` array is always the last parameter:
 
 .. literalinclude:: routing/033.php
 
 .. _applying-filters:
 
-필터 적용
-----------------
+Applying Filters
+================
 
-컨트롤러 전후에 실행할 필터를 제공하여 특정 경로의 동작을 변경할 수 있습니다.
-이를 인증 또는 API 로깅에 이용하면 편리합니다.
-제공되는 필터의 값은 문자열 또는 문자열 배열입니다.
+You can alter the behavior of specific routes by supplying filters to run before or after the controller. This is especially handy during authentication or api logging.
+The value for the filter can be a string or an array of strings:
 
-* **app/Config/Filters.php**\ 에 정의된 별칭 필터.
-* 필터 클래스이름
+* matching the aliases defined in **app/Config/Filters.php**.
+* filter classnames
 
-필터에 대한 자세한 내용은 :doc:`Controller filters <filters>`\ 를 확인하세요.
+See :doc:`Controller Filters <filters>` for more information on setting up filters.
 
-.. Warning:: **app/Config/Routes.php**(**app/Config/Filters.php**\ 가 아님) 파일에 경로에 대한 필터를 설정한 경우 자동 라우팅(Legacy)을 비활성화하는 것이 좋습니다.
-    :ref:`auto-routing-legacy`\ 을 활성화하면 구성된 경로와 다른 URL을 통해 컨트롤러에 액세스할 수 있으며, 이 경우 경로에 지정한 필터가 적용되지 않습니다.
-    자동 라우팅을 비활성화하려면 :ref:`use-defined-routes-only`\ 를 확인하세요.
+.. Warning:: If you set filters to routes in **app/Config/Routes.php**
+    (not in **app/Config/Filters.php**), it is recommended to disable Auto Routing (Legacy).
+    When :ref:`auto-routing-legacy` is enabled, it may be possible that a controller can be accessed
+    via a different URL than the configured route,
+    in which case the filter you specified to the route will not be applied.
+    See :ref:`use-defined-routes-only` to disable auto-routing.
 
-별칭(alias) 필터
-^^^^^^^^^^^^^^^^^
+Alias Filter
+------------
 
-별칭 필터는 **app/Config/Filters.php**\ 에 정의합니다.
+You specify an alias defined in **app/Config/Filters.php** for the filter value:
 
 .. literalinclude:: routing/034.php
 
-별칭 필터의 ``before()`` 또는 ``after()`` 메소드에 전달할 인수를 제공할 수 있습니다.
+You may also supply arguments to be passed to the alias filter's ``before()`` and ``after()`` methods:
 
 .. literalinclude:: routing/035.php
 
-클래스명 필터
-^^^^^^^^^^^^^^^^
+Classname Filter
+----------------
 
 .. versionadded:: 4.1.5
 
-필터에 필터 클래스명을 지정합니다.
+You specify a filter classname for the filter value:
 
 .. literalinclude:: routing/036.php
 
-다중 필터
-^^^^^^^^^^^^
+Multiple Filters
+----------------
 
 .. versionadded:: 4.1.5
 
-.. important:: *다중 필터*\ 는 이전 버전과 호환되지 않아 기본적으로 비활성화되어 있으며, 사용시 별도의 설정이 필요합니다. 
-    자세한 내용은 :ref:'upgrade-415-multiple-filters-for-a-route\ 를 확인하세요.
+.. important:: *Multiple filters* is disabled by default. Because it breaks backward compatibility. If you want to use it, you need to configure. See :ref:`upgrade-415-multiple-filters-for-a-route` for the details.
 
-필터를 배열로 지정합니다.
+You specify an array for the filter value:
 
 .. literalinclude:: routing/037.php
 
+Filter Arguments
+^^^^^^^^^^^^^^^^
+
+Additional arguments may be passed to a filter:
+
+.. literalinclude:: routing/067.php
+
+In this example, the array ``['dual', 'noreturn']`` will be passed in ``$arguments``
+to the filter's ``before()`` and ``after()`` implementation methods.
+
 .. _assigning-namespace:
 
-네임스페이스 할당
----------------------
+Assigning Namespace
+===================
 
-:ref:`routing-default-namespace`\ 가 컨트롤러 앞에 추가되지만 ``namespace`` 옵션을 사용하여 다른 네임스페이스를 지정할 수도 있습니다. 
-값은 수정하려는 네임스페이스여야 합니다.
+While a :ref:`routing-default-namespace` will be prepended to the generated controllers, you can also specify
+a different namespace to be used in any options array, with the ``namespace`` option. The value should be the
+namespace you want modified:
 
 .. literalinclude:: routing/038.php
 
-새로운 네임스페이스는 get, post 등과 같이 단일 경로를 만드는 메소드에 대해서만 적용됩니다.
-다중 경로를 만드는 모든 메소드의 경우 새로운 네임스페이스를 해당 함수에 의해 생성된 모든 경로 또는 ``group()``\ 일 경우 클로저에 생성된 모든 경로에 연결됩니다.
+The new namespace is only applied during that call for any methods that create a single route, like get, post, etc.
+For any methods that create multiple routes, the new namespace is attached to all routes generated by that function
+or, in the case of ``group()``, all routes generated while in the closure.
 
-호스트 이름(Hostname)으로 제한
--------------------------------------
+Limit to Hostname
+=================
 
-"hostname" 옵션을 원하는 도메인과 함께 전달하여 경로(route) 그룹이 특정 도메인 또는 하위 도메인에서만 작동하도록 제한할 수 있습니다.
+You can restrict groups of routes to function only in certain domain or sub-domains of your application
+by passing the "hostname" option along with the desired domain to allow it on as part of the options array:
 
 .. literalinclude:: routing/039.php
 
-이 예는 도메인이 "accounts.example.com".과 정확히 일치하는 경우에만 작동하도록 허용합니다.
-기본 사이트인 **example.com** 에서는 작동하지 않습니다.
+This example would only allow the specified hosts to work if the domain exactly matched **accounts.example.com**.
+It would not work under the main site at **example.com**.
 
-서브도메인(Subdomain)으로 제한
-----------------------------------------
+Limit to Subdomains
+===================
 
-``subdomain`` 옵션이 있으면 시스템은 해당 서브도메인에서만 경로(route)를 사용할 수 있도록 제한합니다.
-경로는 서브도메인(subdomain)이 어플리케이션을 통해 보고 있는 영역인 경우에만 일치합니다.
+When the ``subdomain`` option is present, the system will restrict the routes to only be available on that
+sub-domain. The route will only be matched if the subdomain is the one the application is being viewed through:
 
 .. literalinclude:: routing/040.php
 
-값을 별표(``*``)로 설정하여 하위 도메인으로 제한할 수 있습니다.
-하위 도메인이 없는 URL에서 보는 경우 일치하지 않습니다
+You can restrict it to any subdomain by setting the value to an asterisk, (``*``). If you are viewing from a URL
+that does not have any subdomain present, this will not be matched:
 
 .. literalinclude:: routing/041.php
 
-.. important:: 시스템이 완벽하지 않으므로 프로덕션(production) 환경에서 사용하기 전에 특정 도메인에 대해 테스트해야 합니다.
-    대부분의 도메인에서 제대로 작동하지만, 일부 도메인, 특히 도메인 자체에 마침표가 있는 경우(접미사 또는 www를 구분하는 데 사용되지 않음)에는 잘못 탐지할 수 있습니다.
+.. important:: The system is not perfect and should be tested for your specific domain before being used in production.
+    Most domains should work fine but some edge case ones, especially with a period in the domain itself (not used
+    to separate suffixes or www) can potentially lead to false positives.
 
-일치하는 매개 변수(Parameter) 상쇄(offset)
---------------------------------------------
+Offsetting the Matched Parameters
+=================================
 
-``offset`` 옵션을 사용하여 경로에서 일치하는 매개 변수를 숫자 값으로 상쇄(offset)할 수 있으며 값은 상쇄할 세그먼트 수입니다.
+You can offset the matched parameters in your route by any numeric value with the ``offset`` option, with the
+value being the number of segments to offset.
 
-이 기능은 첫 번째 URI 세그먼트가 버전 번호인 API를 개발할 때 유용할 수 있습니다.
-첫 번째 매개 변수가 언어(language) 문자열 인 경우에도 사용할 수 있습니다.
+This can be beneficial when developing APIs with the first URI segment being the version number. It can also
+be used when the first parameter is a language string:
 
 .. literalinclude:: routing/042.php
 
+.. _reverse-routing:
+
+Reverse Routing
+***************
+
+Reverse routing allows you to define the controller and method, as well as any parameters, that a link should go
+to, and have the router lookup the current route to it. This allows route definitions to change without you having
+to update your application code. This is typically used within views to create links.
+
+For example, if you have a route to a photo gallery that you want to link to, you can use the :php:func:`url_to()` helper
+function to get the route that should be used. The first parameter is the fully qualified Controller and method,
+separated by a double colon (``::``), much like you would use when writing the initial route itself. Any parameters that
+should be passed to the route are passed in next:
+
+.. literalinclude:: routing/029.php
+
+.. _using-named-routes:
+
+Named Routes
+************
+
+You can name routes to make your application less fragile. This applies a name to a route that can be called
+later, and even if the route definition changes, all of the links in your application built with :php:func:`url_to()`
+will still work without you having to make any changes. A route is named by passing in the ``as`` option
+with the name of the route:
+
+.. literalinclude:: routing/030.php
+
+This has the added benefit of making the views more readable, too.
+
+Grouping Routes
+***************
+
+You can group your routes under a common name with the ``group()`` method. The group name becomes a segment that
+appears prior to the routes defined inside of the group. This allows you to reduce the typing needed to build out an
+extensive set of routes that all share the opening string, like when building an admin area:
+
+.. literalinclude:: routing/023.php
+
+This would prefix the **users** and **blog** URIs with **admin**, handling URLs like **admin/users** and **admin/blog**.
+
+Setting Namespace
+=================
+
+If you need to assign options to a group, like a :ref:`assigning-namespace`, do it before the callback:
+
+.. literalinclude:: routing/024.php
+
+This would handle a resource route to the ``App\API\v1\Users`` controller with the **api/users** URI.
+
+Setting Filters
+===============
+
+You can also use a specific :doc:`filter <filters>` for a group of routes. This will always
+run the filter before or after the controller. This is especially handy during authentication or api logging:
+
+.. literalinclude:: routing/025.php
+
+The value for the filter must match one of the aliases defined within **app/Config/Filters.php**.
+
+Setting Other Options
+=====================
+
+At some point, you may want to group routes for the purpose of applying filters or other route
+config options like namespace, subdomain, etc. Without necessarily needing to add a prefix to the group, you can pass
+an empty string in place of the prefix and the routes in the group will be routed as though the group never existed but with the
+given route config options:
+
+.. literalinclude:: routing/027.php
+
+Nesting Groups
+==============
+
+It is possible to nest groups within groups for finer organization if you need it:
+
+.. literalinclude:: routing/026.php
+
+This would handle the URL at **admin/users/list**.
+
+.. note:: Options passed to the outer ``group()`` (for example ``namespace`` and ``filter``) are not merged with the inner ``group()`` options.
+
 .. _routing-priority:
 
-경로(Route) 우선 순위
-*********************
+Route Priority
+**************
 
-경로는 정의된 순서대로 라우팅 테이블에 등록되며, URI에 액세스할 때 일치하는 첫 번째 경로가 실행됩니다.
+Routes are registered in the routing table in the order in which they are defined. This means that when a URI is accessed, the first matching route will be executed.
 
-.. note:: 경로(URI 경로)가 다른 핸들러로 두 번 이상 정의된 경우 첫 번째 정의된 경로만 등록됩니다.
+.. warning:: If a route path is defined more than once with different handlers, only the first defined route is registered.
 
-:ref:`spark route <routing-spark-routes>` 명령을 실행하여 라우팅 테이블에 등록된 경로를 확인할 수 있습니다.
+You can check registered routes in the routing table by running the :ref:`spark routes <routing-spark-routes>` command.
 
-경로 우선 순위 변경
+Changing Route Priority
 =======================
 
-모듈로 작업할 때 어플리케이션의 경로에 와일드카드가 포함되어 있으면 모듈 경로가 올바르게 처리되지 않습니다.
-``priority`` 옵션을 사용하여 경로 처리의 우선순위를 낮추면 이 문제를 해결할 수 있습니다. 
-매개 변수는 양의 정수와 0을 사용합니다. 
-``priority``\ 에 지정된 숫자가 높을수록 처리 대기열의 경로 우선 순위가 낮아집니다.
+When working with modules, it can be a problem if the routes in the application contain wildcards.
+Then the module routes will not be processed correctly.
+You can solve this problem by lowering the priority of route processing using the ``priority`` option. The parameter
+accepts positive integers and zero. The higher the number specified in the ``priority``, the lower
+route priority in the processing queue:
 
 .. literalinclude:: routing/043.php
 
-
-이 기능을 비활성화하려면 매개 변수에 ``false``\ 를 사용하여 메소드를 호출합니다.
+To disable this functionality, you must call the method with the parameter ``false``:
 
 .. literalinclude:: routing/044.php
 
-.. note:: 모든 경로의 우선 순위 기본값은 0입니다. 음수는 절대값으로 캐스팅입니다.
+.. note:: By default, all routes have a priority of 0.
+    Negative integers will be cast to the absolute value.
 
 .. _routes-configuration-options:
 
-경로(Route) 구성 옵션
+Routes Configuration Options
 ****************************
 
-RoutesCollection 클래스는 모든 경로에 영향을 주는 몇 가지 옵션을 제공하며 어플리케이션의 요구에 맞게 수정할 수 있습니다.
-이 옵션들은 `/app/Config/Routes.php` 상단에 있습니다.
+The RoutesCollection class provides several options that affect all routes, and can be modified to meet your
+application's needs. These options are available in **app/Config/Routing.php**.
+
+.. note:: The config file **app/Config/Routing.php** has been added since v4.4.0.
+    In previous versions, the setter methods were used in **app/Config/Routes.php**
+    to change settings.
 
 .. _routing-default-namespace:
 
-기본 네임스페이스
+Default Namespace
 =================
 
-컨트롤러를 경로에 일치시킬 때 라우터는 기본 네임스페이스 값을 경로에 지정된 컨트롤러 앞에 추가합니다. 기본 값은 ``App\Controllers``\ 입니다.
+When matching a controller to a route, the router will add the default namespace value to the front of the controller
+specified by the route. By default, this value is ``App\Controllers``.
 
-값을 빈 문자열(``''``)로 설정하면 완전히 네임스페이스가 지정된 컨트롤러를 지정하기 위해 각 경로(route)가 남습니다.
+If you set the value empty string (``''``), it leaves each route to specify the fully namespaced
+controller:
 
 .. literalinclude:: routing/045.php
 
-컨트롤러의 네임스페이스가 명시적으로 지정되지 않은 경우 이 값을 설정하여 컨트롤러에 네임스페이스를 지정할 수 있습니다.
+If your controllers are not explicitly namespaced, there is no need to change this. If you namespace your controllers,
+then you can change this value to save typing:
 
 .. literalinclude:: routing/046.php
 
-URI 대시(-) 변환
+Translate URI Dashes
 ====================
 
-이 옵션을 사용하면 컨트롤러 및 메서드 URI 세그먼트에서 대시(``-``)를 밑줄(``_``)로 자동 교체하여 필요한 경우 추가 경로 항목을 저장할 수 있습니다.
-대시(``-``)는 클래스 또는 메서드 이름의 유효한 문자가 아니므로, 사용하려고 하면 치명적인 오류를 일으킬 수 있습니다.
+This option enables you to automatically replace dashes (``-``) with underscores in the controller and method
+URI segments when used in Auto Routing, thus saving you additional route entries if you need to do that. This is required because the dash isn't a valid class or method name character and would cause a fatal error if you try to use it:
 
 .. literalinclude:: routing/049.php
 
+.. note:: When using Auto Routing (Improved), prior to v4.4.0, if
+    ``$translateURIDashes`` is true, two URIs correspond to a single controller
+    method, one URI for dashes (e.g., **foo-bar**) and one URI for underscores
+    (e.g., **foo_bar**). This was incorrect behavior. Since v4.4.0, the URI for
+    underscores (**foo_bar**) is not accessible.
+
 .. _use-defined-routes-only:
 
-정의된 경로만 사용
+Use Defined Routes Only
 =======================
 
-v4.2.0부터 자동 라우팅은 기본적으로 비활성화됩니다.
+Since v4.2.0, the auto-routing is disabled by default.
 
-자동 라우팅이 활성화된 경우 URI와 일치하는 정의된 경로(route)가 없으면 시스템은 해당 URI를 컨트롤러 및 메서드와 일치시키려고 시도합니다.
+When no defined route is found that matches the URI, the system will attempt to match that URI against the
+controllers and methods when Auto Routing is enabled.
 
-``setAutoRoute()`` 옵션을 ``false``\ 로 설정하여 자동 라우팅을 비활성화하고 사용자가 정의한 경로(route)만 사용하도록 제한할 수 있습니다.
+You can disable this automatic matching, and restrict routes
+to only those defined by you, by setting the ``$autoRoute`` property to false:
 
 .. literalinclude:: routing/050.php
 
-.. warning:: :doc:`CSRF 보호 </libraries/security>`\ 는 **GET** 요청을 보호하지 않으므로, GET 메소드로 URI에 액세스하면 CSRF 보호가 작동하지 않습니다.
+.. warning:: If you use the :doc:`CSRF protection </libraries/security>`, it does not protect **GET**
+    requests. If the URI is accessible by the GET method, the CSRF protection will not work.
 
-404 재정의
+404 Override
 ============
 
-현재 URI와 일치하는 페이지를 찾을 수 없는 경우 시스템은 일반 404 뷰를 표시합니다.
-``set404Override()`` 메소드로 수행할 작업을 지정하여 이를 변경할 수 있습니다.
-값은 경로에 표시되는 것처럼 유효한 클래스/메서드(class/method) 이거나 클로저(Closure)일 수 있습니다.
+When a page is not found that matches the current URI, the system will show a generic 404 view. You can change
+what happens by specifying an action to happen with the ``set404Override()`` method. The value can be either
+a valid class/method pair, just like you would show in any route, or a Closure:
 
 .. literalinclude:: routing/051.php
 
-.. note:: ``set404Override()`` 메소드는 응답 상태 코드를 ``404``\ 로 변경하지 않습니다.
-    컨트롤러에서 설정시 상태 코드를 설정하지 않으면 기본 상태 코드 ``200``\ 이 반환됩니다. 상태 코드를 설정하는 방법에 대한 정보는 :php:meth:`CodeIgniter\\HTTP\\Response::setStatusCode()`\ 를 참조하십시오.
+Using the ``$override404`` property within the routing config file, you can use closures. Defining the override in the Routing file is restricted to class/method pairs.
 
-우선순위에 따른 경로 처리
+.. note:: The ``set404Override()`` method does not change the Response status code to ``404``.
+    If you don't set the status code in the controller you set, the default status code ``200``
+    will be returned. See :php:meth:`CodeIgniter\\HTTP\\Response::setStatusCode()` for
+    information on how to set the status code.
+
+Route Processing by Priority
 ============================
 
-우선 순위에 따라 경로 대기열 처리를 활성화하거나 비활성화합니다. 우선 순위를 낮추는 것은 route 옵션에 정의되어 있습니다.
-기본적으로 비활성화되어 있으며, 이 기능은 모든 경로(route)에 영향을 줍니다.
-우선 순위를 낮추는 사용 예는 :ref:`routing-priority`\ 를 참조하세요.
+Enables or disables processing of the routes queue by priority. Lowering the priority is defined in the route option.
+Disabled by default. This functionality affects all routes.
+For an example use of lowering the priority see :ref:`routing-priority`:
 
 .. literalinclude:: routing/052.php
 
 .. _auto-routing-improved:
 
-자동 라우팅(개선됨)
+Auto Routing (Improved)
 ***********************
 
 .. versionadded:: 4.2.0
 
-v4.2.0부터 더 안전하고 새로운 자동 라우팅이 도입되었습니다.
+Since v4.2.0, the new more secure Auto Routing has been introduced.
 
-.. note:: CodeIgniter 3에서 4.1.x까지 기본적으로 활성화된 Auto Routing에 익숙하다면 ChangeLog v4.2.0 <v420-new-improved-auto-routing>`\ 에서 차이점을 확인할 수 있습니다.
+.. note:: If you are familiar with Auto Routing, which was enabled by default
+    from CodeIgniter 3 through 4.1.x, you can see the differences in
+    :ref:`ChangeLog v4.2.0 <v420-new-improved-auto-routing>`.
 
-URI와 일치하는 정의된 경로가 없으면 시스템은 자동 라우팅이 활성화된 경우 해당 URI를 컨트롤러와 메서드로 일치시키려고 시도합니다.
+When no defined route is found that matches the URI, the system will attempt to match that URI against the controllers and methods when Auto Routing is enabled.
 
-.. important:: 보안상의 이유로 컨트롤러가 정의된 경로에서 사용되는 경우 자동 라우팅(개선됨)이 컨트롤러로 라우팅하지 않습니다.
+.. important:: For security reasons, if a controller is used in the defined routes, Auto Routing (Improved) does not route to the controller.
 
-자동 라우팅은 규칙에 따라 HTTP 요청을 자동으로 라우팅하고 해당 컨트롤러 메서드를 실행할 수 있습니다.
+Auto Routing can automatically route HTTP requests based on conventions
+and execute the corresponding controller methods.
 
-.. note:: 자동 라우팅(개선됨)은 기본적으로 비활성화되어 있습니다. 사용하려면 아래를 참조하십시오.
+.. note:: Auto Routing (Improved) is disabled by default. To use it, see below.
 
 .. _enabled-auto-routing-improved:
 
-자동 라우팅 활성화
-====================
+Enable Auto Routing
+===================
 
-이를 사용하려면 **app/Config/Routes.php**\ 에서 ``setAutoRoute()`` 설정을 true로 변경해야 합니다.
+To use it, you need to change the setting ``$autoRoute`` option to true in **app/Config/Routing.php**::
 
-::
+    public bool $autoRoute = true;
 
-    $routes->setAutoRoute(true);
-
-그리고 **app/Config/Feature.php**\ 의 ``$autoRoutesImproved`` 속성을 ``true``\ 로 변경해야 합니다.
-
-::
+And you need to change the property ``$autoRoutesImproved`` to ``true`` in **app/Config/Feature.php**::
 
     public bool $autoRoutesImproved = true;
 
-URI 세그먼트
-==============
+URI Segments
+============
 
-Model-View-Controller 접근 방식을 따르는 URL의 세그먼트는 일반적으로 다음과 같습니다.
-
-::
+The segments in the URL, in following with the Model-View-Controller approach, usually represent::
 
     example.com/class/method/ID
 
-1. 첫 번째 세그먼트는 호출되어야 하는 컨트롤러 **class**\ 를 나타냅니다.
-2. 두 번째 세그먼트는 호출되어야 하는 클래스 **method**\ 를 나타냅니다.
-3. 세 번째 세그먼트와 추가 세그먼트는 컨트롤러에 전달될 ID와 변수를 나타냅니다.
+1. The first segment represents the controller **class** that should be invoked.
+2. The second segment represents the class **method** that should be called.
+3. The third, and any additional segments, represent the ID and any variables that will be passed to the controller.
 
-이 URI를 보세요.
-
-::
+Consider this URI::
 
     example.com/index.php/helloworld/hello/1
 
-위의 예에서 **GET** 메소드로 HTTP 요청을 보내면 Auto Routing은 ``App\Controllers\Helloworld``\ 라는 컨트롤러를 찾고 ``getHello()`` 메소드를 실행하고 ``'1'``\ 을 첫 번째 인수로 사용합니다.
+In the above example, when you send a HTTP request with **GET** method,
+Auto Routing would attempt to find a controller named ``App\Controllers\Helloworld``
+and executes ``getHello()`` method with passing ``'1'`` as the first argument.
 
-.. note:: 자동 라우팅(개선됨)에 의해 실행될 컨트롤러 메소드에는 ``getIndex()``, ``postCreate()``\ 와 같은 HTTP 동사(``get``, ``post``, ``put`` 등)가 접두사로 필요합니다. .
+.. note:: A controller method that will be executed by Auto Routing (Improved) needs HTTP verb (``get``, ``post``, ``put``, etc.) prefix like ``getIndex()``, ``postCreate()``.
 
-:ref:`Auto Routing in Controllers <controller-auto-routing-improved>`\ 에서 더 많은 정보를 확인하세요.
+See :ref:`Auto Routing in Controllers <controller-auto-routing-improved>` for more info.
 
-구성 옵션
+.. _routing-auto-routing-improved-configuration-options:
+
+Configuration Options
 =====================
 
-이 옵션은 **app/Config/Routes.php** 상단에서 사용할 수 있습니다.
+These options are available at the top of **app/Config/Routes.php**.
 
-기본 컨트롤러
+Default Controller
 ------------------
 
-사용자가 사이트의 루트(예 : **example.com**)를 방문할 때 경로가 명시적으로 존재하지 않으면 사용할 컨트롤러는 ``setDefaultController()`` 메소드에 의해 설정된 값에 의해 결정됩니다.
-기본값은 ``/app/Controllers/Home.php``\ 의 ``Home`` 컨트롤러입니다.
+For Site Root URI
+^^^^^^^^^^^^^^^^^
+
+When a user visits the root of your site (i.e., **example.com**) the controller to use is determined by the value set by
+the ``setDefaultController()`` method, unless a route exists for it explicitly.
+
+The default value for this is ``Home``
+which matches the controller at **app/Controllers/Home.php**:
 
 .. literalinclude:: routing/047.php
 
-일치하는 경로를 찾지 못한 경우에도 기본 컨트롤러가 사용되며, URI는 컨트롤러 디렉토리를 가리킵니다.
-예를 들어 사용자가 **example.com/admin**\ 을 방문하면 **/app/Controllers/admin/Home.php** 컨트롤러가 사용됩니다.
+For Directory URI
+^^^^^^^^^^^^^^^^^
 
-.. note:: 컨트롤러 이름으로 된 URI로 기본 컨트롤러에 액세스할 수 없습니다.
-    기본 컨트롤러가 ``Home``\ 이면 **example.com/**\ 에 액세스할 수 있지만 **example.com/home**\ 는 액세스할 수 없습니다.
+The default controller is also used when no matching route has been found, and the URI would point to a directory
+in the controllers directory. For example, if the user visits **example.com/admin**, if a controller was found at
+**app/Controllers/Admin/Home.php**, it would be used.
 
-:ref:`Auto Routing in Controllers <controller-auto-routing-improved>`\ 에서 더 많은 정보를 확인하세요.
+.. important:: You cannot access the default controller with the URI of the controller name.
+    When the default controller is ``Home``, you can access **example.com/**, but if you access **example.com/home**, it will be not found.
 
-기본 메소드
+See :ref:`Auto Routing in Controllers <controller-auto-routing-improved>` for more info.
+
+Default Method
 --------------
 
-이 메소드는 기본 컨트롤러 설정과 유사하게 작동하며, URI와 일치하는 컨트롤러를 발견되었으나, 메소드에 대한 세그먼트가 없을 때 사용됩니다.
-기본값은 ``index``\ 입니다.
+This works similar to the default controller setting, but is used to determine the default method that is used
+when a controller is found that matches the URI, but no segment exists for the method. The default value is
+``index``.
 
-사용자가 **example.com/products**\ 를 방문하였을때 ``Products`` 컨트롤러가 존재한다면, ``Products::listAll()`` 메소드가 실행됩니다.
+In this example, if the user were to visit **example.com/products**, and a ``Products`` controller existed, the
+``Products::listAll()`` method would be executed:
 
 .. literalinclude:: routing/048.php
 
-.. note:: 기본 메서드 이름으로 된 URI로 컨트롤러에 액세스할 수 없습니다.
-    위의 예에서는 **example.com/products**\ 에 액세스할 수 있지만 **example.com/products/listall**\ 는 액세스할 수 없습니다.
+.. important:: You cannot access the controller with the URI of the default method name.
+    In the example above, you can access **example.com/products**, but if you access **example.com/products/listall**, it will be not found.
+
+.. _auto-routing-improved-module-routing:
+
+Module Routing
+==============
+
+.. versionadded:: 4.4.0
+
+You can use auto routing even if you use :doc:`../general/modules` and place
+the controllers in a different namespace.
+
+To route to a module, the ``$moduleRoutes`` property in **app/Config/Routing.php**
+must be set::
+
+    public array $moduleRoutes = [
+        'blog' => 'Acme\Blog\Controllers',
+    ];
+
+The key is the first URI segment for the module, and the value is the controller
+namespace. In the above configuration, **http://localhost:8080/blog/foo/bar**
+will be routed to ``Acme\Blog\Controllers\Foo::getBar()``.
+
+.. note:: If you define ``$moduleRoutes``, the routing for the module takes
+    precedence. In the above example, even if you have the ``App\Controllers\Blog``
+    controller, **http://localhost:8080/blog** will be routed to the default
+    controller ``Acme\Blog\Controllers\Home``.
 
 .. _auto-routing-legacy:
 
-자동 라우팅(레거시)
+Auto Routing (Legacy)
 *********************
 
-Auto Routing(Legacy)은 CodeIgniter 3의 라우팅 시스템입니다.
-규칙에 따라 HTTP 요청을 자동으로 라우팅하고 해당 컨트롤러의 메소드를 실행할 수 있습니다.
+Auto Routing (Legacy) is a routing system from CodeIgniter 3.
+It can automatically route HTTP requests based on conventions and execute the corresponding controller methods.
 
-모든 경로는 **app/Config/Routes.php** 파일에 정의되거나 :ref:`auto-routing-improved`\ 를 사용하는 것이 좋습니다.
+It is recommended that all routes are defined in the **app/Config/Routes.php** file,
+or to use :ref:`auto-routing-improved`,
 
-.. warning:: 잘못된 설정 및 잘못된 코딩을 방지하기 위해 자동 라우팅(레거시) 기능을 사용하지 않는 것이 좋습니다.
-    컨트롤러 필터 또는 CSRF 보호가 우회되는 취약한 앱을 만들기 쉽습니다.
+.. warning:: To prevent misconfiguration and miscoding, we recommend that you do not use
+    Auto Routing (Legacy) feature. It is easy to create vulnerable apps where controller filters
+    or CSRF protection are bypassed.
 
-.. important:: 자동 라우팅(레거시)은 **any** HTTP 메서드를 사용하여 HTTP 요청을 컨트롤러 메서드로 라우팅합니다.
+.. important:: Auto Routing (Legacy) routes a HTTP request with **any** HTTP method to a controller method.
 
-자동 라우팅 활성화(레거시)
+Enable Auto Routing (Legacy)
 ============================
 
-v4.2.0부터 자동 라우팅은 기본적으로 비활성화되어 있습니다.
+Since v4.2.0, the auto-routing is disabled by default.
 
-이를 사용하려면 **app/Config/Routes.php**\ 의 ``setAutoRoute()`` 설정을 true로 변경해야 합니다.
-
-::
+To use it, you need to change the setting ``$autoRoute`` option to true in **app/Config/Routing.php**::
 
     $routes->setAutoRoute(true);
 
-URI 세그먼트(레거시)
+URI Segments (Legacy)
 =====================
 
-Model-View-Controller 접근 방식을 따르는 URL의 세그먼트는 일반적으로 다음과 같습니다.
-
-::
+The segments in the URL, in following with the Model-View-Controller approach, usually represent::
 
     example.com/class/method/ID
 
-1. 첫 번째 세그먼트는 호출되어야 하는 컨트롤러 **class**\ 를 나타냅니다.
-2. 두 번째 세그먼트는 호출되어야 하는 클래스 **method**\ 를 나타냅니다.
-3. 세 번째 세그먼트와 추가 세그먼트는 컨트롤러에 전달될 ID와 변수를 나타냅니다.
+1. The first segment represents the controller **class** that should be invoked.
+2. The second segment represents the class **method** that should be called.
+3. The third, and any additional segments, represent the ID and any variables that will be passed to the controller.
 
-다음 URI를 확인하세요.
-
-::
+Consider this URI::
 
     example.com/index.php/helloworld/index/1
 
-위의 예에서 CodeIgniter는 **Helloworld.php**\ 라는 컨트롤러를 찾고 ``'1'``\ 을 첫 번째 인수로 전달하여 ``index()`` 메소드를 실행합니다.
+In the above example, CodeIgniter would attempt to find a controller named **Helloworld.php**
+and executes ``index()`` method with passing ``'1'`` as the first argument.
 
-자세한 내용은 :ref:`Auto Routing (Legacy) in Controllers <controller-auto-routing-legacy>`\ 를 참조하세요.
+See :ref:`Auto Routing (Legacy) in Controllers <controller-auto-routing-legacy>` for more info.
 
-구성 옵션(레거시)
+.. _routing-auto-routing-legacy-configuration-options:
+
+Configuration Options (Legacy)
 ==============================
 
-이 옵션은 **app/Config/Routes.php** 상단에서 사용할 수 있습니다.
+These options are available at the top of **app/Config/Routes.php**.
 
-기본 컨트롤러(레거시)
+Default Controller (Legacy)
 ---------------------------
 
-사용자가 사이트의 루트(예: example.com)를 방문할 때 사용할 컨트롤러는 명시적 경로가 존재하지 않으면 ``setDefaultController()`` 메소드로 설정한 값에 의해 결정됩니다.
-기본값은 **app/Controllers/Home.php** 컨트롤러의 ``Home``\ 입니다.
+For Site Root URI (Legacy)
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When a user visits the root of your site (i.e., example.com) the controller to use is determined by the value set by
+the ``setDefaultController()`` method, unless a route exists for it explicitly. The default value for this is ``Home``
+which matches the controller at **app/Controllers/Home.php**:
 
 .. literalinclude:: routing/047.php
 
-기본 컨트롤러는 일치하는 경로가 없고 URI가 컨트롤러 폴더의 하위 폴더를 가리킬 때도 사용됩니다.
-예를 들어 사용자가 **example.com/admin**\ 을 방문하면 **app/Controllers/Admin/Home.php**\ 에서 컨트롤러가 사용됩니다.
+For Directory URI (Legacy)
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-자세한 내용은 :ref:`Auto Routing (Legacy) in Controllers <controller-auto-routing-legacy>`\ 를 참조하세요.
+The default controller is also used when no matching route has been found, and the URI would point to a directory
+in the controllers directory. For example, if the user visits **example.com/admin**, if a controller was found at
+**app/Controllers/Admin/Home.php**, it would be used.
 
-기본 메소드(레거시)
+See :ref:`Auto Routing (Legacy) in Controllers <controller-auto-routing-legacy>` for more info.
+
+Default Method (Legacy)
 -----------------------
 
-기본 컨트롤러 설정과 유사하게 작동하지만 URI와 일치하는 세그먼트가 없는 컨트롤러의 메소드에 사용되는 기본 메소드를 결정하는 데 사용됩니다. 기본값은 ``index``\ 입니다.
+This works similar to the default controller setting, but is used to determine the default method that is used
+when a controller is found that matches the URI, but no segment exists for the method. The default value is
+``index``.
 
-이 예에서 **example.com/products**\ 는 ``Products`` 컨트롤러의 ``Products::listAll()`` 메소드가 실행됩니다.
+In this example, if the user were to visit **example.com/products**, and a ``Products`` controller existed, the
+``Products::listAll()`` method would be executed:
 
 .. literalinclude:: routing/048.php
 
-경로 확인
+Confirming Routes
 *****************
 
-CodeIgniter는 모든 경로를 표시하는 :doc:`command </cli/spark_commands>`\ 가 있습니다.
+CodeIgniter has the following :doc:`command </cli/spark_commands>` to display all routes.
 
 .. _routing-spark-routes:
 
-routes
-======
+spark routes
+============
 
-모든 경로 및 필터를 표시합니다.
+Displays all routes and filters:
 
-::
+.. code-block:: console
 
-    > php spark routes
+    php spark routes
 
-출력은 다음과 같습니다.
+The output is like the following:
 
 .. code-block:: none
 
@@ -758,18 +901,18 @@ routes
     | GET     | feed    | »             | (Closure)                     |                | toolbar       |
     +---------+---------+---------------+-------------------------------+----------------+---------------+
 
-*Method* 열은 라우트가 수신 대기 중인 HTTP 메서드를 나타냅니다.
+The *Method* column shows the HTTP method that the route is listening for.
 
-*Route* 열은 일치시킬 라우트(URI 경로)를 나타냅니다. 정의된 라우트의 경로는 정규 표현식으로 표현됩니다.
+The *Route* column shows the route path to match. The route of a defined route is expressed as a regular expression.
 
-v4.3.0 이후로 Name 열은 라우트 이름을 나타냅니다. ``»``\ 는 이름이 라우트와 동일함을 나타냅니다.
+Since v4.3.0, the *Name* column shows the route name. ``»`` indicates the name is the same as the route path.
 
-.. important:: 시스템은 완벽하지 않습니다. 사용자 정의 플레이스홀더를 사용하는 경우 필터가 올바르지 않을 수 있습니다. 라우트의 필터를 확인하려면 :ref:`spark filter:check <spark-filter-check>` 명령을 사용할 수 있습니다.
+.. important:: The system is not perfect. If you use Custom Placeholders, *Filters* might not be correct. If you want to check filters for a route, you can use :ref:`spark filter:check <spark-filter-check>` command.
 
-자동 라우팅(개선됨)
+Auto Routing (Improved)
 -----------------------
 
-자동 라우팅(개선됨)을 사용하는 경우 출력은 다음과 같습니다.
+When you use Auto Routing (Improved), the output is like the following:
 
 .. code-block:: none
 
@@ -779,14 +922,35 @@ v4.3.0 이후로 Name 열은 라우트 이름을 나타냅니다. ``»``\ 는 �
     | GET(auto) | product/list/../..[/..] |               | \App\Controllers\Product::getList |                | toolbar       |
     +-----------+-------------------------+---------------+-----------------------------------+----------------+---------------+
 
-*Method*\ 은 ``GET(auto)``\ 와 같습니다.
+The *Method* will be like ``GET(auto)``.
 
-*Route* 열의 ``/..``\ 은 한 세그먼트를 나타냅니다. ``[/..]``\ 는 선택적(optional) 세그먼트를 나타냅니다.
+``/..`` in the *Route* column indicates one segment. ``[/..]`` indicates it is optional.
 
-자동 라우팅(레거시)
+.. note:: When auto-routing is enabled and you have the route ``home``, it can be also accessed by ``Home``, or maybe by ``hOme``, ``hoMe``, ``HOME``, etc. but the command will show only ``home``.
+
+If you see a route starting with ``x`` like the following, it indicates an invalid
+route that won't be routed, but the controller has a public method for routing.
+
+.. code-block:: none
+
+    +-----------+----------------+------+-------------------------------------+----------------+---------------+
+    | Method    | Route          | Name | Handler                             | Before Filters | After Filters |
+    +-----------+----------------+------+-------------------------------------+----------------+---------------+
+    | GET(auto) | x home/foo     |      | \App\Controllers\Home::getFoo       | <unknown>      | <unknown>     |
+    +-----------+----------------+------+-------------------------------------+----------------+---------------+
+
+The above example shows you have the ``\App\Controllers\Home::getFoo()`` method,
+but it is not routed because it is the default controller (``Home`` by default)
+and the default controller name must be omitted in the URI. You should delete
+the ``getFoo()`` method.
+
+.. note:: Prior to v4.3.4, the invalid route is displayed as a normal route
+    due to a bug.
+
+Auto Routing (Legacy)
 ---------------------
 
-자동 라우팅(레거시)를 사용하면 출력은 다음과 같습니다.
+When you use Auto Routing (Legacy), the output is like the following:
 
 .. code-block:: none
 
@@ -796,21 +960,34 @@ v4.3.0 이후로 Name 열은 라우트 이름을 나타냅니다. ``»``\ 는 �
     | auto   | product/list[/...] |               | \App\Controllers\Product::getList |                | toolbar       |
     +--------+--------------------+---------------+-----------------------------------+----------------+---------------+
 
-*Method*\ 는 ``auto``\ 로 지정됩니다.
+The *Method* will be ``auto``.
 
-*Route* 열의 ``[/...]``\ 는 임의의 세그먼트를 나타냅니다.
+``[/...]`` in the *Route* column indicates any number of segments.
 
-.. note:: 자동 라우팅이 활성화된 경우 ``home`` 경로가 있는 경우 ``Home``, ``hOme``, ``hoMe``, ``HOME``\ 등으로 액세스할 수 있습니다.  그러나 명령은 ``home``\ 만 표시합니다.
+.. note:: When auto-routing is enabled and you have the route ``home``, it can be also accessed by ``Home``, or maybe by ``hOme``, ``hoMe``, ``HOME``, etc. but the command will show only ``home``.
 
 .. _routing-spark-routes-sort-by-handler:
 
-Handler로 정렬
+Sort by Handler
 ---------------
 
 .. versionadded:: 4.3.0
 
-*Handler*\ 로 라우트를 정렬할 수 있습니다.
+You can sort the routes by *Handler*:
 
-::
+.. code-block:: console
 
-    > php spark routes -h
+    php spark routes -h
+
+.. _routing-spark-routes-specify-host:
+
+Specify Host
+------------
+
+.. versionadded:: 4.4.0
+
+You can specify the host in the request URL with the ``--host`` option:
+
+.. code-block:: console
+
+    php spark routes --host accounts.example.com

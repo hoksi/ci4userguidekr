@@ -1,282 +1,322 @@
-######################
-응답(Responses) 테스트
-######################
+#################
+Testing Responses
+#################
 
-``Test Response`` 클래스는 테스트 케이스의 응답을 구문 분석하고 테스트하는 데 유용한 여러 기능을 제공합니다. 
-일반적으로 :doc:`Controller Tests <controllers>` 또는 :doc:`HTTP Feature Tests <feature>`\ 의 결과로 ``TestResponse``\ 가 제공되지만 언제든지 ``ResponseInterface``\ 를 사용하여 직접 생성할 수 있습니다.
+The ``TestResponse`` class provides a number of helpful functions for parsing and testing responses
+from your test cases. Usually a ``TestResponse`` will be provided for you as a result of your
+:doc:`Controller Tests <controllers>` or :doc:`HTTP Feature Tests <feature>`, but you can always
+create your own directly using any ``ResponseInterface``:
 
 .. literalinclude:: response/001.php
+   :lines: 2-
 
-응답 테스트
-*************
+.. contents::
+    :local:
+    :depth: 2
 
-테스트 결과 ``TestResponse``\ 를 받았거나, 직접 테스트 응답을 작성하여도 테스트에 사용할 수 있는 여러 가지 새로운 어설션(assertion)\ 을 제고합니다.
+Testing the Response
+********************
 
-Request/Response 액세스
-=========================
+Whether you have received a ``TestResponse`` as a result of your tests or created one yourself,
+there are a number of new assertions that you can use in your tests.
+
+Accessing Request/Response
+==========================
 
 request()
 ---------
 
-테스트 중에 Request 개체가  경우 설정된 직접 액세스할 수 있습니다.
+You can access directly the Request object, if it was set during testing:
 
 .. literalinclude:: response/002.php
+   :lines: 2-
 
 response()
 ----------
 
-이렇게 하면 응답 개체에 직접 액세스할 수 있습니다.
+This allows you direct access to the response object:
 
 .. literalinclude:: response/003.php
+   :lines: 2-
 
-응답 상태 확인
-================
+Checking Response Status
+========================
 
 isOK()
 ------
 
-응답이 "ok"\ 로 인식되는지 여부에 따라 부울 true/false\ 를 반환합니다. 
-이는 주로 응답 상태 코드 200 또는 300에 의해 결정됩니다.
-리디렉션이 아니라면 빈 본문은 유효한 것으로 간주되지 않습니다.
+Returns a boolean true/false based on whether the response is perceived to be "ok". This is primarily determined by
+a response status code in the 200 or 300's. An empty body is not considered valid, unless in redirects.
 
 .. literalinclude:: response/004.php
+   :lines: 2-
 
 assertOK()
 ----------
 
-이 어설션은 ``isOK()`` 메소드를 사용하여 응답을 테스트합니다. 
-``assertNotOK()``\ 는 이 어설션의 반대입니다.
+This assertion simply uses the ``isOK()`` method to test a response. ``assertNotOK()`` is the inverse of this assertion.
 
 .. literalinclude:: response/005.php
+   :lines: 2-
 
 isRedirect()
 ------------
 
-응답이 리디렉션 응답인지 여부에 따라 부울 true/false\ 를 반환합니다.
+Returns a boolean true/false based on whether the response is a redirected response.
 
 .. literalinclude:: response/006.php
+   :lines: 2-
 
 assertRedirect()
 ----------------
 
-응답이 RedirectResponse의 인스턴스임을 확인합니다.
-``assertNotRedirect()``\ 는 이 어설션의 반대입니다.
+Asserts that the Response is an instance of RedirectResponse. ``assertNotRedirect()`` is the inverse of this assertion.
 
 .. literalinclude:: response/007.php
+   :lines: 2-
 
 assertRedirectTo()
 ------------------
 
-응답이 RedirectResponse의 인스턴스이며 대상이 지정된 uri와 일치하는지 확인합니다.
+Asserts that the Response is an instance of RedirectResponse and the destination
+matches the uri given.
 
 .. literalinclude:: response/008.php
+   :lines: 2-
 
 getRedirectUrl()
 ----------------
 
-RedirectResponse에 대해 설정된 URL을 반환합니다.
-실패한 경우 null을 반환합니다.
+Returns the URL set for a RedirectResponse, or null for failure.
 
 .. literalinclude:: response/009.php
+   :lines: 2-
 
 assertStatus(int $code)
 -----------------------
 
-반환된 HTTP 상태 코드가 $code와 일치하는지 확인합니다.
+Asserts that the HTTP status code returned matches $code.
 
 .. literalinclude:: response/010.php
+   :lines: 2-
 
-
-세션 어설션(Assertion)
-=======================
+Session Assertions
+==================
 
 assertSessionHas(string $key, $value = null)
 --------------------------------------------
 
-결과 세션에 값이 존재하는지 확인합니다. 
-$value\ 가 전달되면 는 변수의 값이 지정된 값과 일치하는지 확인합니다.
+Asserts that a value exists in the resulting session. If $value is passed, will also assert that the variable's value
+matches what was specified.
 
 .. literalinclude:: response/011.php
+   :lines: 2-
 
 assertSessionMissing(string $key)
 ---------------------------------
 
-결과 세션에 지정된 $key가 포함되어 있지 않음을 확인합니다.
+Asserts that the resulting session does not include the specified $key.
 
 .. literalinclude:: response/012.php
+   :lines: 2-
 
-
-헤더 어설션(Assertion)
-=======================
+Header Assertions
+=================
 
 assertHeader(string $key, $value = null)
 ----------------------------------------
 
-``$key``\ 라는 헤더가 응답에 있는지 확인합니다. 
-``$value``\ 가 비어 있지 않은면 값이 일치한다고 주장합니다.
+Asserts that a header named ``$key`` exists in the response. If ``$value`` is not empty, will also assert that
+the values match.
 
 .. literalinclude:: response/013.php
+   :lines: 2-
 
 assertHeaderMissing(string $key)
 --------------------------------
 
-헤더 이름 ``$key``\ 가 응답에 존재하지 않음을 확인합니다.
+Asserts that a header name ``$key`` does not exist in the response.
 
 .. literalinclude:: response/014.php
+   :lines: 2-
 
-
-쿠키 어설션(Assertion)
-=======================
+Cookie Assertions
+=================
 
 assertCookie(string $key, $value = null, string $prefix = '')
 -------------------------------------------------------------
 
-응답에 ``$key``\ 라는 쿠키가 있는지 확인합니다. 
-``$value``\ 가 비어 있지 않은 경우에도 값이 일치한다고 주장합니다. 
-필요한 경우 쿠키 접두사를 세 번째 매개 변수로 전달하여 설정할 수 있습니다.
+Asserts that a cookie named ``$key`` exists in the response. If ``$value`` is not empty, will also assert that
+the values match. You can set the cookie prefix, if needed, by passing it in as the third parameter.
 
 .. literalinclude:: response/015.php
+   :lines: 2-
 
 assertCookieMissing(string $key)
 --------------------------------
 
-``$key``\ 라는 쿠키가 응답에 존재하지 않음을 확인합니다.
+Asserts that a cookie named ``$key`` does not exist in the response.
 
 .. literalinclude:: response/016.php
+   :lines: 2-
 
 assertCookieExpired(string $key, string $prefix = '')
 -----------------------------------------------------
 
-``$key``\ 라는 쿠키가 존재하지만 만료되었음을 확인합니다. 
-필요한 경우 쿠키 접두사를 두 번째 매개 변수로 전달하여 설정할 수 있습니다.
+Asserts that a cookie named ``$key`` exists, but has expired. You can set the cookie prefix, if needed, by passing it
+in as the second parameter.
 
 .. literalinclude:: response/017.php
+   :lines: 2-
 
-DOM 헬퍼
+DOM Helpers
 ===========
 
-반환되는 응답에는 응답 내의 HTML 출력을 검사하는 여러 가지 헾러 메소드가 포함되어 있습니다. 
-이러한 헬퍼들은 테스트의 어설션 내에서 사용하는 데 유용합니다.
+The response you get back contains a number of helper methods to inspect the HTML output within the response. These
+are useful for using within assertions in your tests.
 
-``see()`` 메소드는 페이지의 텍스트를 지정된 유형(type), 클래스(class), ID별로  확인하여 자체적이거나, 태그 내에 존재하는지 구체적으로 확인합니다.
+see()
+-----
+
+Returns a boolean true/false based on whether the text on the page exists either
+by itself, or more specifically within
+a tag, as specified by type, class, or id:
 
 .. literalinclude:: response/018.php
+   :lines: 2-
 
-``dontSee()`` 메소드는 반대로 동작합니다.
+The ``dontSee()`` method is the exact opposite:
 
 .. literalinclude:: response/019.php
+   :lines: 2-
 
 seeElement()
 ------------
 
-``seeElements()``\ 와 ``dontSeeElements()``\ 는 이전 메소드와 매우 유사하지만 요소의 값을 살펴보지는 않습니다. 
-대신, 그들은 단순히 페이지에 요소가 존재하는지만 확인합니다.
+The ``seeElement()`` and ``dontSeeElement()`` are very similar to the previous methods, but do not look at the
+values of the elements. Instead, they simply check that the elements exist on the page:
 
 .. literalinclude:: response/020.php
+   :lines: 2-
 
 seeLink()
 ---------
 
-``seeLink()``\ 를 사용하여 지정된 텍스트로 페이지에 링크 주소가 표시되는지 확인할 수 있습니다.
+You can use ``seeLink()`` to ensure that a link appears on the page with the specified text:
 
 .. literalinclude:: response/021.php
+   :lines: 2-
 
 seeInField()
 ------------
 
-``seeInField()`` 메소드는 이름 및 값을 포함한 입력 태그가 있는지 확인합니다.
+The ``seeInField()`` method checks for any input tags exist with the name and value:
 
 .. literalinclude:: response/022.php
+   :lines: 2-
 
 seeCheckboxIsChecked()
 ----------------------
 
-마지막으로 체크박스가 존재하는지 ``seeCheckboxIsChecked()`` 메소드로 체크되어 있는지 확인할 수 있습니다
+Finally, you can check if a checkbox exists and is checked with the ``seeCheckboxIsChecked()`` method:
 
 .. literalinclude:: response/023.php
+   :lines: 2-
 
-DOM 어설션(Assertion)
-======================
+DOM Assertions
+==============
 
-다음 어설션을 사용하여 특정 요소/텍스트 등이 응답(response) 본문에 있는지 확인할 수 있습니다.
+You can perform tests to see if specific elements/text/etc exist with the body of the response with the following
+assertions.
 
 assertSee(string $search = null, string $element = null)
 --------------------------------------------------------
 
-유형, 클래스 또는 ID별로 지정된 태그가 text/HTML 페이지에 있다고 주장합니다.
+Asserts that text/HTML is on the page, either by itself or - more specifically - within
+a tag, as specified by type, class, or id:
 
 .. literalinclude:: response/024.php
+   :lines: 2-
 
 assertDontSee(string $search = null, string $element = null)
 ------------------------------------------------------------
 
-``assertSee()`` 메소드와 반대로 작동합니다.
+Asserts the exact opposite of the ``assertSee()`` method:
 
 .. literalinclude:: response/025.php
+   :lines: 2-
 
 assertSeeElement(string $search)
 --------------------------------
 
-``assurtSee()``\ 와 비슷하지만 기존 요소만 확인합니다. 특정 텍스트를 확인하지 않습니다.
+Similar to ``assertSee()``, however this only checks for an existing element. It does not check for specific text:
 
 .. literalinclude:: response/026.php
+   :lines: 2-
 
 assertDontSeeElement(string $search)
 ------------------------------------
 
-``assurtSee()``\ 와 유사하지만, 누락된 기존 요소만 확인합니다. 특정 텍스트를 확인하지 않습니다.
+Similar to ``assertSee()``, however this only checks for an existing element that is missing. It does not check for
+specific text:
 
 .. literalinclude:: response/027.php
+   :lines: 2-
 
 assertSeeLink(string $text, string $details = null)
 ---------------------------------------------------
 
- 태그 본문중 **$text**\ 와 일치하는 앵커 태그가 있는지 확인합니다.
+Asserts that an anchor tag is found with matching ``$text`` as the body of the tag:
 
 .. literalinclude:: response/028.php
+   :lines: 2-
 
 assertSeeInField(string $field, string $value = null)
 -----------------------------------------------------
 
-이름 및 값을 가진 입력 태그가 있는지 확인합니다.
+Asserts that an input tag exists with the name and value:
 
 .. literalinclude:: response/029.php
+   :lines: 2-
 
-JSON 작업
-===========
+Working with JSON
+=================
 
-응답(Response)중 API 메서드를 사용할 때 자주 JSON이 포함됩니다. 
-다음 메소들을 사용하면 응답을 테스트할 수 있습니다.
+Responses will frequently contain JSON responses, especially when working with API methods. The following methods
+can help to test the responses.
 
 getJSON()
 ---------
 
-이 메소드는 응답 본문을 JSON 문자열로 반환합니다.
+This method will return the body of the response as a JSON string:
 
 .. literalinclude:: response/030.php
+   :lines: 2-
 
-이 메소드를 사용하여 ``$response``\ 이 실제로 JSON 콘텐츠를 보유하고 있는지 확인할 수 있습니다.
+You can use this method to determine if ``$response`` actually holds JSON content:
 
 .. literalinclude:: response/031.php
+   :lines: 2-
 
-.. note:: JSON 문자열은 결과에 예쁘게 출력(pretty-print)됩니다.
+.. note:: Be aware that the JSON string will be pretty-printed in the result.
 
 assertJSONFragment(array $fragment)
 -----------------------------------
 
-$fragment\ 가 JSON 응답 내에서 발견되없음 주장합니다. 전체 JSON 값과 일치할 필요는 없습니다.
+Asserts that ``$fragment`` is found within the JSON response. It does not need to match the entire JSON value.
 
 .. literalinclude:: response/032.php
+   :lines: 2-
 
 assertJSONExact($test)
 ----------------------
 
-``assertJSONFragment()``\ 와 유사하지만 전체 JSON 응답을 확인하여 정확하게 일치를 확인합니다.
+Similar to ``assertJSONFragment()``, but checks the entire JSON response to ensure exact matches.
 
-XML 작업
-===========
+Working with XML
+================
 
 getXML()
 --------
 
-응용프로그램이 XML을 반환하는 경우 이 메소드를 통해 XML을 검색할 수 있습니다.
+If your application returns XML, you can retrieve it through this method.

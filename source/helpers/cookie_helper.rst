@@ -1,85 +1,98 @@
 #############
-쿠키 헬퍼
+Cookie Helper
 #############
 
-쿠키 헬퍼에는 쿠키 작업을 지원하는 기능이 포함되어 있습니다.
+The Cookie Helper file contains functions that assist in working with
+cookies.
 
 .. contents::
     :local:
     :depth: 2
 
-헬퍼 로드
+Loading this Helper
 ===================
 
-이 헬퍼는 다음 코드를 사용하여 로드됩니다.
+This helper is loaded using the following code:
 
 .. literalinclude:: cookie_helper/001.php
 
-사용 가능한 함수
+Available Functions
 ===================
 
-사용 가능한 함수는 다음과 같습니다.
+The following functions are available:
 
-.. php:function:: set_cookie($name[, $value = ''[, $expire = ''[, $domain = ''[, $path = '/'[, $prefix = ''[, $secure = false[, $httpOnly = false]]]]]]])
+.. php:function:: set_cookie($name[, $value = ''[, $expire = ''[, $domain = ''[, $path = '/'[, $prefix = ''[, $secure = false[, $httpOnly = false[, $sameSite = '']]]]]]]])
 
-    :param	mixed	$name: 이 함수에 사용 가능한 모든 매개 변수의 쿠키 이름 *또는* 연관 배열
-    :param	string	$value: 쿠키 값
-    :param	int	    $expire: 만료까지의 시간 (초)
-    :param	string	$domain: 쿠키 도메인 (일반적으로 .yourdomain.com)
-    :param	string	$path: 쿠키 경로
-    :param	string	$prefix: 쿠키 이름 접두사. ``''``\ 인 경우 **app/Config/Cookie.php**\ 의 기본값이 사용됩니다.
-    :param	bool	$secure: HTTPS를 통해서만 쿠키를 보낼지 여부.  ``null``\ 인 경우 **app/Config/Cookie.php**\ 의 기본값이 사용됩니다.
-    :param	bool	$httpOnly: JavaScript에서 쿠키를 숨길 지 여부.  ``null``\ 인 경우 **app/Config/Cookie.php**\ 의 기본값이 사용됩니다.
-    :param  string  $sameSite: SameSite 쿠키 매개변수의 값입니다. ``null``\ 인 경우 **app/Config/Cookie.php**\ 의 기본값이 사용됩니다.
-    :rtype:	void
+    :param    array|Cookie|string    $name: Cookie name *or* associative array of all of the parameters available to this function *or* an instance of ``CodeIgniter\Cookie\Cookie``
+    :param    string    $value: Cookie value
+    :param    int    $expire: Number of seconds until expiration. If set to ``0`` the cookie will only last as long as the browser is open
+    :param    string    $domain: Cookie domain (usually: .yourdomain.com)
+    :param    string    $path: Cookie path
+    :param    string    $prefix: Cookie name prefix. If ``''``, the default from **app/Config/Cookie.php** is used
+    :param    bool    $secure: Whether to only send the cookie through HTTPS. If ``null``, the default from **app/Config/Cookie.php** is used
+    :param    bool    $httpOnly: Whether to hide the cookie from JavaScript. If ``null``, the default from **app/Config/Cookie.php** is used
+    :param    string    $sameSite: The value for the SameSite cookie parameter. If ``null``, the default from **app/Config/Cookie.php** is used
+    :rtype:    void
 
-    .. note:: v4.2.7 이전 버전은 버그로 인해 ``$secure``\ 와 ``$httpOnly``\ 의 기본값이 ``false``\ 였으며 **app/Config/Cookie.php**\ 의 기본 값이 사용되지 않았습니다.
+    .. note:: Prior to v4.2.7, the default values of ``$secure`` and ``$httpOnly`` were ``false``
+        due to a bug, and these values from **app/Config/Cookie.php** were never used.
 
-    브라우저 쿠키를 설정하기 위한 보다 친근한 구문을 제공합니다.
-    이 함수는 :php:meth:`CodeIgniter\\HTTP\\Response::setCookie()`\ 의 별칭이므로, 사용법에 대한 설명은 :doc:`Response 라이브러리 </outgoing/response>`\ 를 참조하십시오.
+    This helper function gives you friendlier syntax to set browser
+    cookies. Refer to the :doc:`Response Library </outgoing/response>` for
+    a description of its use, as this function is an alias for
+    :php:meth:`CodeIgniter\\HTTP\\Response::setCookie()`.
 
 .. php:function:: get_cookie($index[, $xssClean = false[, $prefix = '']])
 
-    :param	string	$index: 쿠키 이름
-    :param	bool	$xssClean: 반환된 값에 XSS 필터링을 적용할지 여부
-    :param	string	$prefix: 쿠키 이름 접두사. ``''``\ 로 설정하면 **app/Config/Cookie.php**\ 의 기본값이 사용됩니다. ``null``\ 로 설정하면 접두사 없음
-    :returns:	쿠키 값 또는 찾지 못한 경우 null
-    :rtype:	mixed
+    :param    string    $index: Cookie name
+    :param    bool    $xssClean: Whether to apply XSS filtering to the returned value
+    :param    string|null  $prefix: Cookie name prefix. If set to ``''``, the default value from **app/Config/Cookie.php** will be used. If set to ``null``, no prefix
+    :returns:    The cookie value or null if not found
+    :rtype:    mixed
 
-    .. note:: v4.2.1부터 세 번째 매개변수 ``$prefix``\ 가 도입되었으며 버그 수정으로 인해 동작이 약간 변경되었습니다. 자세한 내용은 :ref:`업그레이드 <upgrade-421-get_cookie>`\ 를 참조하세요.
+    .. note:: Since v4.2.1, the third parameter ``$prefix`` has been introduced and the behavior has been changed a bit due to a bug fix. See :ref:`Upgrading <upgrade-421-get_cookie>` for details.
 
-    이 헬퍼 함수는 브라우저 쿠키를 얻기 위한 보다 친숙한 구문을 제공합니다.
-    이 함수는 **app/Config/Cookie.php** 파일에 설정된 ``Config\Cookie::$prefix``\ 를 추가한다는 점을 제외하고는 ``IncomingRequest::getCookie()``\ 와 매우 유사하게 작동하므로 자세한 사용법은 :doc:`IncomingRequest 라이브러리 </incoming/incomingrequest>`\ 를 참조하십시오.
+    This helper function gives you friendlier syntax to get browser
+    cookies. Refer to the :doc:`IncomingRequest Library </incoming/incomingrequest>` for
+    detailed description of its use, as this function acts very
+    similarly to :php:meth:`CodeIgniter\\HTTP\\IncomingRequest::getCookie()`,
+    except it will also prepend
+    the ``Config\Cookie::$prefix`` that you might've set in your
+    **app/Config/Cookie.php** file.
 
-    .. warning:: XSS 필터링을 사용하는 것은 나쁜 습관입니다. XSS 공격을 완벽하게 차단하지는 않습니다. 뷰(view)에서 올바른 ``$context``\ 와 함께 ``esc()``\ 를 사용하는 것이 좋습니다.
+    .. warning:: Using XSS filtering is a bad practice. It does not prevent XSS attacks perfectly. Using :php:func:`esc()` with the correct ``$context`` in the views is recommended.
 
 .. php:function:: delete_cookie($name[, $domain = ''[, $path = '/'[, $prefix = '']]])
 
-    :param string $name: 쿠키 이름
-    :param string $domain: 쿠키 도메인 (일반적으로 .yourdomain.com)
-    :param string $path: 쿠키 경로
-    :param string $prefix: 쿠키 이름 접두사
-    :rtype:	void
+    :param string $name: Cookie name
+    :param string $domain: Cookie domain (usually: .yourdomain.com)
+    :param string $path: Cookie path
+    :param string $prefix: Cookie name prefix
+    :rtype: void
 
-    쿠키를 삭제할 수 있습니다. 
-    필수값으로 쿠키 이름만 필요하며, 사용자 정의 경로나 다른 값을 설정하지 않아도 됩니다.
+    Lets you delete a cookie. Unless you've set a custom path or other
+    values, only the name of the cookie is needed.
 
     .. literalinclude:: cookie_helper/002.php
 
-    이 함수는 ``value``\ 와 ``expire`` 변수가 없다는 점을 제외하면 ``set_cookie()``\ 와 동일합니다.
+    This function is otherwise identical to :php:func:`set_cookie()`, except that it
+    does not have the ``value`` and ``expire`` parameters.
 
-    .. note:: ``set_cookie()``\ 를 사용할 때 ``value``\ 가 빈 문자열로 설정되고 ``expire``\ 가 ``0``\ 으로 설정되면 쿠키가 삭제됩니다.
-        ``value``\ 가 비어 있지 않은 문자열로 설정되고 ``expire``\ 가 ``0``\ 으로 설정되면 쿠키는 브라우저가 열려 있는 동안에만 지속됩니다.
+    .. note:: When you use :php:func:`set_cookie()`,
+        if the ``value`` is set to empty string and the ``expire`` is set to ``0``, the cookie will be deleted.
+        If the ``value`` is set to non-empty string and the ``expire`` is set to ``0``, the cookie will only last as long as the browser is open.
 
-    첫 번째 매개 변수에 값 배열이나 불연속 매개 변수(discrete parameters)를 설정할 수 있습니다.
+    You can submit an
+    array of values in the first parameter or you can set discrete
+    parameters.
 
     .. literalinclude:: cookie_helper/003.php
 
 .. php:function:: has_cookie(string $name[, ?string $value = null[, string $prefix = '']])
 
-    :param string $name: 쿠키 이름
-    :param string|null $value: 쿠키 값
-    :param string $prefix: 쿠키 접두사(prefix)
+    :param string $name: Cookie name
+    :param string|null $value: Cookie value
+    :param string $prefix: Cookie prefix
     :rtype: bool
 
-    이름으로 쿠키가 있는지 확인합니다. ``Response::hasCookie()``\ 의 별칭(alias)입니다..
+    Checks if a cookie exists by name. This is an alias of ``Response::hasCookie()``.

@@ -1,8 +1,8 @@
-#############
-헬퍼(Helper)
-#############
+#######
+Helpers
+#######
 
-헬퍼는 유용한 함수의 모음입니다.
+Helpers are collections of useful procedural functions.
 
 .. toctree::
     :glob:

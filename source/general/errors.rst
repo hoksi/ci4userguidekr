@@ -1,106 +1,225 @@
 ##############
-오류 처리
+Error Handling
 ##############
 
-CodeIgniter는 프레임워크에서 제공하는 몇 가지 사용자 정의 예외뿐만 아니라 `SPL collection <https://php.net/manual/en/spl.exceptions.php>`_\ 과 예외(exception)를 통해 시스템에 오류 보고를 빌드합니다.
-어플리케이션이 ``production`` 환경에서 실행되고 있지 않다면, 환경 설정에 따라 오류 또는 예외가 발생하면 자세한 오류 보고서를 표시합니다.
-이 경우 사용자에게 최상의 사용자 환경을 유지하기 위해 보다 일반적인 메시지가 표시됩니다.
+CodeIgniter builds error reporting into your system through Exceptions, both the `SPL collection <https://www.php.net/manual/en/spl.exceptions.php>`_, as
+well as a few exceptions that are provided by the framework.
+
+Depending on your environment's setup,
+the default action when an error or exception is thrown is to display a detailed error report unless the application
+is running under the ``production`` environment. In the ``production`` environment, a more generic message is displayed to
+keep the best user experience for your users.
 
 .. contents::
     :local:
     :depth: 2
 
-예외 사용
+Using Exceptions
 ================
 
-이 섹션은 새로운 프로그래머 또는 예외 사용 경험이 없는 개발자를 위한 것입니다.
+This section is a quick overview for newer programmers, or for developers who are not experienced with using exceptions.
 
-예외(exception)는 단순히 예외가 "발생(thrown)"\ 할 때 발생하는 이벤트입니다.
-아래와 같이하면 스크립트의 현재 흐름은 중단되고, 해당 오류 페이지를 표시하는 오류 처리기로 실행이 전송됩니다.
+Exceptions are simply events that happen when the exception is "thrown". This halts the current flow of the script, and
+execution is then sent to the error handler which displays the appropriate error page:
 
 .. literalinclude:: errors/001.php
 
-예외를 던질 수 있는 메소드를 호출하는 경우 ``try/catch`` 블록을 사용하여 해당 예외를 포착할 수 있습니다.
+If you are calling a method that might throw an exception, you can catch that exception using a ``try/catch`` block:
 
 .. literalinclude:: errors/002.php
 
-``$userModel``\ 에서 예외가 발생하면 예외가 포착되고 catch 블록 내의 코드가 실행됩니다.
-이 예제에서 스크립트는 실행을 중단하고 ``UserModel``\ 이 정의한 오류 메시지를 반영합니다.
+If the ``$userModel`` throws an exception, it is caught and the code within the catch block is executed. In this example,
+the scripts dies, echoing the error message that the ``UserModel`` defined.
 
-이 예는 모든 유형(Exception)의 예외를 포착(catch)합니다.
-``UnknownFileException``\ 과 같은 특정 유형의 예외만 감시하려는 경우 catch 매개 변수에서 예외를 지정할 수 있습니다.
-발생된 예외의 하위 클래스가 아닌 다른 예외는 오류 처리기로 전달됩니다.
+In the example above, we catch any type of Exception. If we only want to watch for specific types of exceptions, like
+a ``UnknownFileException``, we can specify that in the catch parameter. Any other exceptions that are thrown and are
+not child classes of the caught exception will be passed on to the error handler:
 
 .. literalinclude:: errors/003.php
 
-이는 오류를 직접 처리하거나 스크립트가 끝나기 전에 필요한 뭔가를 정리하는데 유용할 수 있습니다.
+This can be handy for handling the error yourself, or for performing cleanup before the script ends. If you want
+the error handler to function as normal, you can throw a new exception within the catch block:
 
 .. literalinclude:: errors/004.php
 
-구성
+Configuration
 =============
 
-기본적으로 CodeIgniter는 ``development`` 및 ``testing`` 환경에서는 모든 오류를 표시하고 ``production`` 환경에서는 오류를 표시하지 않습니다.
-이 값을 변경하려면 ``.env`` 파일의 ``CI_ENVIRONMENT`` 상수에 값을 설정하면 됩니다.
+Error Reporting
+---------------
 
-.. important:: 오류 보고를 비활성화해도 오류가 있는 경우 로그 쓰기가 중지되지 않습니다.
+By default, CodeIgniter will display a detailed error report with all errors in the ``development`` and ``testing`` environments, and will not
+display any errors in the ``production`` environment. You can change this by setting the ``CI_ENVIRONMENT`` variable
+in the :ref:`.env <dotenv-file>` file.
 
-로깅 예외
+.. important:: Disabling error reporting DOES NOT stop logs from being written if there are errors.
+
+.. warning:: Note that your settings from the **.env** file are added to ``$_SERVER``
+    and ``$_ENV``. As a side effect, this means that if the detailed error report
+    is displayed, **your secure credentials are publicly exposed**.
+
+Logging Exceptions
 ------------------
 
-기본적으로 404 - Page Not Found 예외 이외의 모든 예외가 기록됩니다.
-``Config\Exceptions``\ 의 **$log** 값을 설정하여 켜거나 끌 수 있습니다.
+By default, all Exceptions other than 404 - Page Not Found exceptions are logged. This can be turned on and off
+by setting the ``$log`` value of **app/Config/Exceptions.php**:
 
 .. literalinclude:: errors/005.php
 
-다른 상태 코드에 대한 로깅을 무시하려면 동일한 파일에서 상태 코드를 무시하도록 설정할 수 있습니다.
+To ignore logging on other status codes, you can set the status code to ignore in the same file:
 
 .. literalinclude:: errors/006.php
 
-.. note:: 현재 로그 설정이 모든 예외가 기록되는 **critical**\ 로 설정되지 않은 경우에도 예외에 대해 로깅이 발생하지 않을 수 있습니다.
+.. note:: It is possible that logging still will not happen for exceptions if your current Log settings
+    are not set up to log **critical** errors, which all exceptions are logged as.
 
-사용자 정의 예외
-==================
+Framework Exceptions
+====================
 
-다음과 프레임워크 예외를 사용할 수 있습니다.
+The following framework exceptions are available:
 
 PageNotFoundException
 ---------------------
 
-404, Page Not Found 오류를 알리는 데 사용됩니다.
-예외가 발생하면 시스템은 ``app/views/errors/html/error_404.php``\ 에 있는 뷰를 보여줍니다.
-``app/Config/Routes.php``\ 에서 404 오류를 재정의하여 지정하면 표준 404 페이지 대신 호출됩니다.
+This is used to signal a 404, Page Not Found error. When thrown, the system will show the view found at
+**app/Views/errors/html/error_404.php**. You should customize all of the error views for your site.
+If, in **app/Config/Routes.php**, you have specified a 404 Override, that will be called instead of the standard
+404 page:
 
 .. literalinclude:: errors/007.php
 
-404 페이지의 기본 메시지 대신 표시될 예외로 메시지를 전달할 수 있습니다.
+You can pass a message into the exception that will be displayed in place of the default message on the 404 page.
 
 ConfigException
 ---------------
 
-이 예외는 구성 클래스의 값이 유효하지 않거나, 구성 클래스가 올바른 유형이 아닌 경우에 사용해야 합니다.
+This exception should be used when the values from the configuration class are invalid, or when the config class
+is not the right type, etc:
 
 .. literalinclude:: errors/008.php
 
-HTTP 상태 코드는 500이고 종료 코드는 3입니다.
+This provides an exit code of 3.
 
 DatabaseException
 -----------------
 
-이 예외는 데이터베이스 연결을 작성할 수 없거나 일시적으로 유실 된 경우와 같은 데이터베이스 오류에 대해 발생합니다.
+This exception is thrown for database errors, such as when the database connection cannot be created,
+or when it is temporarily lost:
 
 .. literalinclude:: errors/009.php
 
-HTTP 상태 코드는 500이고 종료 코드는 8입니다.
+This provides an exit code of 8.
 
 RedirectException
 -----------------
 
-This exception is a special case allowing for overriding of all other response routing and forcing a redirect to a specific route or URL.
-이 예외는 다른 모든 응답 라우팅을 재정의하고 특정 경로 또는 URL로 리디렉션을 강제 적용할 수 있는 특수한 경우입니다.
+.. note:: Since v4.4.0, the namespace of ``RedirectException`` has been changed.
+    Previously it was ``CodeIgniter\Router\Exceptions\RedirectException``. The
+    previous class is deprecated.
+
+This exception is a special case allowing for overriding of all other response routing and
+forcing a redirect to a specific URI:
 
 .. literalinclude:: errors/010.php
 
-``$route``\ 는 이름이 지정된 경로, 상대 URI 또는 전체 URL일 수 있습니다. 기본값("302", "임시 리디렉션") 대신 사용할 리디렉션 코드를 제공할 수도 있습니다.
+``$uri`` is a URI path relative to baseURL. You can also supply a
+redirect code to use instead of the default (``302``, "temporary redirect"):
 
 .. literalinclude:: errors/011.php
+
+Also, since v4.4.0 an object of a class that implements ResponseInterface can be used as the first argument.
+This solution is suitable for cases where you need to add additional headers or cookies in the response.
+
+.. literalinclude:: errors/018.php
+
+.. _error-specify-http-status-code:
+
+Specify HTTP Status Code in Your Exception
+==========================================
+
+.. versionadded:: 4.3.0
+
+Since v4.3.0, you can specify the HTTP status code for your Exception class to implement
+``HTTPExceptionInterface``.
+
+When an exception implementing ``HTTPExceptionInterface`` is caught by CodeIgniter's exception handler, the Exception code will become the HTTP status code.
+
+.. _error-specify-exit-code:
+
+Specify Exit Code in Your Exception
+===================================
+
+.. versionadded:: 4.3.0
+
+Since v4.3.0, you can specify the exit code for your Exception class to implement
+``HasExitCodeInterface``.
+
+When an exception implementing ``HasExitCodeInterface`` is caught by CodeIgniter's exception handler, the code returned from the ``getExitCode()`` method will become the exit code.
+
+.. _logging_deprecation_warnings:
+
+Logging Deprecation Warnings
+============================
+
+.. versionadded:: 4.3.0
+
+By default, all errors reported by ``error_reporting()`` will be thrown as an ``ErrorException`` object. These
+include both ``E_DEPRECATED`` and ``E_USER_DEPRECATED`` errors. With the surge in use of PHP 8.1+, many users
+may see exceptions thrown for `passing null to non-nullable arguments of internal functions <https://wiki.php.net/rfc/deprecate_null_to_scalar_internal_arg>`_.
+To ease the migration to PHP 8.1, you can instruct CodeIgniter to log the deprecations instead of throwing them.
+
+First, make sure your copy of ``Config\Exceptions`` is updated with the two new properties and set as follows:
+
+.. literalinclude:: errors/012.php
+
+Next, depending on the log level you set in ``Config\Exceptions::$deprecationLogLevel``, check whether the
+logger threshold defined in ``Config\Logger::$threshold`` covers the deprecation log level. If not, adjust
+it accordingly.
+
+.. literalinclude:: errors/013.php
+
+After that, subsequent deprecations will be logged instead of thrown.
+
+This feature also works with user deprecations:
+
+.. literalinclude:: errors/014.php
+
+For testing your application you may want to always throw on deprecations. You may configure this by
+setting the environment variable ``CODEIGNITER_SCREAM_DEPRECATIONS`` to a truthy value.
+
+.. _custom-exception-handlers:
+
+Custom Exception Handlers
+=========================
+
+.. versionadded:: 4.4.0
+
+If you need more control over how exceptions are displayed you can now define your own handlers and
+specify when they apply.
+
+Defining the New Handler
+------------------------
+
+The first step is to create a new class which implements ``CodeIgniter\Debug\ExceptionHandlerInterface``.
+You can also extend ``CodeIgniter\Debug\BaseExceptionHandler``.
+This class includes a number of utility methods that are used by the default exception handler.
+The new handler must implement a single method: ``handle()``:
+
+.. literalinclude:: errors/015.php
+
+This example defines the minimum amount of code typically needed - display a view and exit with the proper
+exit code. However, the ``BaseExceptionHandler`` provides a number of other helper functions and objects.
+
+Configuring the New Handler
+---------------------------
+
+Telling CodeIgniter to use your new exception handler class is done in the **app/Config/Exceptions.php**
+configuration file's ``handler()`` method:
+
+.. literalinclude:: errors/016.php
+
+You can use any logic your application needs to determine whether it should handle the exception, but the
+two most common are checking on the HTTP status code or the type of exception. If your class should handle
+it then return a new instance of that class:
+
+.. literalinclude:: errors/017.php

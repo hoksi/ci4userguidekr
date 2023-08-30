@@ -1,10 +1,11 @@
 #################
-공식 패키지
+Official Packages
 #################
 
-CodeIgniter 프레임워크는 개발자가 직면하게 될 모든 문제를 해결할 수 없습니다.
-많은 사용자들이 프레임워크가 얼마나 작고 빠른지 좋아한다고 말했기 때문에 우리는 핵심 프레임워크가 부풀려지는 것을 원하지 않습니다.
-간극을 메우기 위해 모든 사이트에서 필요하거나 원하지 않는 추가 기능을 제공하는 공식 패키지를 출시하고 있습니다.
+The CodeIgniter framework cannot solve all of the problems that developers will encounter.
+Many users have said they love how small and fast the framework is, so we don't want to
+bloat the core framework. To bridge the gap we are releasing official packages to provide
+additional functionality that not every site will need or want.
 
 .. contents::
     :local:
@@ -16,42 +17,55 @@ CodeIgniter 프레임워크는 개발자가 직면하게 될 모든 문제를 �
 Shield
 ******
 
-`CodeIgniter Shield <https://codeigniter4.github.io/shield/>`_\ 는 CodeIgniter 4용 인증 및 권한 부여 프레임워크입니다.
-안전하고 유연하며 쉽게 확장하여 다양한 유형의 웹사이트의 요구 사항을 충족하도록 설계되었습니다.
-많은 기능중에는 다음이 포함됩니다.
+`CodeIgniter Shield <https://codeigniter4.github.io/shield/>`_ is an authentication
+and authorization framework for CodeIgniter 4. It is designed to be secure, flexible,
+and easily extendable to meet the needs of many different types of websites.
+Among the many features, it includes:
 
-* 세션 기반 인증
-* 개인용 액세스 토큰 인증
-* 로그인/등록 후 "작업"을 위한 프레임워크(예: 이중 인증 등)
-* 간단하고 유연한 권한으로 역할 기반 액세스 제어.
-* 사용자별 권한 재정의,
-* 그리고 더..
+* Session-based authentication
+* Personal access token authentication
+* framework for after login/register "actions" (like Two Factor Authentication, etc)
+* Role-Based Access Control with simple, flexible permissions.
+* Per-user permission overrides,
+* and more...
 
 ********
 Settings
 ********
 
-`CodeIgniter 설정 <https://github.com/codeigniter4/settings>`_\ 은 모든 구성 설정을 데이터베이스에 저장할 수 있도록 하는 구성 파일에 대한 래퍼입니다.
-이를 통해 애플리케이션은 기본 구성 값으로 제공되지만 코드를 건드릴 필요 없이 프로젝트가 성장하거나 서버를 이동함에 따라 적응할 수 있습니다.
+`CodeIgniter Settings <https://github.com/codeigniter4/settings>`_ is a wrapper around
+the configuration files that allows any configuration setting to saved to the database,
+while defaulting to the config files when not custom value has been stored. This allows
+an application to ship with the default config values, but adapt as the project grows
+or moves servers, without having to touch the code.
+
 
 *****
 Cache
 *****
 
-CodeIgniter 4용 `PSR-6 및 PSR-16 캐시 어댑터 <https://github.com/codeigniter4/cache>`_\ 가 포함된 라이브러리를 제공합니다.
-CodeIgniter 4는 모든 기능을 갖춘 캐시 구성 요소와 함께 제공되므로 사용에 필요하지 않습니다.
-이 모듈은 PSR 인터페이스 규정에 의존하는 타사 패키지를 통합하기 위한 것입니다.
+We provide a library with `PSR-6 and PSR-16 Cache Adapters <https://github.com/codeigniter4/cache>`_
+for CodeIgniter 4. This is not required for use, since CodeIgniter 4 comes with a fully-
+functional cache component. This module is only for integrating third-party packages
+that rely on the PSR interface provisions.
+
 
 ******
 DevKit
 ******
 
-`CodeIgniter DevKit <https://github.com/codeigniter4/devkit>`_\ 은 코딩 표준, 정적 분석 도구 및 규칙, 단위 테스트, 데이터 생성, 파일 시스템 조롱, 보안 권고 등을 제공합니다.
-이것은 개인 프로젝트나 라이브러리에서 17가지 다른 도구로 빠르게 설정하는 데 사용할 수 있습니다.
+`CodeIgniter DevKit <https://github.com/codeigniter4/devkit>`_ provides all of the
+development tools that CodeIgniter uses to help ensure quality code, including
+our coding standard, static analysis tools and rules, unit testing, data generation,
+file-system mocking, security advisories, and more. This can be used in any of
+your personal projects or libraries to get you rapidly setup with 17 different tools.
+
 
 ***************
 Coding Standard
 ***************
 
-`CodeIgniter 코딩 표준 <https://github.com/CodeIgniter/coding-standard>`_\ 은 PHP CS Fixer를 기반으로 하고 Nexus CS Config로 구동되는 CodeIgniter의 공식 코딩 표준을 보유하고 있습니다.
-이것은 코드에 자동으로 적용될 수 있는 일관된 스타일 규칙 세트의 기초를 형성하기 위해 자신의 프로젝트에서 사용할 수 있습니다.
+The `CodeIgniter Coding Standard <https://github.com/CodeIgniter/coding-standard>`_
+holds the official coding standards of CodeIgniter based on PHP CS Fixer and powered by
+Nexus CS Config. This can be used in your own projects to form the basis of a
+consistent set of style rules that can be automatically applied to your code.

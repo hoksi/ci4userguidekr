@@ -8,39 +8,38 @@ Upgrade Routing
 Documentations
 ==============
 
-- `CodeIgniter 3.X URI Routing 문서 <http://codeigniter.com/userguide3/general/routing.html>`_
-- :doc:`CodeIgniter 4.X URI Routing 문서 </incoming/routing>`
+- `URI Routing Documentation CodeIgniter 3.X <http://codeigniter.com/userguide3/general/routing.html>`_
+- :doc:`URI Routing Documentation CodeIgniter 4.X </incoming/routing>`
 
-변경된 사항
+What has been changed
 =====================
 
-- CI4에서 자동 라우팅은 기본적으로 비활성화되어 있습니다.
-- CI4에서 더 안전한 새로운 :ref:`auto-routing-improved`\ 가 도입되었습니다.
-- CI4에서는 배열로 경로를 설정하여 라우팅을 구성하지 않습니다.
+- In CI4 the Auto Routing is disabled by default.
+- In CI4 the new more secure :ref:`auto-routing-improved` is introduced.
+- In CI4 the routing is no longer configured by setting the routes as array.
 
 Upgrade Guide
 =============
 
-1. CI3와 같은 방식으로 Auto Routing을 사용하는 경우 :ref:`auto-routing-legacy`\ 을 활성화해야 합니다.
-2. CI3의 플레이스홀더 ``(:any)``\ 는 CI4에서 ``(:segment)``\ 입니다.
-3. 각 라우팅 라인의 CI4 형식으로 구문을 변경하고 **app/Config/Routes.php**\ 에 추가해야 합니다.
+1. If you use the Auto Routing in the same way as CI3, you need to enable :ref:`auto-routing-legacy`.
+2. The placeholder ``(:any)`` in CI3 will be ``(:segment)`` in CI4.
+3. You have to change the syntax of each routing line and append it in **app/Config/Routes.php**. For example:
 
-    - ``$route['journals'] = 'blogs';``\ 는 ``$routes->add('journals', 'Blogs::index');``\ 로 변경. 이는 ``Blogs`` 클래스의 ``index()`` 메소드로 매핑(mapping) 합니다.
-    - ``$route['product/(:any)'] = 'catalog/product_lookup';``\ 는 ``$routes->add('product/(:segment)', 'Catalog::productLookup');``\ 로 변경
-    - ``$route['login/(.+)'] = 'auth/login/$1';``\ 는 ``$routes->add('login/(.+)', 'Auth::login/$1');`` \ 로 변경
+    - ``$route['journals'] = 'blogs';`` to ``$routes->add('journals', 'Blogs::index');``. This would map to the ``index()`` method in the ``Blogs`` controller.
+    - ``$route['product/(:any)'] = 'catalog/product_lookup';`` to ``$routes->add('product/(:segment)', 'Catalog::productLookup');``
+    - ``$route['login/(.+)'] = 'auth/login/$1';`` to ``$routes->add('login/(.+)', 'Auth::login/$1');``
 
 Code Example
 ============
 
 CodeIgniter Version 3.x
 ------------------------
-Path: **application/config/routes.php**
-
+Path: **application/config/routes.php**:
 
 .. literalinclude:: upgrade_routing/ci3sample/001.php
 
 CodeIgniter Version 4.x
 -----------------------
-Path: **app/Config/Routes.php**
+Path: **app/Config/Routes.php**:
 
 .. literalinclude:: upgrade_routing/001.php

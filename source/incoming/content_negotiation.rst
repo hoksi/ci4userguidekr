@@ -1,130 +1,130 @@
-###############################
-콘텐츠 협상(Content Negotiator)
-###############################
+###################
+Content Negotiation
+###################
 
 .. contents::
     :local:
     :depth: 2
 
 ****************************
-콘텐츠 협상이란?
+What is Content Negotiation?
 ****************************
 
-컨텐츠 협상(Content Negotiation)은 클라이언트와 서버가 처리할 수 있는 콘텐츠 유형을 기반으로 클라이언트에게 반환할 콘텐츠 유형을 결정하는 방법입니다.
-이를 통해 클라이언트가 HTML 또는 JSON을 요청하는지, 이미지를 JPEG 또는 PNG로 반환해야 하는지, 어떤 유형의 압축을 지원하는지 등을 결정할 수 있습니다.
-이는 각각 우선순위가 있는 여러 가지 값 옵션을 지원하는 네 가지 다른 헤더를 분석하여 수행됩니다.
+Content negotiation is a way to determine what type of content to return to the client based on what the client
+can handle, and what the server can handle. This can be used to determine whether the client is wanting HTML or JSON
+returned, whether the image should be returned as a JPEG or PNG, what type of compression is supported and more. This
+is done by analyzing four different headers which can each support multiple value options, each with their own priority.
 
-이를 수동으로 매칭하려면 상당히 어려울 수 있습니다. CodeIgniter는 이를 처리할 수 있는 ``Negotiator`` 클래스를 제공합니다.
+Trying to match this up manually can be pretty challenging. CodeIgniter provides the ``Negotiator`` class that
+can handle this for you.
 
-컨텐츠 협상은 단순히 HTTP 사양의 일부로, 하나의 리소스가 여러 유형의 콘텐츠를 제공할 수 있도록 하여 클라이언트가 최적의 데이터 유형을 요청할 수 있게 합니다.
+At it's heart Content Negotiation is simply a part of the HTTP specification that allows a single
+resource to serve more than one type of content, allowing the clients to request the type of
+data that works best for them.
 
-이의 대표적인 예는 PNG 파일을 표시할 수 없는 브라우저가 GIF 또는 JPEG 이미지만 요청할 수 있는 경우입니다.
-서버가 요청을 받으면 클라이언트가 요청하는 사용 가능한 파일 유형을 살펴보고, 지원하는 이미지 형식 중에서 가장 적합한 것을 선택하여 반환합니다. 이 경우 JPEG 이미지를 선택할 가능성이 높습니다.
+A classic example of this is a browser that cannot display PNG files can request only GIF or
+JPEG images. When the server receives the request, it looks at the available file types the client
+is requesting and selects the best match from the image formats that it supports, in this case
+likely choosing a JPEG image to return.
 
-이러한 협상은 데이터의 네 가지 유형에서 발생할 수 있습니다:
+This same negotiation can happen with four types of data:
 
-* **미디어/문서 유형(Media/Document Type)** - 이미지 형식 또는 HTML 대 XML 또는 JSON일 수 있습니다.
-* **문자 집합(Character Set)** - 반환된 문서가 설정되어야 하는 문자 집합입니다. 일반적으로 UTF-8입니다.
-* **문서 인코딩(Document Encoding)** - 결과물에 사용된 압축 유형입니다.
-* **문서 언어(Document Language)** - 여러 언어를 지원하는 사이트의 경우, 반환할 언어를 결정하는 데 도움이 됩니다.
+* **Media/Document Type** - this could be image format, or HTML vs. XML or JSON.
+* **Character Set** - The character set the returned document should be set in. Typically is UTF-8.
+* **Document Encoding** - Typically the type of compression used on the results.
+* **Document Language** - For sites that support multiple languages, this helps determine which to return.
 
-**************
-클래스 로드
-**************
+*****************
+Loading the Class
+*****************
 
-Service 클래스를 통해 클래스 인스턴스를 수동으로 로드할 수 있습니다.
+You can load an instance of the class manually through the Service class:
 
 .. literalinclude:: content_negotiation/001.php
 
-요청 인스턴스를 가져와 자동으로 Negotiator 클래스를 삽입합니다.
+This will grab the current request instance and automatically inject it into the Negotiator class.
 
-이 클래스는 로드할 필요없이 요청(reqest)의 ``IncomingRequest`` 인스턴스를 통해 액세스 할 수 있습니다.
-클래스의 메소드를 직접 액세스할 수는 없지만 ``negotiate()`` 메소드를 통해 모든 메소드에 쉽게 액세스할 수 있습니다
+This class does not need to be loaded on it's own. Instead, it can be accessed through this request's ``IncomingRequest``
+instance. While you cannot access it directly this way, you can easily access all of methods through the ``negotiate()``
+method:
 
 .. literalinclude:: content_negotiation/002.php
 
-이렇게 액세스할 때 첫 번째 매개 변수는 일치시키려는 컨텐츠 유형이고, 두 번째 매개 변수는 지원되는 값의 배열입니다.
+When accessed this way, the first parameter is the type of content you're trying to find a match for, while the
+second is an array of supported values.
 
-********
-협상
-********
+***********
+Negotiating
+***********
 
-이 섹션에서는 협상할 수 있는 4 가지 유형의 컨텐츠에 대해 논의하고 협상자(negotiator)에게 액세스하기 위해 위에서 설명한 두 가지 방법을 어떻게 사용하는지 보여줍니다.
+In this section, we will discuss the 4 types of content that can be negotiated and show how that would look using
+both of the methods described above to access the negotiator.
 
 Media
 =====
 
-살펴볼 첫 번째 측면은 'media' 협상 처리입니다.
-이들은 ``Accept`` 헤더에 의해 제공되며 가장 복잡한 헤더중 하나입니다.
-일반적인 예는 클라이언트가 서버에게 데이터를 원하는 형식을 알려주는 것입니다.
-특히 API에서 이것은 일반적입니다.
-예를 들어, 아래와 같이 클라이언트는 API 엔드(End) 포인트에서 JSON 형식의 데이터를 요청할 수 있습니다.
-
-::
+The first aspect to look at is handling 'media' negotiations. These are provided by the ``Accept`` header and
+is one of the most complex headers available. A common example is the client telling the server what format it
+wants the data in. This is especially common in APIs. For example, a client might request JSON formatted data
+from an API endpoint::
 
     GET /foo HTTP/1.1
     Accept: application/json
 
-서버는 이제 어떤 유형의 컨텐츠를 제공할 수 있는지 목록을 제공해야 합니다.
-아래 예는 API가 HTML, JSON 또는 XML로 데이터를 반환하며, 선호하는 순서(JSON, HTML, XML)대로 제공합니다.
+The server now needs to provide a list of what type of content it can provide. In this example, the API might
+be able to return data as raw HTML, JSON, or XML. This list should be provided in order of preference:
 
 .. literalinclude:: content_negotiation/003.php
 
-위의 경우 클라이언트와 서버 모두 데이터를 JSON으로 형식화하는데 동의하므로 협상 메소드에서 'json'이 반환됩니다.
-기본적으로 일치하는 항목이 없으면 ``$supported`` 배열의 첫 번째 요소가 반환됩니다.
-그러나 때에 따라 형식을 엄격하게 일치시켜야 할 수도 있습니다.
-``true``\ 를 최종 값으로 전달하면 일치하는 항목이 없을때 빈 문자열이 반환됩니다.
+In this case, both the client and the server can agree on formatting the data as JSON so 'json' is returned from
+the negotiate method. By default, if no match is found, the first element in the ``$supported`` array would be returned.
+In some cases, though, you might need to enforce the format to be a strict match. If you pass ``true`` as the
+final value, it will return an empty string if no match is found:
 
 .. literalinclude:: content_negotiation/004.php
 
 Language
 ========
 
-또 다른 일반적인 사용법은 콘텐츠를 제공할 언어를 결정하는 것입니다.
-브라우저는 일반적으로 ``Accept-Language`` 헤더에 선호하는 언어를 보냅니다.
-이는 단일 언어로 구성된 사이트를 운영하는 경우에는 큰 의미가 없으나, 여러 언어로 번역 콘텐츠를 제공할 수 있는 사이트에서는 이 기능이 유용합니다. 
-
-::
+Another common usage is to determine the language the content should be served in. If you are running only a single
+language site, this obviously isn't going to make much difference, but any site that can offer up multiple translations
+of content will find this useful, since the browser will typically send the preferred language along in the ``Accept-Language``
+header::
 
     GET /foo HTTP/1.1
     Accept-Language: fr; q=1.0, en; q=0.5
 
-이 예에서 브라우저는 영어와 두 번째로 프랑스어를 선호합니다.
-당신의 웹 사이트가 영어와 독일어를 지원한다면
+In this example, the browser would prefer French, with a second choice of English. If your website supports English
+and German you would do something like:
 
 .. literalinclude:: content_negotiation/005.php
 
-이 예는 협상 결과로 'en'이 반환됩니다.
-일치하는 것이 없으면 ``$supported`` 배열의 첫 번째 요소를 반환하므로 선호하는 언어를 첫 번째로 설정합니다.
+In this example, 'en' would be returned as the current language. If no match is found, it will return the first element
+in the ``$supported`` array, so that should always be the preferred language.
 
 Encoding
 ========
 
-``Accept-Encoding`` 헤더에는 라이언트가 이해 가능한 컨텐츠 인코딩이 무엇인지 알려주며, 클라이언트가 지원하는 압축 유형을 지정하는 데 사용됩니다
-
-::
+The ``Accept-Encoding`` header contains the character sets the client prefers to receive, and is used to
+specify the type of compression the client supports::
 
     GET /foo HTTP/1.1
     Accept-Encoding: compress, gzip
 
-웹 서버는 사용할 수있는 압축 유형을 정의합니다.
-Apache와 같은 일부 웹 서버는 **gzip**\ 만 지원합니다.
+Your web server will define what types of compression you can use. Some, like Apache, only support **gzip**:
 
 .. literalinclude:: content_negotiation/006.php
 
-`Wikipedia <https://en.wikipedia.org/wiki/HTTP_compression>`_\ 에서 더 많은 것을 보십시오.
+See more at `Wikipedia <https://en.wikipedia.org/wiki/HTTP_compression>`_.
 
 Character Set
 =============
 
-원하는 문자 세트는 ``Accept-Charset`` 헤더를 통해 전달됩니다
-
-::
+The desired character set is passed through the ``Accept-Charset`` header::
 
     GET /foo HTTP/1.1
     Accept-Charset: utf-16, utf-8
 
-일치하는 항목이 없으면 기본적으로 **utf-8**\ 이 반환됩니다.
+By default, if no matches are found, **utf-8** will be returned:
 
 .. literalinclude:: content_negotiation/007.php
-

@@ -7,17 +7,17 @@ Upgrade HTTP Responses
 
 Documentations
 ==============
-- `CodeIgniter 3.X Output Class 문서 <http://codeigniter.com/userguide3/libraries/output.html>`_
-- :doc:`CodeIgniter 4.X HTTP Responses 문서 </outgoing/response>`
+- `Output Class Documentation CodeIgniter 3.X <http://codeigniter.com/userguide3/libraries/output.html>`_
+- :doc:`HTTP Responses Documentation CodeIgniter 4.X </outgoing/response>`
 
-변경된 사항
+What has been changed
 =====================
-- 메소드 이름이 변경되었습니다.
+- The methods have been renamed
 
 Upgrade Guide
 =============
-1. HTTP Responses 클래스의 메소드 이름의 가장 중요한 변경 사항은 밑줄이 있는 메소드 이름에서 camelCase로의 전환입니다. 버전 3의 ``set_content_type()`` 메소드는 ``setContentType()`` 등으로 이름이 지정됩니다.
-2. 대부분의 경우 ``$this->output``\ 을 ``$this->response``\ 로 변경한 다음 메소드를 변경해야 합니다. :doc:`../outgoing/response`\ 에서 모든 메소드를 찾을 수 있습니다 .
+1. The methods in the HTTP Responses class are named slightly different. The most important change in the naming is the switch from underscored method names to camelCase. The method ``set_content_type()`` from version 3 is now named ``setContentType()`` and so on.
+2. In the most cases you have to change ``$this->output`` to ``$this->response`` followed by the method. You can find all methods in :doc:`../outgoing/response`.
 
 Code Example
 ============

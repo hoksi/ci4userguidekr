@@ -1,7 +1,7 @@
 Version 4.2.6
 #############
 
-Release Date: Unreleased
+Release Date: September 4, 2022
 
 **4.2.6 release of CodeIgniter4**
 
@@ -9,30 +9,18 @@ Release Date: Unreleased
     :local:
     :depth: 2
 
-BREAKING
-********
-
-none.
-
-Enhancements
-************
-
-none.
-
-Changes
-*******
-
-none.
-
 Deprecations
 ************
 
-none.
+- :php:meth:`CodeIgniter\\Cookie\\Cookie::withNeverExpiring()` is deprecated.
 
 Bugs Fixed
 **********
 
-많은 버그가 수정되었지만 특히:
-- CLI에서 유효성 검사를 사용할 때 AssertionError가 발생함 `#6452 <https://github.com/codeigniter4/CodeIgniter4/pull/6452>`_
+Many bugs fixed, but notably:
 
-수정된 전체 버그 목록은 `CHANGELOG.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/CHANGELOG.md>`_\ 를 참조하세요.
+- AssertionError occurs when using Validation in CLI `#6452 <https://github.com/codeigniter4/CodeIgniter4/pull/6452>`_
+
+See the repo's
+`CHANGELOG_4.2.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/changelogs/CHANGELOG_4.2.md>`_
+for a complete list of bugs fixed.

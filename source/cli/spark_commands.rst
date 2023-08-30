@@ -1,72 +1,121 @@
 ##############
-Spark 명령
+Spark Commands
 ##############
 
-CodeIgniter는 공식 명령 **spark**\와 내장 명령(built-in command)을 제공합니다.
+CodeIgniter ships with the official command **spark** and built-in commands.
 
 .. contents::
     :local:
-    :depth: 2
+    :depth: 3
 
 ****************
-명령 실행
+Running Commands
 ****************
 
-명령(command)은 루트 디렉터리의 명령줄에서 실행됩니다.
-CLI 명령을 실행하는 데 사용되는 사용자 지정 스크립트 **spark**\ 가 제공됩니다.
+Running via CLI
+===============
 
-::
+The commands are run from the command line, in the project root directory.
+The command file **spark** has been provided that is used to run any of the CLI commands.
 
-    > php spark
+Showing List of Commands
+------------------------
 
-명령을 지정하지 않고 호출하면 사용 가능한 명령 목록을 제공하는 간단한 도움말 페이지가 표시됩니다.
-해당 명령을 실행하려면 명령 이름을 첫 번째 인수로 전달해야 합니다.
+When called **spark** without specifying a command, a simple help page is displayed
+that also provides a list of available commands and their descriptions, sorted by
+categories:
 
-::
+.. code-block:: console
 
-    > php spark migrate
+    php spark
 
-일부 명령은 공백으로 구분하여 명령 뒤에 제공해야 하는 추가 인수를 사용합니다.
+spark list
+^^^^^^^^^^
 
-::
+``php spark`` is the exactly same as the ``list`` command:
 
-    > php spark db:seed DevUserSeeder
+.. code-block:: console
 
-결과 구문 분석을 위해 헤더 출력을 없애는 ``--no-header`` 옵션을 전달할 수 있습니다.
+    php spark list
 
-::
+You may also use the ``--simple`` option to get a raw list of all available commands,
+sorted alphabetically:
 
-    > php spark cache:clear --no-header
+.. code-block:: console
 
-CodeIgniter가 제공하는 모든 명령에 대해 필수 인수를 제공하지 않으면 올바르게 실행하는데 필요한 정보를 입력하라는 메시지가 표시됩니다.
+    php spark list --simple
 
-::
+Showing Help
+------------
 
-    > php spark migrate:version
-    > Version?
+You can get help about any CLI command using the ``help`` command as follows:
 
-명령 호출
+.. code-block:: console
+
+    php spark help db:seed
+
+Since v4.3.0, you can also use the ``--help`` option instead of the ``help`` command:
+
+.. code-block:: console
+
+    php spark db:seed --help
+
+Running a Command
+-----------------
+
+You should pass the name of the command as the first argument to run that command:
+
+.. code-block:: console
+
+    php spark migrate
+
+Some commands take additional arguments, which should be provided directly after the command, separated by spaces:
+
+.. code-block:: console
+
+    php spark db:seed DevUserSeeder
+
+For all of the commands CodeIgniter provides, if you do not provide the required arguments, you will be prompted
+for the information it needs to run correctly:
+
+.. code-block:: console
+
+    php spark make:controller
+
+    Controller class name :
+
+Suppressing Header Output
+-------------------------
+
+When you run a command, the header with CodeIgniter version and the current time
+is output:
+
+.. code-block:: console
+
+    php spark env
+
+    CodeIgniter v4.3.5 Command Line Tool - Server Time: 2023-06-16 12:45:31 UTC+00:00
+
+    Your environment is currently set as development.
+
+You may always pass ``--no-header`` to suppress the header output, helpful for parsing results:
+
+.. code-block:: console
+
+    php spark env --no-header
+
+    Your environment is currently set as development.
+
+Calling Commands
 ================
 
-자신의 코드 안에서 ``command()`` 함수를 사용하여 명령을 실행할 수 있습니다.
-보통 cronjob 작업을 위해 컨트롤러 내에서 수행되지만, 필요에 따라 언제든지 사용할 수 있습니다. 
+Commands can also be ran from within your own code. This is most often done within a controller for cronjob tasks,
+but they can be used at any time. You do this by using the ``command()`` function. This function is always available.
 
 .. literalinclude:: cli_commands/001.php
 
-인수는 호출된 명령인 문자열과 모든 매개변수이며, 명령줄에서 호출하는 것과 정확히 동일합니다.
+The only argument is string that is the command called and any parameters. This appears exactly as you would call
+it from the command line.
 
-실행된 명령의 모든 출력은 명령줄에서 실행되지 않을 때 캡처됩니다.
-표시 여부를 선택할 수 있도록 명령에서 반환됩니다.
-
-******************
-help 명령 사용
-******************
-
-help 명령을 사용하여 모든 CLI 명령에 대한 도움말을 얻을 수 있습니다.
-
-::
-
-    > php spark help db:seed
-
-**list** 명령을 사용하여 범주별로 정렬된 사용 가능한 명령과 설명 목록을 가져옵니다.
-``spark list --simple``\ 을 사용하면 알파벳순으로 정렬된 사용 가능한 모든 명령의 목록을 얻을 수 있습니다.
+All output from the command that is ran is captured when not run from the command line. It is returned from the command
+so that you can choose to display it or not.

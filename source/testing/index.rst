@@ -1,20 +1,19 @@
-############
-테스트(Test)
-############
+#######
+Testing
+#######
 
-CodeIgniter에는 어플리케이션을 철저히 테스트하고 디버깅할 수 있는 다양한 도구가 제공됩니다.
-다음 섹션에서는 어플리케이션을 빠르게 테스트할 수 있습니다.
+CodeIgniter ships with a number of tools to help you test and debug your application thoroughly.
+The following sections should get you quickly testing your applications.
 
 .. toctree::
     :titlesonly:
 
-    시작하기 <overview>
-    데이터베이스 <database>
-    데이터 생성 <fabricator>
-    컨트롤러 테스트 <controllers>
-    HTTP 테스트 <feature>
+    Getting Started <overview>
+    Database <database>
+    Generating Data <fabricator>
+    Controller Testing <controllers>
+    HTTP Testing <feature>
     response
-    벤치마크 <benchmark>
-    디버깅 <debugging>
+    benchmark
+    debugging
     Mocking <mocking>
-     

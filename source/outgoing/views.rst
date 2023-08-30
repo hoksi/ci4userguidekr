@@ -1,169 +1,171 @@
-########
-뷰(View)
-########
+#####
+Views
+#####
 
 .. contents::
     :local:
     :depth: 2
 
-뷰는 단순히 웹 페이지 또는 머리글, 바닥 글, 사이드 바 등과 같은 페이지 조각입니다. 
-계층별 구성이 필요한 경우 뷰에서 다른 뷰를 유연하게 포함시킬수 있습니다.
+A view is simply a web page, or a page fragment, like a header, footer, sidebar, etc. In fact,
+views can flexibly be embedded within other views (within other views, etc.) if you need
+this type of hierarchy.
 
-뷰는 직접 호출되지 않으며 컨트롤러 또는 :ref:`view route <view-routes>`\ 가 로드해야 합니다.
-MVC 프레임워크에서는 컨트롤러가 교통경찰 역할을 하므로 특정 뷰를 가져오는 역할을 합니다.
-:doc:`컨트롤러 </incoming/controllers>` 아직 페이지를 읽지 않았다면 먼저 읽어보세요.
+Views are never called directly, they must be loaded by a controller or :ref:`view route <view-routes>`.
 
-컨트롤러 페이지에서 생성한 예제 컨트롤러를 사용하여 해당 페이지에 뷰를 추가해 봅시다.
+Remember that in an MVC framework,
+the Controller acts as the traffic cop, so it is responsible for fetching a particular view. If you have
+not read the :doc:`Controllers </incoming/controllers>` page, you should do so before continuing.
 
-뷰 만들기
+Using the example controller you created in the controller page, let's add a view to it.
+
+Creating a View
 ===============
 
-텍스트 에디터를 사용하여 **blog_view.php**\ 라는 파일을 만들고 다음을 입력하세요.
+Using your text editor, create a file called **blog_view.php** and put this in it::
 
-::
-
-	<html>
+    <html>
         <head>
             <title>My Blog</title>
         </head>
         <body>
             <h1>Welcome to my Blog!</h1>
         </body>
-	</html>
+    </html>
 
-**app/Views** 디렉토리에 파일을 저장하십시오.
+Then save the file in your **app/Views** directory.
 
-뷰 표시
+Displaying a View
 =================
 
-특정 뷰 파일을 로드하고 표시하기 위해 컨트롤러에 다음 코드를 사용합니다.
+To load and display a particular view file you will use the following code in your controller:
 
 .. literalinclude:: views/001.php
    :lines: 2-
 
-*name*\ 은 뷰 파일의 이름입니다.
+Where *name* is the name of your view file.
 
-.. important:: 파일 확장자가 생략되면 뷰는 **.php** 확장자를 기본으로 사용합니다.
+.. important:: If the file extension is omitted, then the views are expected to end with the **.php** extension.
 
-이제 ``Blog.php``\ 라는 컨트롤러 파일을 열고 echo view 부분을 수정합니다.
-이제 **app/Controllers** 디렉토리에 **Blog.php**\ 라는 파일을 만들고, 다음 코드를 넣으세요.
+Now, create a file called **Blog.php** in the **app/Controllers** directory,
+and put this in it:
 
 .. literalinclude:: views/002.php
 
-**app/Config/Routes.php** 파일을 열고, 문자열 "Route Definitions"\ 을 찾은 다음 아래 코드를 추가하세요.
+Open the routing file located at **app/Config/Routes.php**, and look for the "Route Definitions".
+Add the following code:
 
 .. literalinclude:: views/013.php
-:lines: 2-
+   :lines: 2-
 
-다음과 비슷한 URL을 사용하여 사이트를 방문하면 새로운 뷰가 표시됩니다.
+If you visit your site, you should see your new view. The URL was similar to this::
 
-::
+    example.com/index.php/blog/
 
-	example.com/index.php/blog/
+Loading Multiple Views
+======================
 
-.. note:: 모든 예제가 뷰를 echo문을 사용하여 표시 하지만 뷰의 출력을 캡처하여 반환할 수 있습니다.
-
-다중(Multiple) 뷰 로드
-==========================
-
-CodeIgniter는 컨트롤러에서 ``view()``\를 여러 호출하여도 똑똑하게 처리합니다.
-둘 이상의 호출이 발생하면 출력에 추가됩니다.
-예를 들자면 머리글, 메뉴, 내용, 바닥글 뷰를 조합하여 출력하기 원할 수 있습니다. 
-다음과 같이하면 됩니다.
+CodeIgniter will intelligently handle multiple calls to ``view()`` from within a controller. If more than one
+call happens they will be appended together. For example, you may wish to have a header view, a menu view, a
+content view, and a footer view. That might look something like this:
 
 .. literalinclude:: views/003.php
 
-위의 예에서는 "동적으로 추가 된 데이터"\ 를 사용하고 있습니다. 이에 대한 부분은 아래에서 설명하고 있습니다.
+In the example above, we are using "dynamically added data", which you will see below.
 
-하위 디렉토리에 뷰 저장
+Storing Views within Sub-directories
 ====================================
 
-계층별의 조직화를 선호한다면 뷰 파일을 하위 디렉토리에 저장할 수 있습니다.
-이렇게한 경우 뷰를 로드하려면 디렉토리 이름을 포함시켜야 합니다.
+Your view files can also be stored within sub-directories if you prefer that type of organization.
+When doing so you will need to include the directory name loading the view. Example:
 
 .. literalinclude:: views/004.php
    :lines: 2-
 
-네임스페이스 뷰
+Namespaced Views
 ================
 
-네임스페이스가 있는 **View** 디렉토리에 뷰를 저장하고, 네임스페이스가 있는 것처럼 해당 뷰를 로드할 수 있습니다.
-PHP는 네임스페이스에 클래스가 아닌 파일 로드를 지원하지 않지만, CodeIgniter는 이 기능을 제공하여 쉽게 재사용하거나 배포할 수 있도록 모듈과 같은 방식으로 뷰를 함께 패키지화할 수 있습니다.
+You can store views under a **View** directory that is namespaced, and load that view as if it was namespaced. While
+PHP does not support loading non-class files from a namespace, CodeIgniter provides this feature to make it possible
+to package your views together in a module-like fashion for easy re-use or distribution.
 
-PSR-4 매핑이 :doc:`Autoloader </concepts/autoloader>`\ 에 ``Example\Blog`` 네임스페이스가 설정되어 있다면  **example/blog** 디렉토리는 마치 네임스페이스로 구성된 것처럼 뷰 파일을 가져올 수 있습니다.
-다음은 네임스페이스를 뷰 이름앞에 추가하여 **example/blog/Views** 디렉토리에서 **blog_view.php** 파일을 로드하는 예입니다.
+If you have **example/blog** directory that has a PSR-4 mapping set up in the :doc:`Autoloader </concepts/autoloader>` living
+under the namespace ``Example\Blog``, you could retrieve view files as if they were namespaced also.
+
+Following this
+example, you could load the **blog_view.php** file from **example/blog/Views** by prepending the namespace to the view name:
 
 .. literalinclude:: views/005.php
 
 .. _caching-views:
 
-뷰 캐싱
+Caching Views
 =============
 
-``view()`` 함수의 세 번째 매개 변수에 ``cache`` 옵션을 전달하여 뷰를 캐시(cache)할 수 있습니다.
+You can cache a view with the ``view()`` function by passing a ``cache`` option with the number of seconds to cache
+the view for, in the third parameter:
 
 .. literalinclude:: views/006.php
    :lines: 2-
 
-기본적으로 뷰는 뷰 파일과 동일한 이름을 사용하여 캐시됩니다.
-``cache_name`` 옵션과 사용하려는 캐시 ID를 전달하여 이를 바꿀수 있습니다.
+By default, the view will be cached using the same name as the view file itself. You can customize this by passing
+along ``cache_name`` and the cache ID you wish to use:
 
 .. literalinclude:: views/007.php
    :lines: 2-
 
-뷰에 동적 데이터 추가
+Adding Dynamic Data to the View
 ===============================
 
-뷰 함수의 두 번째 매개 변수에 배열을 통해 컨트롤러에서 뷰로 데이터를 전달할 수 있습니다.
-다음 예를 보십시오.
+Data is passed from the controller to the view by way of an array in the second parameter of the ``view()`` function.
+Here's an example:
 
 .. literalinclude:: views/008.php
    :lines: 2-
 
-컨트롤러 파일에 시도해 봅시다. 컨트롤러 파일을 열고 아래 코드를 추가하십시오.
+Let's try it with your controller file. Open it and add this code:
 
 .. literalinclude:: views/009.php
 
-이제 뷰 파일을 열고 데이터의 아래와 같이 텍스트를 배열 키에 해당하는 변수로 변경하십시오.
+Now open your view file and change the text to variables that correspond to the array keys in your data::
 
-::
-
-	<html>
+    <html>
         <head>
             <title><?= esc($title) ?></title>
         </head>
         <body>
             <h1><?= esc($heading) ?></h1>
         </body>
-	</html>
+    </html>
 
-그런 다음 사용중인 URL에서 페이지를 로드하면 변수가 바뀐것을 볼 수 있습니다.
+Then load the page at the URL you've been using and you should see the variables replaced.
 
-saveData 옵션
+The saveData Option
 -------------------
 
-전달된 데이터는 ``view()``\ 에 대한 후속 호출을 위해 유지됩니다.
-단일 요청에서 함수를 여러 번 호출하면 각 ``view()``\ 에 원하는 데이터를 전달할 필요가 없습니다.
+The data passed in is retained for subsequent calls to ``view()``. If you call the function multiple times
+in a single request, you will not have to pass the desired data to each ``view()``.
 
-그러나 이로 인해 데이터가 다른 뷰로 "유입"\ 되어 잠재적으로 문제가 발생하는 것을 방지할 수 없습니다.
-한 번 호출한 후 데이터를 정리하려는 경우 세 번째 매개변수의 ``$option`` 배열에 ``saveData`` 옵션을 전달합니다.
+But this might not keep any data from "bleeding" into
+other views, potentially causing issues. If you would prefer to clean the data after one call, you can pass the ``saveData`` option
+into the ``$option`` array in the third parameter.
 
 .. literalinclude:: views/010.php
    :lines: 2-
 
-``view()`` 함수 호출 후 옵션 지정 없이 기본적으로 데이터를 지우도록 하려면 **app/Config/Views.php**\ 에서 ``$saveData``\ 를 ``false``\ 로 설정합니다.
+Additionally, if you would like the default functionality of the ``view()`` function to be that it does clear the data
+between calls, you can set ``$saveData`` to ``false`` in **app/Config/Views.php**.
 
-루프(Loop) 만들기
-======================
+Creating Loops
+==============
 
-뷰 파일에 전달하는 데이터 배열은 단순한 변수로 제한되지 않습니다.
-다차원 배열을 전달할 수 있으며, 여러 행을 생성하기 위해 반복될 수 있습니다.
-일반적으로 데이터베이스에서 데이터를 가져오면 다차원 배열 형식이 되는데 이것이 좋은 예입니다.
+The data array you pass to your view files is not limited to simple variables. You can pass multi dimensional
+arrays, which can be looped to generate multiple rows. For example, if you pull data from your database it will
+typically be in the form of a multi-dimensional array.
 
-다음은 간단한 예입니다. 다음을 컨트롤러에 추가하십시오.
+Here's a simple example. Add this to your controller:
 
 .. literalinclude:: views/011.php
 
-이제 뷰 파일을 열고 루프를 만듭니다.
+Now open your view file and create a loop:
 
 .. literalinclude:: views/012.php

@@ -1,123 +1,160 @@
-################################
-구성(configuration) 파일 작업
-################################
+#############
+Configuration
+#############
 
-모든 프레임워크는 구성 파일을 사용하여 수많은 매개 변수 및 초기 설정을 정의합니다. 
-CodeIgniter 구성 파일은 필요한 설정이 공용 속성인 단순 클래스를 정의합니다.  
+Every framework uses configuration files to define numerous parameters and
+initial settings. CodeIgniter configuration files define simple classes where
+the required settings are public properties.
 
-다른 많은 프레임워크와 달리 CodeIgniter 구성 가능한 항목은 단일 파일에 포함되어 있지 않습니다. 
-대신 구성 가능한 항목이 필요한 각 클래스는 이를 사용하는 사용하는 클래스와 이름이 같은 구성 파일을 가집니다. 
-어플리케이션 구성 파일은 **app/Config** 폴더에 있습니다.
-
+Unlike many other frameworks, CodeIgniter configurable items aren't contained in
+a single file. Instead, each class that needs configurable items will have a
+configuration file with the same name as the class that uses it. You will find
+the application configuration files in the **app/Config** folder.
 
 .. contents::
     :local:
     :depth: 2
 
-구성 파일을 사용하여 작업
-*************************
+Working with Configuration Files
+********************************
 
-여러 가지 방법으로 클래스의 구성 파일에 액세스할 수 있습니다.
+Getting a Config Object
+=======================
 
-- ``new`` 키워드를 사용하여 인스턴스를 만듭니다.
+You can access configuration files for your classes in several different ways.
 
-  .. literalinclude:: configuration/001.php
+new keyword
+-----------
 
-- ``config()`` 함수를 사용합니다.
+By using the ``new`` keyword to create an instance:
 
-  .. literalinclude:: configuration/002.php
+.. literalinclude:: configuration/001.php
 
-모든 구성(config) 개체 속성은 공용(public)이므로 다른 속성과 마찬가지로 설정에 액세스할 수 있습니다.
+.. _configuration-config:
+
+config()
+--------
+
+By using the :php:func:`config()` function:
+
+.. literalinclude:: configuration/002.php
+
+If no namespace is provided, it will look for the file in the **app/Config**
+folder first, and if not found, look for in the **Config** folder in all defined
+namespaces.
+
+All of the configuration files that ship with CodeIgniter are namespaced with
+``Config``. Using this namespace in your application will provide the best
+performance since it knows exactly where to find the files.
+
+.. note:: Prior to v4.4.0, ``config()`` finds the file in **app/Config/** when there
+    is a class with the same shortname,
+    even if you specify a fully qualified class name like ``config(\Acme\Blog\Config\Blog::class)``.
+    This behavior has been fixed in v4.4.0, and returns the specified instance.
+
+Getting a Config Property
+=========================
+
+All configuration object properties are public, so you access the settings like any other property:
 
 .. literalinclude:: configuration/003.php
 
-네임스페이스가 제공되지 않으면 **app/Config/**\ 와 정의된 모든 네임스페이스에서 파일을 찾습니다. 
+Creating Configuration Files
+****************************
 
-CodeIgniter와 함께 제공되는 모든 구성(config) 파일의 네임스페이스는 ``Config``\ 입니다.
-어플리케이션에서 이 네임스페이스를 사용하면 파일을 찾는 위치를 정확히 알 수 있으므로 최상의 성능을 제공합니다.
+When you need a new configuration, first you create a new file at your desired location.
+The default file location (recommended for most cases) is **app/Config**.
 
-다른 네임스페이스를 사용하여 원하는 폴더에 구성 파일을 넣을 수 있습니다. 
-이렇게 하면 개발 중에 쉽게 액세스할 수 있도록 **/app** 아래에 유지하면서 프로덕션 서버의 구성 파일을 웹에서 액세스할 수 없는 폴더에 배치할 수 있습니다.
+You can put configuration files in any **Config** folder by using a different namespace.
 
-구성 파일 만들기
-*****************
+The class should use the appropriate namespace, and it should extend
+``CodeIgniter\Config\BaseConfig`` to ensure that it can receive environment-specific settings.
 
-새 구성이 필요한 경우 먼저 원하는 위치에 새 파일을 생성합니다. 
-대부분의 경우 권장하는 기본 파일 위치는 **app/Config**\ 입니다.  
-클래스는 적절한 네임스페이스를 사용해야 하며 환경별로 설정을 상속 받을 수 있도록 "CodeIgniter\Config\BaseConfig"\ 를 확장해야 합니다.
-
-클래스를 정의하고 설정을 나타내는 공용 속성으로 채웁니다.
+Define the class and fill it with public properties that represent your settings:
 
 .. literalinclude:: configuration/004.php
 
-환경 변수
-**********
+Environment Variables
+*********************
 
-어플리케이션 설정을 위한 모범 사례중 하나는 환경 변수를 사용하는 것입니다. 
-이를 사용하는 한 가지 이유는 환경 변수가 코드를 변경하지 않고 배포 환경에 따라 구성이 쉽게 변경될 수 있기 때문입니다.
-구성은 배포 전반에 걸쳐 크게 변경될 수 있지만 코드는 변경되지 않습니다.
-예를 들어 개발자의 로컬 시스템 및 프로덕션 서버와 같은 여러 환경에서는 일반적으로 특정 설정에 대해 서로 다른 구성 값이 필요합니다.
+One of today's best practices for application setup is to use Environment Variables. One reason for this is that Environment Variables are easy to change between deploys without changing any code. Configuration can change a lot across deploys, but code does not. For instance, multiple environments, such as the developer's local machine and the production server, usually need different configuration values for each particular setup.
 
-암호, API 키 또는 개인 데이터와 같은 기타 중요한 데이터에도 환경 변수를 사용해야 합니다.
+Environment Variables should also be used for anything private such as passwords, API keys, or other sensitive data.
 
-환경 변수와 CodeIgniter
-========================
+.. _dotenv-file:
 
-CodeIgniter를 사용하면 ``dotenv`` 파일을 사용하여 환경 변수를 간단하고 쉽게 설정할 수 있습니다. 
-이 용어는 "env" 앞에 점으로 시작하는 파일 이름에서 유래되었습니다.
+Dotenv File
+===========
 
-CodeIgniter는 **.env**\ 가 ``app`` 디렉토리와 함께 프로젝트의 루트에 있을 것으로 예상합니다.
-CodeIgniter와 함께 배포된 템플릿 파일 **env**\ 가 프로젝트 루트에 있습니다 (**.**\ 으로 시작하지 않습니다).
-비어 있거나 더미 또는 기본값이 할당된 프로젝트에서 사용할 수 있는 많은 변수 모음이 있습니다. 
-이 템플릿 파일의 이름을 **.env**\ 로 변경하거나 **.env**\ 로 복사본을 만들어 어플리케이션의 시작 부분으로 사용할 수 있습니다.
+CodeIgniter makes it simple and painless to set Environment Variables by using a "dotenv" file. The term comes from the file name, which starts with a dot before the text "env".
 
-.. important:: 버전 제어 시스템에서 **.env** 파일을 관리하지 않아야 합니다. *git*\ 을 사용하고 있다면 **.gitignore**\ 에 **.env** 파일을 추가합니다. 
-    그렇지 않으면 중요한 정보가 공개될 수 있습니다.
+Creating Dotenv File
+--------------------
 
-설정은 **.env** 파일에 등호(=)로 구분된 이름/값 쌍의 단순한 모음으로 저장됩니다.
+CodeIgniter expects the **.env** file to be at the root of your project alongside the
+**app** directories. There is a template file distributed with CodeIgniter that's
+located at the project root named **env** (Notice there's no dot (``.``) at the start?).
 
+It has a large collection of variables your project might use that have been assigned
+empty, dummy, or default values. You can use this file as a starting place for your
+application by either renaming the template to **.env**, or by making a copy of it named **.env**.
+
+.. warning:: Make sure the **.env** file is NOT tracked by your version control system. For *git* that means adding it to **.gitignore**. Failure to do so could result in sensitive credentials being exposed to the public.
+
+Setting Variables
+-----------------
+
+Settings are stored in **.env** files as a simple a collection of name/value pairs separated by an equal sign.
 ::
 
     S3_BUCKET = dotenv
     SECRET_KEY = super_secret_key
     CI_ENVIRONMENT = development
 
-어플리케이션이 실행되면 **.env** 가 자동으로 로드되고 변수가 환경에 입력됩니다. 
-환경에 변수가 이미 있는 경우 이 변수를 덮어쓰지 않습니다. 
-로드된 환경 변수는 ``getenv()``, ``$_SERVER`` 또는 ``$_ENV``\ 중 하나를 사용하여 액세스합니다.
+When your application runs, **.env** will be loaded automatically, and the variables put
+into the environment. If a variable already exists in the environment, it will NOT be
+overwritten.
+
+Getting Variables
+-----------------
+
+The loaded environment variables are accessed using any of the following:
+``getenv()``, ``$_SERVER``, or ``$_ENV``.
 
 .. literalinclude:: configuration/005.php
 
-.. warning:: **.env** 파일의 설정이 환경 변수에 추가됩니다. 그 부작용으로, (디버깅 또는 기타 유효한 이유로) ``var_dump($_ENV)`` 또는 ``phpinfo()``\ 를 사용하면 **중요한 보안 관련 데이터가 공개적으로 노출**\ 됩니다.
+.. warning:: Note that your settings from the **.env** file are added to ``$_SERVER`` and ``$_ENV``. As a side effect, this means that if your CodeIgniter application is (for example) generating a ``var_dump($_ENV)`` or ``phpinfo()`` (for debugging or other valid reasons), or a detailed error report in the ``development`` environment is shown, **your secure credentials are publicly exposed**.
 
-중첩(Nesting) 변수
-=====================
+Nesting Variables
+-----------------
 
-입력 시간을 절약하기 위해 변수 이름을 ``${...}``\ 로 묶어 파일에 이미 지정한 변수를 재사용 할 수 있습니다.
-
-::
-
-    BASE_DIR="/var/webroot/project-root"
-    CACHE_DIR="${BASE_DIR}/cache"
-    TMP_DIR="${BASE_DIR}/tmp"
-
-네임스페이스 변수
-====================
-
-이름이 같은 변수가 여러 개 있을 수 있습니다. 
-시스템은 올바른 설정이 무엇인지 알 수 있는 방법이 필요합니다. 
-이 문제는 변수 "*namespacing*"을 통해 해결됩니다.
-
-네임스페이스 변수는 점 표기법을 사용하여 변수 이름에 대한 자격을 부여하므로 고유합니다.
-이 작업은 구분 접두사 뒤에 점(.)을 포함시킨 변수 이름을 포함하여 구성합니다.
+To save on typing, you can reuse variables that you've already specified in the file by wrapping the
+variable name within ``${...}``:
 
 ::
 
-    // 네임스페이스 변수 아님
+    BASE_DIR = "/var/webroot/project-root"
+    CACHE_DIR = "${BASE_DIR}/cache"
+    TMP_DIR = "${BASE_DIR}/tmp"
+
+Namespaced Variables
+--------------------
+
+There will be times when you will have several variables with the same name.
+The system needs a way of knowing what the correct setting should be.
+This problem is solved by "*namespacing*" the variables.
+
+Namespaced variables use a dot notation to qualify variable names so they will be unique
+when incorporated into the environment. This is done by including a distinguishing
+prefix followed by a dot (.), and then the variable name itself.
+
+::
+
+    // not namespaced variables
     name = "George"
-    db=my_db
+    db = my_db
 
-    // 네임스페이스 변수
+    // namespaced variables
     address.city = "Berlin"
     address.country = "Germany"
     frontend.db = sales
@@ -126,11 +163,10 @@ CodeIgniter와 함께 배포된 템플릿 파일 **env**\ 가 프로젝트 루�
 
 .. _env-var-namespace-separator:
 
-네임스페이스 구분 기호
------------------------
+Namespace Separator
+-------------------
 
-Docker, CloudFormation과 같은 일부 환경에서는 ``.``\ 이 있는 변수 이름을 허용하지 않습니다.
-이러한 경우를 위해 v4.1.5부터 ``_``\ 를 구분 기호로 사용할 수 있습니다.
+Some environments, e.g., Docker, CloudFormation, do not permit variable name with dots (``.``). In such case, since v4.1.5, you could also use underscores (``_``) as a separator.
 
 ::
 
@@ -138,145 +174,174 @@ Docker, CloudFormation과 같은 일부 환경에서는 ``.``\ 이 있는 변수
     app_forceGlobalSecureRequests = true
     app_CSPEnabled = true
 
-구성 클래스 및 환경 변수
-=========================
+Configuration Classes and Environment Variables
+***********************************************
 
-구성 클래스를 인스턴스화하면 구성 개체의 속성에 병합하기 위한 *namespaced* 환경 변수가 고려됩니다.
+When you instantiate a configuration class, any *namespaced* environment variables
+are considered for merging into the configuration object's properties.
 
-네임스페이스가 지정된 변수의 접두사(prefix)가 구성 클래스의 네임스페이스와 정확히 일치하면 설정의 후행 부분(점 이후)이 구성 속성으로 처리됩니다. 
-기존 구성 속성과 일치하면 환경 변수의 값이 구성 파일의 해당 값을 대체합니다. 
-일치하는 항목이 없으면 구성 클래스 속성은 변경되지 않습니다.
-이렇게 사용할 때 접두사는 클래스의 전체(대소문자 구분) 네임스페이스를 사용합니다.
+.. important:: You cannot add a new property by setting environment variables,
+    nor change a scalar value to an array. See :ref:`env-var-replacements-for-data`.
+
+If the prefix of a namespaced variable exactly matches the namespace of the configuration
+class, then the trailing part of the setting (after the dot) is treated as a configuration
+property. If it matches an existing configuration property, the environment variable's
+value will replace the corresponding value from the configuration file. If there is no match,
+the configuration class properties are left unchanged. In this usage, the prefix must be
+the full (case-sensitive) namespace of the class.
 
 ::
 
-    Config\App.forceGlobalSecureRequests  = true
+    Config\App.forceGlobalSecureRequests = true
     Config\App.CSPEnabled = true
 
-.. note:: 네임스페이스 접두사와 속성 이름은 대소문자를 구분합니다. 
-    구성 클래스 파일에 정의된 대로 전체 네임스페이스와 속성 이름은 정확히 일치해야 합니다.
+.. note:: Both the namespace prefix and the property name are case-sensitive. They must exactly match the full namespace and property names as defined in the configuration class file.
 
-구성 클래스 이름의 소문자 버전만 사용하는 네임스페이스인 *short prefix*도 마찬가지입니다. 
-짧은 접두사(short prefix)가 클래스 이름과 일치하면 **.env**\ 의 값이 구성 파일 값을 대체합니다.
+The same holds for a *short prefix*, which is a namespace using only the lowercase version of
+the configuration class name. If the short prefix matches the class name,
+the value from **.env** replaces the configuration file value.
 
 ::
 
-    app.forceGlobalSecureRequests  = true    
+    app.forceGlobalSecureRequests = true
     app.CSPEnabled = true
 
-v4.1.5부터 ``_``\ 를 사용할 수 있습니다.
-
-::
+Since v4.1.5, you can also write with underscores::
 
     app_forceGlobalSecureRequests = true
     app_CSPEnabled = true
 
-.. note:: *짧은 접두사(short prefix)*\ 를 사용할 때 속성 이름은 여전히 클래스 정의 이름과 정확히 일치해야 합니다.
+.. note:: When using the *short prefix* the property names must still exactly match the class defined name.
 
-데이터를 대체하는 환경 변수
-============================
+.. _env-var-replacements-for-data:
 
-**.env**\ 에 포함된 환경 변수는 **구성 파일의 기존 데이터를 대체 할 뿐**\ 이라는 점을 기억하십시오.
-``.env``\ 를 구성에 대한 대체 항목의 값을 관련 구성 파일에서 받을 수 없습니다.
+Environment Variables as Replacements for Data
+==============================================
 
-``.env``\ 는 구성 파일의 값을 채우거나 교체하는 역할만 하므로 구성 파일에 컨테이너나 수신 속성이 있어야 합니다.
-수신 측에 컨테이너나 수신 속성을 포함하지 않고 ``.env``\ 에 대체 변수를 추가하는 것은 쓸모가 없습니다.
+It is very important to always remember that environment variables contained in your **.env** are
+**only replacements for existing data**.
 
-간단히 말해서, ``Config\App``\ 에 myNewConfig 속성이 없다면 ``.env``\ 에 ``app.myNewConfig = foo``\ 를 넣고 런타임에 myNewConfig 속성과 값을 가질 것으로 기대하면 안됩니다.
+Simply put, you can change only the property value that exists in the Config class
+by setting it in your **.env**.
 
-환경변수를 배열로 처리
-=======================
+You cannot add a property that is not defined in the Config class, nor can you
+change it to an array if the value of the defined property is a scalar.
 
-네이스페이스 환경변수는 배열로 처리될 수 있습니다.
-접두사가 구성 클래스와 일치하면 나머지 환경 변수 이름도 점을 포함하는 경우 배열 참조로 처리됩니다.
+For example, you cannot just put ``app.myNewConfig = foo`` in your **.env** and
+expect your ``Config\App`` to magically have that property and value at run time.
+
+When you have the property ``$default = ['encrypt' => false]`` in your
+``Config\Database``, you cannot change the ``encrypt`` value to an array even if
+you put ``database.default.encrypt.ssl_verify = true`` in your **.env**.
+
+Treating Environment Variables as Arrays
+========================================
+
+A namespaced environment variable can be further treated as an array.
+If the prefix matches the configuration class, then the remainder of the
+environment variable name is treated as an array reference if it also
+contains a dot.
 
 ::
 
-    // 정규 네임스페싱 변수
+    // regular namespaced variable
     Config\SimpleConfig.name = George
 
-    // 배열 네임스페싱 변수
+    // array namespaced variables
     Config\SimpleConfig.address.city = "Berlin"
     Config\SimpleConfig.address.country = "Germany"
 
-
-이것이 SimpleConfig 구성 오브젝트를 참조하는 경우 위 예제는 다음과 같이 처리됩니다.
+If this was referring to a SimpleConfig configuration object, the above example would be treated as:
 
 .. literalinclude:: configuration/006.php
 
-``$address`` 속성의 다른 요소는 변경되지 않습니다.
+Any other elements of the ``$address`` property would be unchanged.
 
-배열 속성 이름을 접두사로 사용할 수도 있습니다. 
-환경 파일이 다음과 같다면 결과는 위와 동일합니다.
+You can also use the array property name as a prefix. If the environment file
+held the following then the result would be the same as above.
 
 ::
 
-    // 배열 네임스페싱 변수
-    SimpleConfig.address.city = "Berlin"
+    // array namespaced variables
+    Config\SimpleConfig.address.city = "Berlin"
     address.country = "Germany"
 
-다양한 환경 처리
-===============================
+Handling Different Environments
+*******************************
 
-다양한 환경의 요구 사항에 맞게 수정된 값이 있는 별도의 **.env** 파일을 사용하면 여러 환경을 쉽게 구성할 수 있습니다.
+Configuring multiple environments is easily accomplished by using a separate **.env** file with values modified to meet that environment's needs.
 
-**.env** 파일에 어플리케이션에서 사용하는 모든 구성 클래스에 대한 모든 설정을 포함하면 안 됩니다.
-환경에 특정되거나 암호, API 키와 같은 중요한 세부 정보와 노출되어서는 안 되는 기타 정보만 포함해야 합니다.
-그러나 배포간에 변경되는 것은 허용됩니다.
+The file should not contain every possible setting for every configuration class used by the application. In truth, it should include only those items that are specific to the environment or are sensitive details like passwords and API keys and other information that should not be exposed. But anything that changes between deployments is fair-game.
 
-각 환경의 **.env** 파일을 프로젝트의 루트 폴더에 배치합니다. 대부분 설정 파일의 위치는 ``app`` 디렉토리와 동일한 위치입니다. 
+In each environment, place the **.env** file in the project's root folder. For most setups, this will be the same level as the ``app`` directories.
 
-버전 관리 시스템으로 **.env** 파일을 관리하지 마십시오.
-저장소가 공개되면 모든 사용자가 중요한 정보가 노출됩니다.
+Do not track **.env** files with your version control system. If you do, and the repository is made public, you will have put sensitive information where everybody can find it.
 
 .. _registrars:
 
-레지스터(Registrars)
-=====================
+Registrars
+**********
 
-"Registrars"\ 는 추가 구성 속성을 제공할 수 있는 다른 클래스입니다.
-레지스터는 네임스페이스와 파일에 걸쳐 런타임에 구성을 변경하는 방법을 제공합니다.
-레지스터(Registrars)를 구현하는 두 가지 방법이 있습니다 : 암시적 방법과 명시적 방법
+"Registrars" are any other classes which might provide additional configuration properties.
+Registrars provide a means of altering a configuration at runtime across namespaces and files.
 
+Registrars work if :ref:`auto-discovery` is enabled in :doc:`Modules </general/modules>`.
+It alters configuration properties when the Config object is instantiated.
 
-.. note:: **.env**\ 의 값은 항상 Registrars에 등록된 값보다 우선합니다.
+There are two ways to implement a Registrar: **implicit** and **explicit**.
 
-암시적(Implicit) 레지스터
----------------------------
+.. note:: Values from **.env** always take priority over Registrars.
 
-:doc:`Modules </general/modules>`\ 에서 검색이 활성화된 경우 모든 네임스페이스는  **Config/Registrar.php** 파일을 사용하여 레지스터를 정의할 수 있습니다.
-이러한 파일은 확장하려는 각 구성 클래스에 대해 메서드의 이름이 지정된 클래스입니다.
-예를 들어, 제3자 모듈은 개발이 이미 구성한 내용을 덮어쓰지 않고 ``Pager``\ 에 추가 템플릿을 제공할 수 있습니다.
-**src/Config/Registrar.php**\ 에는 단일 ``Pager()`` 메소드(대/소문자 구분에 주의)를 사용하는 ``Registrar`` 클래스가 있을 것입니다.
+Implicit Registrars
+===================
+
+Implicit Registrars can change any Config class properties.
+
+Any namespace may define implicit registrars by using the **Config/Registrar.php**
+file. These files are classes whose methods are named for each configuration class
+you wish to extend.
+
+For example, a third-party module or Composer package might
+wish to supply an additional template to ``Config\Pager`` without overwriting whatever a developer has
+already configured. In **src/Config/Registrar.php** there would be a ``Registrar`` class with
+the single ``Pager()`` method (note the case-sensitivity):
 
 .. literalinclude:: configuration/007.php
 
-레지스터 메소드는 항상 대상 구성 파일의 속성에 해당하는 키를 사용하여 배열을 반환해야 합니다.
-기존 값이 병합되고 레지스터 속성에는 덮어쓰기 우선 순위가 있습니다.
+Registrar methods must always return an array, with keys corresponding to the properties
+of the target config file. Existing values are merged, and Registrar properties have
+overwrite priority.
 
-명시적(Explicit) 레지스터
-===========================
+Explicit Registrars
+===================
 
-구성 파일은 레지스터 수를 명시적으로 지정할 수 있습니다.
-"레지스터(registrars)"를 지정하려면 ``$registrators``\ 의 속성을 구성 파일에 추가하고, 후보 레지스터(registrars)의 이름을 배열로 추가하면 됩니다.
+Explicit Registrars can only change the Config class properties in which they are
+registered.
+
+A configuration file can also specify any number of registrars explicitly.
+This is done by adding a ``$registrars`` property to your configuration file,
+holding an array of the names of candidate registrars:
 
 .. literalinclude:: configuration/008.php
 
+In order to act as a "registrar" the classes so identified must have a
+static function with the same name as the configuration class, and it should return an associative
+array of property settings.
 
-이렇게 식별된 클래스가 "레지스터(registrars)"로 작동하려면 구성 클래스와 이름이 같은 정적 함수를 가지고 있어야 하며 속성 연관 배열을 반환해야 합니다.
+When your configuration object is instantiated, it will loop over the
+designated classes in ``$registrars``. For each of these classes it will invoke
+the method named for the configuration class and incorporate any returned properties.
 
-구성 개체가 인스턴스화되면 ``$registrars``\ 에 지정된 클래스를 순환합니다.
-각 클래스에 대한 구성 클래스에 대해 명명된 메서드를 호출하고 반환된 속성을 통합합니다.
-
-구성 클래스 설정 예
+A sample configuration class setup for this:
 
 .. literalinclude:: configuration/009.php
 
-... RegionalSales 모델 클래스가 다음과 같을때
+... and the associated regional sales model might look like:
 
 .. literalinclude:: configuration/010.php
 
-위의 예에서 ``MySalesConfig``\ 가 인스턴스화되면 선언된 세 개의 속성중 ``$target`` 속성의 값은 ``RegionalSales``\ 를 "레지스터(registrar)"로 처리하여 재정의됩니다.
-재정의된 속성의 결과는 다음과 같습니다.
+With the above example, when ``MySalesConfig`` is instantiated, it will end up with
+the three properties declared, but the value of the ``$target`` property will be overridden
+by treating ``RegionalSales`` as a "registrar". The resulting configuration properties:
 
 .. literalinclude:: configuration/011.php

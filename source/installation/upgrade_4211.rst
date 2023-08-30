@@ -2,11 +2,11 @@
 Upgrading from 4.2.10 to 4.2.11
 ###############################
 
-설치 방법에 해당하는 업그레이드 지침을 참조하십시오.
+Please refer to the upgrade instructions corresponding to your installation method.
 
-- :ref:`Composer 설치 - App Starter 업그레이드 <app-starter-upgrading>`
-- :ref:`Composer 설치 - 기존 프로젝트의 CodeIgniter4 업그레이드 <adding-codeigniter4-upgrading>`
-- :ref:`수동 설치 업그레이드 <installing-manual-upgrading>`
+- :ref:`Composer Installation App Starter Upgrading <app-starter-upgrading>`
+- :ref:`Composer Installation Adding CodeIgniter4 to an Existing Project Upgrading <adding-codeigniter4-upgrading>`
+- :ref:`Manual Installation Upgrading <installing-manual-upgrading>`
 
 .. contents::
     :local:
@@ -20,43 +20,48 @@ Breaking Changes
 Config\\App::$proxyIPs
 ======================
 
-프록시 IP 주소와 클라이언트 IP 주소에 대해 HTTP 헤더를 설정하여 배열을 구성하도록 형식이 변경되었습니다..
-
-::
+The config value format has been changed. Now you must set your proxy IP address and the HTTP header name for the client IP address pair as an array::
 
     public $proxyIPs = [
             '10.0.1.200'     => 'X-Forwarded-For',
             '192.168.5.0/24' => 'X-Forwarded-For',
     ];
 
-이전 형식 구성 값에 대해 ``ConfigException`` 예외가 발생합니다.
+``ConfigException`` will be thrown for old format config value.
 
 .. _upgrade-4211-session-key:
 
-세션 핸들러 키 변경 사항
-=========================
+Session Handler Key Changes
+===========================
 
-:ref:`sessions-databasehandler-driver`, :ref:`sessions-memcachedhandler-driver`, :ref:`sessions-redishandler-driver`\ 에 대한 세션 데이터 레코드 키가 변경되었습니다.
-세션 드라이버를 사용하고 있다면 업그레이드 후 기존 세션 데이터가 무효화됩니다.
+The key of the session data record for :ref:`sessions-databasehandler-driver`,
+:ref:`sessions-memcachedhandler-driver` and :ref:`sessions-redishandler-driver`
+has changed. Therefore, any existing session data will be invalidated after
+the upgrade if you are using these session handlers.
 
-- ``DatabaseHandler``\ 를 사용할 때 세션 테이블의 ``id``\ 에 세션 쿠키 이름(``Config\App::$sessionCookieName``)이 포함됩니다.
-- ``MemcachedHandler``\ 나 ``RedisHandler``\ 를 사용하는 경우 키 값에 세션 쿠키 이름(``Config\App::$sessionCookieName``)이 포함됩니다.
+- When using ``DatabaseHandler``, the ``id`` column value in the session table
+  now contains the session cookie name (``Config\App::$sessionCookieName``).
+- When using ``MemcachedHandler`` or ``RedisHandler``, the key value contains
+  the session cookie name (``Config\App::$sessionCookieName``).
 
-``id``\ 의 최대 길이는 Memcached 키의 최대 길이(250바이트)입니다.
-다음 값이 최대 길이를 초과하면 세션이 제대로 작동하지 않습니다.
+There is maximum length for the ``id`` column and Memcached key (250 bytes).
+If the following values exceed those maximum length, the session will not work properly.
 
-- ``DatabaseHandler`` 사용 시 세션 쿠키 이름, 구분 기호 및 세션 ID(기본적으로 32자)
-- ``MemcachedHandler`` 사용 시 접두사(``ci_session``), 세션 쿠키 이름, 구분 기호 및 세션 ID
+- the session cookie name, delimiter, and session id (32 characters by default)
+  when using ``DatabaseHandler``
+- the prefix (``ci_session``), session cookie name, delimiters, and session id
+  when using  ``MemcachedHandler``
 
 Project Files
 *************
 
-``4.2.11`` 버전은 프로젝트 파일의 실행 코드를 변경하지 않았습니다.
+Version 4.2.11 did not alter any executable code in project files.
 
 All Changes
 ===========
 
-다음은 **프로젝트 공간**\ 에서 변경사항이 있는 모든 파일의 목록입니다. 대부분은 런타임에 영향을 미치지 않는 간단한 주석 또는 형식입니다.
+This is a list of all files in the **project space** that received changes;
+many will be simple comments or formatting that have no effect on the runtime:
 
 * app/Config/App.php
 * app/Config/Autoload.php

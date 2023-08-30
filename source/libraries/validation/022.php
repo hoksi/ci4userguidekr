@@ -1,5 +1,6 @@
 <?php
 
 $validation->setRules([
-    'email' => 'required|valid_email|is_unique[users.email,id,4]',
+    'id'    => 'max_length[19]|is_natural_no_zero',
+    'email' => 'required|max_length[254]|valid_email|is_unique[users.email,id,4]',
 ]);

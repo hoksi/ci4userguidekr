@@ -1,369 +1,495 @@
-###################
-세션 라이브러리
-###################
+###############
+Session Library
+###############
 
-Session 클래스를 사용하면 사용자의 "상태"를 유지하고 사이트를 탐색하는 동안 활동을 추적할 수 있습니다.
+The Session class permits you to maintain a user's "state" and track their
+activity while they browse your site.
 
-CodeIgniter에는 목차의 마지막 섹션에서 볼 수 있는 몇 가지 세션 스토리지 드라이버가 제공됩니다.
+CodeIgniter comes with a few session storage drivers, that you can see
+in the last section of the table of contents:
 
 .. contents::
     :local:
     :depth: 2
 
-세션 클래스 사용
-*******************
+Using the Session Class
+***********************
 
-세션 초기화
-=================
+Initializing a Session
+======================
 
-세션은 일반적으로 각 페이지를 로드할 때마다 전체적으로 실행되므로 세션 클래스를 초기화해야 합니다.
+Sessions will typically run globally with each page load, so the Session
+class should be magically initialized.
 
-세션에 액세스하고 초기화하려면
+To access and initialize the session:
 
 .. literalinclude:: sessions/001.php
 
-``$config`` 매개 변수는 선택 사항이며, 제공되지 않으면 서비스 레지스터가 기본 설정을 인스턴스화 합니다.
+The ``$config`` parameter is optional - your application configuration.
+If not provided, the services register will instantiate your default
+one.
 
-로드되면, 세션 라이브러리 객체를 사용할 수 있습니다
+Once loaded, the Sessions library object will be available using::
 
-::
+    $session
 
-	$session
-
-또는 기본 구성 옵션을 사용하는 헬퍼 기능을 사용할 수 있습니다.
-이 버전은 읽기 쉽지만 구성 옵션이 없습니다.
+Alternatively, you can use the helper function that will use the default
+configuration options. This version is a little friendlier to read,
+but does not take any configuration options.
 
 .. literalinclude:: sessions/002.php
 
-세션은 어떻게 작동합니까?
-=============================
+How Do Sessions Work?
+=====================
 
-페이지가 로드되면 세션 클래스는 사용자의 브라우저에서 유효한 세션 쿠키가 전송되는지 확인합니다.
-세션 쿠키가 존재하지 않거나, 서버에 저장된 쿠키와 일치하지 않거나, 만료된 경우 새 세션이 생성되고 저장됩니다.
+When a page is loaded, the session class will check to see if a valid
+session cookie is sent by the user's browser. If a sessions cookie does
+**not** exist (or if it doesn't match one stored on the server or has
+expired) a new session will be created and saved.
 
-유효한 세션이 존재하면 해당 정보가 업데이트됩니다. 
-업데이트할 때마다 세션 ID가 다시 생성될 수 있습니다.
+If a valid session does exist, its information will be updated. With each
+update, the session ID may be regenerated if configured to do so.
 
-일단 Session 클래스가 초기화되면 자동으로 실행된다는 것을 이해하는 것이 중요합니다.
-위의 동작을 발생시키기 위해 수행해야 할 작업은 없습니다.
-아래에서 볼 수 있듯이 세션 데이터로 작업할 수 있지만, 세션을 읽고, 쓰고, 업데이트하는 프로세스는 자동입니다.
+It's important for you to understand that once initialized, the Session
+class runs automatically. There is nothing you need to do to cause the
+above behavior to happen. You can, as you'll see below, work with session
+data, but the process of reading, writing, and updating a session is
+automatic.
 
-.. note:: 세션 라이브러리는 HTTP 프로토콜을 기반으로 하는 개념이므로 CLI에서는 자동으로 중지됩니다.
+.. note:: Under CLI, the Session library will automatically halt itself,
+    as this is a concept based entirely on the HTTP protocol.
 
-동시성에 대한 메모
+A Note about Concurrency
 ------------------------
 
-AJAX 사용량이 많은 웹 사이트를 개발하지 않는다면 이 섹션을 건너 뛸 수 있습니다.
-그러나 세션으로 인해 성능 문제가 발생한다면, 이 메모를 참고 하십시오.
+Unless you're developing a website with heavy AJAX usage, you can skip this
+section. If you are, however, and if you're experiencing performance
+issues, then this note is exactly what you're looking for.
 
-CodeIgniter v2.x의 세션은 잠금을 구현하지 않았으므로, 동일한 세션을 사용하는 두 개의 HTTP 요청이 동시에 실행될 수 있었습니다. - 보다 적절한 기술 용어를 사용하면 요청이 차단되지 않았습니다.
+Sessions in CodeIgniter v2.x didn't implement locking,
+which meant that two HTTP requests using the same session could run exactly
+at the same time. To use a more appropriate technical term - requests were
+non-blocking.
 
-그러나 세션 컨텍스트에 대해 비차단 요청은 안전하지 않음을 의미하기도 합니다. 
-한 요청에서 세션 데이터(또는 세션 ID 재생성)를 수정하면 두 번째 동시 요청의 실행을 방해할 수 있기 때문입니다. 
-이러한 세부 사항은 많은 문제의 근원이며, CodeIgniter 3의 세션 라이브러리를 완전히 다시 작성한 주된 이유입니다.
+However, non-blocking requests in the context of sessions also means
+unsafe, because, modifications to session data (or session ID regeneration)
+in one request can interfere with the execution of a second, concurrent
+request. This detail was at the root of many issues and the main reason why
+CodeIgniter 3 has a completely re-written Session library.
 
-왜 우리가 이것을 말합니까? 
-성능 문제의 원인을 찾은 후에는 세션 잠금이 문제라는 결론을 내릴 수 있으므로 세션 잠금을 제거하는 방법을 조사 할 수 있습니다.
+Why are we telling you this? Because it is likely that after trying to
+find the reason for your performance issues, you may conclude that locking
+is the issue and therefore look into how to remove the locks ...
 
-그렇게 하지 마세요! 잠금 장치를 제거하는 것은 **잘못된** 방법이며, 더 많은 문제를 일으킬 수 있습니다!
+DO NOT DO THAT! Removing locks would be **wrong** and it will cause you
+more problems!
 
-잠금은 문제가 아니며 해결책입니다. 
-문제는 여전히 세션을 이미 처리했지만 더 이상 필요하지 않은 상태에서 열어두는 것 입니다.
-따라서 현재 요청이 더 이상 세션을 필요하지 않다면 세션을 아래와 같이 닫아주세요.
+Locking is not the issue, it is a solution. Your issue is that you still
+have the session open, while you've already processed it and therefore no
+longer need it. So, what you need is to close the session for the
+current request after you no longer need it.
 
 .. literalinclude:: sessions/003.php
 
-세션 데이터란 무엇입니까?
-============================
+What is Session Data?
+=====================
 
-세션 데이터는 단순히 특정 세션 ID(cookie)와 연결된 배열입니다.
+Session data is simply an array associated with a particular session ID
+(cookie).
 
-PHP에서 세션을 사용해 본 적이 있다면 PHP의 `$_SESSION superglobal <https://www.php.net/manual/en/reserved.variables.session.php>`_\ 에 익숙해야 합니다.(그렇지 않은 경우 해당 링크의 내용을 읽으십시오.)
+If you've used sessions in PHP before, you should be familiar with PHP's
+`$_SESSION superglobal <https://www.php.net/manual/en/reserved.variables.session.php>`_
+(if not, please read the content on that link).
 
-CodeIgniter는 PHP에서 제공하는 세션 핸들러 메커니즘을 사용하는 것과 동일한 방법으로 세션 데이터에 액세스합니다.
-세션 데이터를 사용하는 것은 ``$_SESSION`` 배열을 조작(읽기, 설정 및 설정 해제)하는 것 만큼 간단합니다.
+CodeIgniter gives access to its session data through the same means, as it
+uses the session handlers' mechanism provided by PHP. Using session data is
+as simple as manipulating (read, set and unset values) the ``$_SESSION``
+array.
 
-.. note:: 일반적으로 전역 변수를 사용하는 것은 좋지 않습니다.
-    따라서 슈퍼글로벌 ``$_SESSION``\ 을 직접 사용하는 것은 권장되지 않습니다.
+.. note:: In general, it is bad practice to use global variables.
+    So using the superglobal ``$_SESSION`` directly is not recommended.
 
-또한 CodeIgniter는 아래에서 자세히 설명하는 두 가지 특수 유형의 세션 데이터 (flashdata 및 tempdata)도 제공합니다.
+In addition, CodeIgniter also provides 2 special types of session data
+that are further explained below: `Flashdata`_ and `Tempdata`_.
 
-.. note:: 역사적 이유로 Flashdata 및 Tempdata를 제외한 세션 데이터를 "userdata"\ 라고 합니다.
+.. note:: For historical reasons, we refer to session data excluding Flashdata and Tempdata as "userdata".
 
-세션 데이터 검색
+Retrieving Session Data
 =======================
 
-세션 배열의 모든 정보는 ``$_SESSION`` superglobal을 통해 사용할 수 있습니다
+Any piece of information from the session array is available through the
+``$_SESSION`` superglobal:
 
 .. literalinclude:: sessions/004.php
 
-또는 기존의 접근자 메소드를 통해
+Or through the conventional accessor method:
 
 .. literalinclude:: sessions/005.php
 
-또는 매직 게터(magic gatter)를 통해
+Or through the magic getter:
 
 .. literalinclude:: sessions/006.php
 
-또는 세션 헬퍼 메소드를 통해서도
+Or even through the session helper method:
 
 .. literalinclude:: sessions/007.php
 
-여기서 ``item``\ 은 가져 오려는 항목에 해당하는 배열 키입니다.
-예를 들어, 이전에 저장된 ``name`` 항목을 ``$name`` 변수에 할당하려면 다음과 같이 합니다.
+Where ``item`` is the array key corresponding to the item you wish to fetch.
+For example, to assign a previously stored ``name`` item to the ``$name``
+variable, you will do this:
 
 .. literalinclude:: sessions/008.php
 
-.. note:: 액세스하려는 항목이 존재하지 않으면 ``get()`` 메소드는 null을 반환합니다.
+.. note:: The ``get()`` method returns null if the item you are trying
+    to access does not exist.
 
-기존 데이터를 모두 검색하려면 항목 키를 생략하면 됩니다. (magic getter 는 단일 속성 값에 대해서만 작동합니다)
+If you want to retrieve all of the existing session data, you can simply
+omit the item key (magic getter only works for single property values):
 
 .. literalinclude:: sessions/009.php
 
-세션 데이터 추가
+.. important:: The ``get()`` method WILL return flashdata or tempdata items when
+    retrieving a single item by key. It will not return flashdata or tempdata when
+    grabbing all data from the session, however.
+
+Adding Session Data
 ===================
 
-특정 사용자가 사이트에 로그인한다고 가정해 보겠습니다. 
-인증되면 사용자 이름과 전자 메일 주소를 세션에 추가하여 필요할 때 데이터베이스 쿼리를 실행할 필요없이 해당 데이터를 전체적으로 사용할 수 있습니다.
+Let's say a particular user logs into your site. Once authenticated, you
+could add their username and e-mail address to the session, making that
+data globally available to you without having to run a database query when
+you need it.
 
-다른 변수와 마찬가지로 간단히 ``$_SESSION`` 배열 또는 ``$session``\ 의 속성에 데이터를 할당할 수 있습니다.
+You can simply assign data to the ``$_SESSION`` array, as with any other
+variable. Or as a property of ``$session``.
 
-새 세션 데이터가 포함된 배열을 ``set()`` 메소드에 전달할 수 있습니다.
+You can pass an array containing your new session data to the
+``set()`` method:
 
 .. literalinclude:: sessions/010.php
 
-여기서 ``$array``\ 는 새 데이터를 포함하는 연관 배열입니다.
-여기에 예가 있습니다.
+Where ``$array`` is an associative array containing your new data. Here's
+an example:
 
 .. literalinclude:: sessions/011.php
 
-``set()``\ 은 한 번에 하나의 값으로 세션 데이터를 추가하는 것도 지원합니다
+If you want to add session data one value at a time, ``set()`` also
+supports this syntax:
 
 .. literalinclude:: sessions/012.php
 
-세션 값이 존재하는지 확인하려면 ``isset()``\ 으로 확인하십시오.
+If you want to verify that a session value exists, simply check with
+``isset()``:
 
 .. literalinclude:: sessions/013.php
 
-또는 ``has()``\ 를 호출 할 수도 있습니다.
+Or you can call ``has()``:
 
 .. literalinclude:: sessions/014.php
 
-세션 데이터에 새로운 값 제공
+Pushing New Value to Session Data
 =================================
 
-``push()`` 메소드는 배열인 세션 값으로 새로운 값을 푸시하는 데 사용됩니다.
-예를 들어, ``hobbies`` 키에 일련의 취미가 포함된 경우 다음과 같이 배열에 새로운 값을 추가할 수 있습니다
+The ``push()`` method is used to push a new value onto a session value that is an array.
+For instance, if the ``hobbies`` key contains an array of hobbies, you can add a new value onto the array like so:
 
 .. literalinclude:: sessions/015.php
 
-세션 데이터 제거
+Removing Session Data
 =====================
 
-다른 변수와 마찬가지로 ``$_SESSION``\ 의 값 설정 해제는 ``unset()``\ 을 통해 수행합니다.
+Just as with any other variable, unsetting a value in ``$_SESSION`` can be
+done through ``unset()``:
 
 .. literalinclude:: sessions/016.php
 
-또한 ``set()``\ 을 사용하여 세션에 정보를 추가할 수 있는 것처럼 세션 키를 ``remove()``\ 메소드에 전달하여 정보를 제거할 수 있습니다.
-예를 들어, 세션 데이터 배열에서 ``some_name``\ 을 제거하려는 경우
+Also, just as ``set()`` can be used to add information to a
+session, ``remove()`` can be used to remove it, by passing the
+session key. For example, if you wanted to remove ``some_name`` from your
+session data array:
 
 .. literalinclude:: sessions/017.php
 
-이 방법은 또한 설정 해제를 위해 일련의 항목 키를 허용합니다.
+This method also accepts an array of item keys to unset:
 
-::
+.. literalinclude:: sessions/018.php
 
-	$array_items = ['username', 'email'];
-	$session->remove($array_items);
+.. _sessions-flashdata:
 
-플래시 데이터
-=================
+Flashdata
+=========
 
-CodeIgniter는 세션 데이터를 다음 요청에서만 사용한 다음 자동으로 지워지는 "flashdata"\ 를 지원합니다.
+CodeIgniter supports "flashdata", or session data that will only be
+available for the next request, and is then automatically cleared.
 
-이는 일회성 정보, 오류 또는 상태 메시지 (예 : "레코드 2 삭제됨")에 매우 유용합니다.
+This can be very useful, especially for one-time informational, error or
+status messages (for example: "Record 2 deleted").
 
-flashdata 변수는 CodeIgniter 세션 핸들러내에서 관리되는 일반 세션 변수입니다.
+It should be noted that flashdata variables are regular session variables,
+managed inside the CodeIgniter session handler.
 
-기존 항목을 "flashdata"로 표시하려면
+To mark an existing item as "flashdata":
 
 .. literalinclude:: sessions/019.php
 
-여러 항목을 플래시 데이터로 표시하려면 키를 배열로 전달하면됩니다.
+If you want to mark multiple items as flashdata, simply pass the keys as an
+array:
 
 .. literalinclude:: sessions/020.php
 
-플래시 데이터를 추가하려면
+To add flashdata:
 
 .. literalinclude:: sessions/021.php
 
-또는 ``setFlashdata()`` 메소드를 사용하여
+Or alternatively, using the ``setFlashdata()`` method:
 
 .. literalinclude:: sessions/022.php
 
-``set()``\ 과 같은 방식으로 ``setFlashdata()``\ 에 배열을 전달할 수도 있습니다.
+You can also pass an array to ``setFlashdata()``, in the same manner as
+``set()``.
 
-플래시 데이터 변수를 읽는 것은 ``$_SESSION``\ 을 통해 일반 세션 데이터를 읽는 것과 같습니다.
+Reading flashdata variables is the same as reading regular session data
+through ``$_SESSION``:
 
 .. literalinclude:: sessions/023.php
 
-.. important:: ``get()`` 메소드는 키로 단일 항목을 검색할 때 플래시 데이터 항목을 반환합니다. 그러나 세션에서 모든 데이터를 가져올 때 플래시 데이터를 반환하지 않습니다.
+.. important:: The ``get()`` method WILL return flashdata items when
+    retrieving a single item by key. It will not return flashdata when
+    grabbing all data from the session, however.
 
-``getFlashdata()`` 메소드를 사용하면 "flashdata"\ 의 값만 가져올 수 있습니다
+However, if you want to be sure that you're reading "flashdata" (and not
+any other kind), you can also use the ``getFlashdata()`` method:
 
 .. literalinclude:: sessions/024.php
 
-.. note:: ``getFlashdata()`` 메소드는 항목을 찾을 수 없는 경우 null을 반환합니다.
+.. note:: The ``getFlashdata()`` method returns null if the item cannot be
+    found.
 
-모든 플래시 데이터가 있는 배열을 얻으려면 키 매개 변수를 생략하십시오.
+Or to get an array with all flashdata, simply omit the key parameter:
 
 .. literalinclude:: sessions/025.php
 
-추가 요청을 통해 플래시 데이터 변수를 유지해야 하는 경우 ``keepFlashdata()`` 메소드를 사용하여 이를 수행 할 수 있습니다.
-단일 항목 또는 플래시 데이터 항목 배열을 전달하여 유지합니다.
+
+If you find that you need to preserve a flashdata variable through an
+additional request, you can do so using the ``keepFlashdata()`` method.
+You can either pass a single item or an array of flashdata items to keep.
 
 .. literalinclude:: sessions/026.php
 
 Tempdata
-===============
+========
 
-CodeIgniter는 특정 만료 시간을 가지는 세션 데이터 "tempdata"도 지원합니다. 
-값이 만료되거나, 세션이 만료되거나, 삭제되면 값이 자동으로 제거됩니다.
+CodeIgniter also supports "tempdata", or session data with a specific
+expiration time. After the value expires, or the session expires or is
+deleted, the value is automatically removed.
 
-flashdata와 마찬가지로 tempdata 변수는 CodeIgniter 세션 처리기에 의해 내부적으로 관리됩니다.
+Similarly to flashdata, tempdata variables are managed internally by the
+CodeIgniter session handler.
 
-기존 항목을 "tempdata"로 전환하려면 해당 키와 만료 시간 (초)을 ``markAsTempdata()`` 메소드에 전달하면 됩니다.
+To mark an existing item as "tempdata", simply pass its key and expiry time
+(in seconds!) to the ``markAsTempdata()`` method:
 
 .. literalinclude:: sessions/027.php
 
-모두 동일한 만료 시간을 원하는지 여부에 따라 두 가지 방법으로 여러 항목을 tempdata로 표시할 수 있습니다.
+You can mark multiple items as tempdata in two ways, depending on whether
+you want them all to have the same expiry time or not:
 
 .. literalinclude:: sessions/028.php
 
-tempdata를 추가하려면
+To add tempdata:
 
 .. literalinclude:: sessions/029.php
 
-또는 ``setTempdata()`` 메소드를 사용하여
+Or alternatively, using the ``setTempdata()`` method:
 
 .. literalinclude:: sessions/030.php
 
-``set_tempdata()``\ 에 배열을 전달할 수 있습니다.
+You can also pass an array to ``setTempdata()``:
 
 .. literalinclude:: sessions/031.php
 
-.. note:: 만료를 생략하거나 0으로 설정하면 기본 활성 시간 값인 300 초(5 분)가 사용됩니다.
+.. note:: If the expiration is omitted or set to 0, the default
+    time-to-live value of 300 seconds (or 5 minutes) will be used.
 
-tempdata 변수를 읽으려면 ``$_SESSION`` 슈퍼 전역 배열을 통해 액세스할 수 있습니다
+To read a tempdata variable, again you can just access it through the
+``$_SESSION`` superglobal array:
 
 .. literalinclude:: sessions/032.php
 
-.. important:: ``get()`` 메소드는 키로 단일 항목을 검색할 때 tempdata 항목을 반환합니다. 그러나 세션에서 모든 데이터를 가져 오면 tempdata를 반환하지 않습니다.
+.. important:: The ``get()`` method WILL return tempdata items when
+    retrieving a single item by key. It will not return tempdata when
+    grabbing all data from the session, however.
 
-``getTempdata()`` 메소드를 사용하여 "tempdata"\ 의 값만 가져올수 있습니다
+Or if you want to be sure that you're reading "tempdata" (and not any
+other kind), you can also use the ``getTempdata()`` method:
 
 .. literalinclude:: sessions/033.php
 
-.. note:: ``getTempdata()`` 메소드는 항목을 찾을 수 없는 경우 null을 리턴합니다.
+.. note:: The ``getTempdata()`` method returns null if the item cannot be
+    found.
 
-기존의 모든 tempdata를 검색하려는 경우
+And of course, if you want to retrieve all existing tempdata:
 
 .. literalinclude:: sessions/034.php
 
-만료되기 전에 tempdata 값을 제거해야 하는 경우 ``$_SESSION`` 배열에서 직접 설정을 해제 할 수 있습니다.
+If you need to remove a tempdata value before it expires, you can directly
+unset it from the ``$_SESSION`` array:
 
 .. literalinclude:: sessions/035.php
 
-그러나 이 특정 항목을 tempdata로 만드는 마커를 제거하지는 않으므로 (다음 HTTP 요청에서 무효화 됨) 동일한 요청에서 동일한 키를 재사용하려는 경우 ``removeTempdata()`` 메소드를 호출합니다.
+However, this won't remove the marker that makes this specific item to be
+tempdata (it will be invalidated on the next HTTP request), so if you
+intend to reuse that same key in the same request, you'd want to use
+``removeTempdata()``:
 
 .. literalinclude:: sessions/036.php
 
-세션 파괴
+Closing a Session
+=================
+
+.. _session-close:
+
+close()
+-------
+
+.. versionadded:: 4.4.0
+
+To close the current session manually after you no longer need it, use the
+``close()`` method:
+
+.. literalinclude:: sessions/044.php
+
+You do not have to close the session manually, PHP will close it automatically
+after your script terminated. But as session data is locked to prevent concurrent
+writes only one request may operate on a session at any time. You may improve
+your site performance by closing the session as soon as all changes to session
+data are done.
+
+This method will work in exactly the same way as PHP's
+`session_write_close() <https://www.php.net/session_write_close>`_ function.
+
+Destroying a Session
 ====================
 
-현재 세션을 지우려면 (예 : 로그 아웃 중) PHP의 `session_destroy() <https://www.php.net/session_destroy>`_ 함수 또는 라이브러리의 ``destroy()`` 메소드를 사용하면됩니다.
-둘 다 정확히 같은 방식으로 작동합니다.
+.. _session-destroy:
+
+destroy()
+---------
+
+To clear the current session (for example, during a logout), you may
+simply use the library's ``destroy()`` method:
 
 .. literalinclude:: sessions/037.php
 
-.. note:: 동일한 요청 중에 수행한 마지막 세션 관련 작업이어야 합니다. 모든 세션 데이터 (플래시 데이터 및 tmpdata 포함)는 영구적으로 삭제되며 세션을 삭제한 후 동일한 요청 중에 기능을 사용할 수 없습니다.
+This method will work in exactly the same way as PHP's
+`session_destroy() <https://www.php.net/session_destroy>`_ function.
 
-``stop()`` 메소드를 사용하여 이전 세션 ID와 모든 데이터를 삭제하고, 세션 ID가 포함된 쿠키를 삭제하여 세션을 완전히 종료할 수 있습니다
+This must be the last session-related operation that you do during the same request.
+All session data (including flashdata and tempdata) will be destroyed permanently.
 
-.. literalinclude:: sessions/038.php
+.. note:: You do not have to call this method from usual code. Cleanup session
+    data rather than destroying the session.
 
-세션 메타 데이터 액세스
+.. _session-stop:
+
+stop()
+------
+
+.. deprecated:: 4.3.5
+
+The session class also has the ``stop()`` method.
+
+.. warning:: Prior to v4.3.5, this method did not destroy the session due to a bug.
+
+Starting with v4.3.5, this method has been modified to destroy the session.
+However, it is deprecated because it is exactly the same as the ``destroy()``
+method. Use the ``destroy()`` method instead.
+
+Accessing Session Metadata
 ==========================
 
-CodeIgniter 2버전에서 세션 데이터 배열에 4개의 기본 항목이 포함되었습니다.
-'session_id', 'ip_address', 'user_agent', 'last_activity'.
+In CodeIgniter 2, the session data array included 4 items
+by default: 'session_id', 'ip_address', 'user_agent', 'last_activity'.
 
-이 항목들은 세션의 작동 방식에 대한 세부 사항을 위한 것이지만 이제는 새로운 구현에 더 이상 필요하지 않습니다.
-그러나 어플리케이션이 이러한 값에 의존한다면, 다음과 같은 방법으로 액세스할 수 있습니다.
+This was due to the specifics of how sessions worked, but is now no longer
+necessary with our new implementation. However, it may happen that your
+application relied on these values, so here are alternative methods of
+accessing them:
 
-  - session_id: ``$session->session_id`` 또는 ``session_id()`` (PHP 내장 함수)
+  - session_id: ``$session->session_id`` or ``session_id()`` (PHP's built-in function)
   - ip_address: ``$_SERVER['REMOTE_ADDR']``
   - user_agent: ``$_SERVER['HTTP_USER_AGENT']`` (unused by sessions)
   - last_activity: Depends on the storage, no straightforward way. Sorry!
 
-세션 환경 설정
-***********************
+Session Preferences
+*******************
 
-CodeIgniter는 일반적으로 모든 것을 즉시 사용할 수 있도록 합니다.
-그러나 세션은 모든 응용 프로그램에서 매우 민감한 구성 요소이므로 신중하게 구성해야합니다. 
-시간을내어 모든 옵션과 그 효과를 고려하십시오.
+CodeIgniter will usually make everything work out of the box. However,
+Sessions are a very sensitive component of any application, so some
+careful configuration must be done. Please take your time to consider
+all of the options and their effects.
 
-.. note:: v4.3.0 이후로 새로운 파일인 **app/Config/Session.php**\ 가 추가되었습니다.
-	이전 버전에서는 세션 설정이 **app/Config/App.php** 파일에 있었습니다.
+.. note:: Since v4.3.0, the new **app/Config/Session.php** has been added.
+    Previously, the Session Preferences were in your **app/Config/App.php** file.
 
-You'll find the following Session related preferences in your **app/Config/Session.php** file:
-**app/Config/Session.php** 파일에서 다음과 같은 세션 관련 설정을 찾을 수 있습니다.
+You'll find the following Session related preferences in your
+**app/Config/Session.php** file:
 
 ======================= ============================================ ================================================= ============================================================================================
 Preference                     Default                                      Options                                           Description
 ======================= ============================================ ================================================= ============================================================================================
-**driver**              CodeIgniter\\Session\\Handlers\\FileHandler  CodeIgniter\\Session\\Handlers\\FileHandler       사용할 세션 드라이버를 지정합니다.
+**driver**              CodeIgniter\\Session\\Handlers\\FileHandler  CodeIgniter\\Session\\Handlers\\FileHandler       The session storage driver to use.
                                                                      CodeIgniter\\Session\\Handlers\\DatabaseHandler
                                                                      CodeIgniter\\Session\\Handlers\\MemcachedHandler
                                                                      CodeIgniter\\Session\\Handlers\\RedisHandler
                                                                      CodeIgniter\\Session\\Handlers\\ArrayHandler
-**cookieName**          ci_session                                   [A-Za-z\_-] characters only                       세션 쿠키의 이름을 지정합니다.
-**expiration**          7200 (2 hours)                               Time in seconds (integer)                         세션이 지속되는 시간(초)을 지정합니다.
-                                                                                                                       브라우저가 닫힐 때까지만 세션이 지속되길 원한다면 0으로 지정합니다.
-**savePath**            null                                         None                                              드라이버에 따라 저장 위치를 지정합니다.
-**matchIP**             false                                        true/false (boolean)                              세션 쿠키를 읽을 때 사용자 IP 주소를 검증할지 여부를 지정합니다.
-                                                                                                                       일부 ISP에서 IP 주소가 동적으로 변경되므로 만료되지 않는 세션을 필요하다면
-                                                                                                                       이 값을 false로 설정해야 합니다.
-**timeToUpdate**        300                                          Time in seconds (integer)                         이 옵션은 세션 클래스가 자체를 자주 재생성하고 새 세션 ID를 생성하는 주기를 제어합니다.
-                                                                                                                       0으로 설정하면 세션 ID 재생성이 비활성화됩니다.
-**regenerateDestroy**   false                                        true/false (boolean)                              자동으로 세션 ID를 다시 생성할 때 이전 세션 ID와 연결된 세션 데이터를 파괴할지 여부를 
-                                                                                                                       지정합니다. false로 설정하면 데이터는 나중에 가비지 컬렉터에 의해 삭제됩니다.
+**cookieName**          ci_session                                   [A-Za-z\_-] characters only                       The name used for the session cookie.
+**expiration**          7200 (2 hours)                               Time in seconds (integer)                         The number of seconds you would like the session to last.
+                                                                                                                       If you would like a non-expiring session (until browser is closed) set the value to zero: 0
+**savePath**            null                                         None                                              Specifies the storage location, depends on the driver being used.
+**matchIP**             false                                        true/false (boolean)                              Whether to validate the user's IP address when reading the session cookie.
+                                                                                                                       Note that some ISPs dynamically changes the IP, so if you want a non-expiring session you
+                                                                                                                       will likely set this to false.
+**timeToUpdate**        300                                          Time in seconds (integer)                         This option controls how often the session class will regenerate itself and create a new
+                                                                                                                       session ID. Setting it to 0 will disable session ID regeneration.
+**regenerateDestroy**   false                                        true/false (boolean)                              Whether to destroy session data associated with the old session ID when auto-regenerating
+                                                                                                                       the session ID. When set to false, the data will be later deleted by the garbage collector.
 ======================= ============================================ ================================================= ============================================================================================
 
-.. note:: 세션 라이브러리는 PHP의 세션 관련 INI 설정과 위의 항목 중 하나라도 구성되지 않은 경우, 최후의 수단으로 'sess_expire_on_close'\ 와 같은 코드이그나이터 3의 설정을 가져 오려고 시도합니다.
-	그러나 예기치 않은 결과가 발생하거나 나중에 변경될 수 있으므로 이 방법에 의존해서는 안됩니다. 모든 것을 올바르게 구성하십시오.
+.. note:: As a last resort, the Session library will try to fetch PHP's
+    session related INI settings, as well as CodeIgniter 3 settings such as
+    'sess_expire_on_close' when any of the above is not configured.
+    However, you should never rely on this behavior as it can cause
+    unexpected results or be changed in the future. Please configure
+    everything properly.
 
-.. note:: ``sessionExpiration``\ 을 ``0``\ 으로 설정하면 PHP가 설정한 세션 관리의 ``session.gc_maxlifetime`` 설정 값 그대로(기본값 ``1440``) 사용됩니다.
-	이 값은 필요에 따라 ``php.ini`` 또는 ``ini_set()``\ 을 통해 변경 가능 합니다.
+.. note:: If ``expiration`` is set to ``0``, the ``session.gc_maxlifetime``
+    setting set by PHP in session management will be used as-is
+    (often the default value of ``1440``). This needs to be changed in
+    ``php.ini`` or via ``ini_set()`` as needed.
 
-위에서 언급한 값들 외에도, 세션 쿠키는 다음과 같은 구성 값을 **app/Config/Cookie.php** 파일에서 사용합니다
+In addition to the values above, the Session cookie uses the
+following configuration values in your **app/Config/Cookie.php** file:
 
-==================== =============== ===========================================================================
+============== =============== ===========================================================================
 Preference           Default         Description
-==================== =============== ===========================================================================
-**domain**           ''              세션 적용 도메인
-**path**             /               세션 적용 가능 경로
-**secure**           false           암호화된 (HTTPS) 연결에서만 세션 쿠키를 작성할 지 여부
-**sameSite**         Lax             세션 쿠키에 대한 SameSite 설정
-==================== =============== ===========================================================================
+============== =============== ===========================================================================
+**domain**     ''              The domain for which the session is applicable
+**path**       /               The path to which the session is applicable
+**secure**     false           Whether to create the session cookie only on encrypted (HTTPS) connections
+**sameSite**   Lax             The SameSite setting for the session cookie
+============== =============== ===========================================================================
 
-.. note:: 'httponly' 설정은 세션에 영향을 미치지 않습니다.
-	대신 보안상의 이유로 HttpOnly 매개 변수가 항상 사용되며, ``Config\Cookie::$prefix`` 설정은 완전히 무시됩니다.
+.. note:: The ``httponly`` setting doesn't have an effect on sessions.
+    Instead the HttpOnly parameter is always enabled, for security
+    reasons. Additionally, the ``Config\Cookie::$prefix`` setting is completely
+    ignored.
 
-세션 드라이버
-**************
+Session Drivers
+***************
 
-이미 언급했듯이 세션 라이브러리는 다음 4가지개의 사용할 수 있는 핸들러 또는 스토리지 엔진을 제공합니다.
+As already mentioned, the Session library comes with 4 handlers, or storage
+engines, that you can use:
 
   - CodeIgniter\\Session\\Handlers\\FileHandler
   - CodeIgniter\\Session\\Handlers\\DatabaseHandler
@@ -371,189 +497,262 @@ Preference           Default         Description
   - CodeIgniter\\Session\\Handlers\\RedisHandler
   - CodeIgniter\\Session\\Handlers\\ArrayHandler
 
-``FileHandler`` 드라이버는 가장 안전한 선택이며, 모든 곳에서 작동할 것으로 예상되기 때문에 세션이 초기화 될 때 기본적으로 사용됩니다. (모든 환경에는 파일 시스템이 있습니다)
+By default, the ``FileHandler`` Driver will be used when a session is initialized,
+because it is the safest choice and is expected to work everywhere
+(virtually every environment has a file system).
 
-그러나 다른 드라이버는 **app/Config/Session.php** 파일의 ``public $driver``\ 을 통해 선택할 수 있습니다. (원하는 경우)
-모든 드라이버는 각기 다른 주의 사항이 있으며, 이를 염두에 두어야합니다. 
-따라서 선택하기 전에 반드시 아래 부분을 잘 읽어보십시오.
+However, any other driver may be selected via the ``public $driver``
+line in your **app/Config/Session.php** file, if you chose to do so.
+Have it in mind though, every driver has different caveats, so be sure to
+get yourself familiar with them (below) before you make that choice.
 
-.. note:: ArrayHandler는 테스트할 때 사용되며, PHP배열에 모든 세션 데이터를 저장하여 데이터가 테스트 이후 유지되는 것을 방지합니다.
+.. note:: The ArrayHandler is used during testing and stores all data within
+    a PHP array, while preventing the data from being persisted.
 
-FileHandler 드라이버 (기본)
-=============================================
+FileHandler Driver (the default)
+================================
 
-'FileHandler' 드라이버는 파일 시스템을 사용하여 세션 데이터를 저장합니다.
+The 'FileHandler' driver uses your file system for storing session data.
 
-PHP의 기본 세션 구현과 똑같이 작동고 안전하다고 말할 수 있지만, 이것이 중요한 세부사항의 경우 기본 세션과 동일한 코드가 아니며 몇 가지 제한 사항과 장점이 있습니다.
+It can safely be said that it works exactly like PHP's own default session
+implementation, but in case this is an important detail for you, have it
+mind that it is in fact not the same code and it has some limitations
+(and advantages).
 
-좀 더 구체적으로 말하면 session.save_path <https://www.php.net/manual/en/session.configuration.php#ini.session.save-path>_\ 에서 사용되는 PHP의 디렉토리 레벨 및 모드 형식을 지원하지 않습니다. 
-안전을 위해 대부분의 옵션이 하드 코딩되어 있으며, ``public string $savePath``\ 는 절대 경로만 지원됩니다.
+To be more specific, it doesn't support PHP's `directory level and mode
+formats used in session.save_path
+<https://www.php.net/manual/en/session.configuration.php#ini.session.save-path>`_,
+and it has most of the options hard-coded for safety. Instead, only
+absolute paths are supported for ``public string $savePath``.
 
-알아야 할 또 다른 중요한 사항은 공개적으로 읽거나 공유 디렉토리를 사용하여 세션 파일을 저장하지 않도록 하는 것입니다.
-선택한 *savePath* 디렉토리의 내용을 볼 수있는 권한이 *당신에게만* 있는지 확인하십시오.
-그렇지 않으면 이를 수행할 수 있는 모든 사람이 현재 세션 ("sessiion fixation" 공격이라고도 함)을 도용할 수 있습니다.
+Another important thing that you should know, is to make sure that you
+don't use a publicly-readable or shared directory for storing your session
+files. Make sure that *only you* have access to see the contents of your
+chosen *savePath* directory. Otherwise, anybody who can do that, can
+also steal any of the current sessions (also known as "session fixation"
+attack).
 
-유닉스 계열 운영 체제에서, 이것은 일반적으로 `chmod` 명령을 통해 해당 디렉토리에 대한 0700 모드 권한을 설정함으로써 달성되며, 디렉토리 소유자만 디렉토리에 대한 읽기 및 쓰기 작업을 수행할 수 있습니다.
-그러나 스크립트를 실행하는 시스템 사용자는 일반적으로 사용자 자신이 아니라 'www-data'\ 와 같은 것이기 때문에 이러한 권한을 설정하면 어플리케이션이 동작하지 않을수 있으므로 주의하십시오.
+On UNIX-like operating systems, this is usually achieved by setting the
+0700 mode permissions on that directory via the `chmod` command, which
+allows only the directory's owner to perform read and write operations on
+it. But be careful because the system user *running* the script is usually
+not your own, but something like 'www-data' instead, so only setting those
+permissions will probably break your application.
 
-환경에 따라 아래와 같은 작업을 수행합니다.
+Instead, you should do something like this, depending on your environment:
 
-::
+.. code-block:: console
 
-	> mkdir /<path to your application directory>/Writable/sessions/
-	> chmod 0700 /<path to your application directory>/Writable/sessions/
-	> chown www-data /<path to your application directory>/Writable/sessions/
+    mkdir /<path to your application directory>/writable/sessions/
+    chmod 0700 /<path to your application directory>/writable/sessions/
+    chown www-data /<path to your application directory>/writable/sessions/
 
-보너스 팁
--------------------
+Bonus Tip
+---------
 
-파일 저장 공간이 일반적으로 느리기 때문에 여러분중 일부는 다른 세션 드라이버를 선택하게 될 것입니다. 하지만 이것은 반만 맞습니다.
+Some of you will probably opt to choose another session driver because
+file storage is usually slower. This is only half true.
 
-매우 기본적인 테스트는 아마도 SQL 데이터베이스가 더 빠르다고 생각하도록 속이는 것입니다. 
-그러나 99%의 경우 현재 세션이 거의 없는 동안에만 해당됩니다.
-세션 수가 많아지고, 서버로드가 증가할수록 (시간이 중요 함) 파일 시스템은 거의 모든 관계형 데이터베이스보다 지속적으로 성능이 뛰어납니다.
+A very basic test will probably trick you into believing that an SQL
+database is faster, but in 99% of the cases, this is only true while you
+only have a few current sessions. As the sessions count and server loads
+increase - which is the time when it matters - the file system will
+consistently outperform almost all relational database setups.
 
-또한 성능이 유일한 관심사라면 파일 세션을 `tmpfs <http://eddmann.com/posts/storing-php-sessions-file-caches-in-memory-using-tmpfs/>`_ 에 저장하는 방법도 있습니다. (경고 : 외부 리소스)
+In addition, if performance is your only concern, you may want to look
+into using `tmpfs <https://eddmann.com/posts/storing-php-sessions-file-caches-in-memory-using-tmpfs/>`_,
+(warning: external resource), which can make your sessions blazing fast.
 
 .. _sessions-databasehandler-driver:
 
-DatabaseHandler 드라이버
-=============================
+DatabaseHandler Driver
+======================
 
-.. important:: 다른 플랫폼은 공지된 잠금 메커니즘이 없기 때문에, 공식적으로는 MySQL과 PostgreSQL 데이터베이스만 지원됩니다.
-	잠금 없이 세션을 사용하면 AJAX의 무거운(heavy) 사용으로 인해 다양한 문제가 발생할 수 있으며, 이러한 경우에는 지원하지 않습니다.
-	성능 문제가 발생하는 경우 세션 데이터 처리 후 ``session_write_close()``\ 를 사용하십시오.
+.. important:: Only MySQL and PostgreSQL databases are officially
+    supported, due to lack of advisory locking mechanisms on other
+    platforms. Using sessions without locks can cause all sorts of
+    problems, especially with heavy usage of AJAX, and we will not
+    support such cases. Use the :ref:`session-close` method after you've
+    done processing session data if you're having performance
+    issues.
 
-'DatabaseHandler' 드라이버는 MySQL 또는 PostgreSQL과 같은 관계형 데이터베이스를 사용하여 세션을 저장합니다. 
-이는 개발자가 어플리케이션내에서 세션 데이터에 쉽게 액세스할 수 있기 때문에 많은 사용자에게 인기있는 선택입니다. 
-이는 데이터베이스의 다른 테이블 일뿐입니다.
+The 'DatabaseHandler' driver uses a relational database such as MySQL or
+PostgreSQL to store sessions. This is a popular choice among many users,
+because it allows the developer easy access to the session data within
+an application - it is just another table in your database.
 
-그러나 몇 가지 조건을 충족해야합니다.
+However, there are some conditions that must be met:
 
-	- 영구 연결(persistent connection)을 사용할 수 없습니다.
+  - You can NOT use a persistent connection.
 
-DatabaseHandler 구성
+Configure DatabaseHandler
 -------------------------
 
-'DatabaseHandler' 세션 드라이버를 사용하려면 세션 테이블을 만든 다음 이를 ``$savePath``\ 의 값으로 설정해야 합니다.
-예를 들어 테이블 이름으로 'ci_sessions'을 사용하려면 다음과 같이합니다.
+Setting Table Name
+^^^^^^^^^^^^^^^^^^
+
+In order to use the 'DatabaseHandler' session driver, you must also create this
+table that we already mentioned and then set it as your
+``$savePath`` value.
+For example, if you would like to use 'ci_sessions' as your table name,
+you would do this:
 
 .. literalinclude:: sessions/039.php
 
-물론 데이터베이스 테이블을 생성하십시오 ...
+Creating Database Table
+^^^^^^^^^^^^^^^^^^^^^^^
 
-MySQL
+And then of course, create the database table ...
 
-::
+For MySQL::
 
-	CREATE TABLE IF NOT EXISTS `ci_sessions` (
-		`id` varchar(128) NOT null,
-		`ip_address` varchar(45) NOT null,
-		`timestamp` timestamp DEFAULT CURRENT_TIMESTAMP NOT null,
-		`data` blob NOT null,
-		KEY `ci_sessions_timestamp` (`timestamp`)
-	);
+    CREATE TABLE IF NOT EXISTS `ci_sessions` (
+        `id` varchar(128) NOT null,
+        `ip_address` varchar(45) NOT null,
+        `timestamp` timestamp DEFAULT CURRENT_TIMESTAMP NOT null,
+        `data` blob NOT null,
+        KEY `ci_sessions_timestamp` (`timestamp`)
+    );
 
-PostgreSQL
+For PostgreSQL::
 
-::
+    CREATE TABLE "ci_sessions" (
+        "id" varchar(128) NOT NULL,
+        "ip_address" inet NOT NULL,
+        "timestamp" timestamptz DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        "data" bytea DEFAULT '' NOT NULL
+    );
 
-	CREATE TABLE "ci_sessions" (
-		"id" varchar(128) NOT null,
-		"ip_address" inet NOT null,
-		"timestamp" timestamptz DEFAULT CURRENT_TIMESTAMP NOT null,
-		"data" bytea DEFAULT '' NOT null
-	);
+    CREATE INDEX "ci_sessions_timestamp" ON "ci_sessions" ("timestamp");
 
-	CREATE INDEX "ci_sessions_timestamp" ON "ci_sessions" ("timestamp");
+.. note:: The ``id`` value contains the session cookie name (``Config\Session::$cookieName``)
+    and the session ID and a delimiter. It should be increased as needed, for example,
+    when using long session IDs.
 
-.. note:: ``id`` 값은 세션 쿠키 이름(``Config\Session::$cookieName``)과 세션 ID, 그리고 구분 기호를 포함합니다.
-	예를 들어, 세션 ID가 긴 경우에는 필요에 따라 이 값을 증가시켜야 합니다.
+Adding Primary Key
+^^^^^^^^^^^^^^^^^^
 
-또한 **$matchIP 설정에 따라** PRIMARY KEY를 추가해야 합니다.
-아래 예시는 MySQL과 PostgreSQL에서 모두 작동합니다.
+You will also need to add a PRIMARY KEY **depending on your $matchIP
+setting**. The examples below work both on MySQL and PostgreSQL::
 
-::
+    // When $matchIP = true
+    ALTER TABLE ci_sessions ADD PRIMARY KEY (id, ip_address);
 
-	// When sessionMatchIP = true
-	ALTER TABLE ci_sessions ADD PRIMARY KEY (id, ip_address);
+    // When $matchIP = false
+    ALTER TABLE ci_sessions ADD PRIMARY KEY (id);
 
-	// When sessionMatchIP = false
-	ALTER TABLE ci_sessions ADD PRIMARY KEY (id);
+    // To drop a previously created primary key (use when changing the setting)
+    ALTER TABLE ci_sessions DROP PRIMARY KEY;
 
-	// To drop a previously created primary key (use when changing the setting)
-	ALTER TABLE ci_sessions DROP PRIMARY KEY;
+.. important:: If you don't add the correct primary key, the following error
+    may occur::
 
-사용할 데이터베이스 그룹은 **app/Config/Session.php** 파일에 새로운 줄을 추가하여 그룹 이름을 지정할 수 있습니다.
+        Uncaught mysqli_sql_exception: Duplicate entry 'ci_session:***' for key 'ci_sessions.PRIMARY'
+
+Changing Database Group
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The default database group is used by default.
+You can change the database group to use by changing the ``$DBGroup`` property
+in the **app/Config/Session.php** file to the name of the group to use:
 
 .. literalinclude:: sessions/040.php
 
-직접 이 작업을 모두 수행하지 않으려면 cli에서 ``make:migration --session`` 명령을 사용하여 마이그레이션 파일을 생성하십시오.
+Setting Up Database Table with Command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-::
+If you'd rather not do all of this by hand, you can use the ``make:migration --session`` command
+from the cli to generate a migration file for you:
 
-  > php spark make:migration --session
-  > php spark migrate
+.. code-block:: console
 
-이 명령은 코드를 생성할 때 **savePath**\ 와 **matchIP** 설정을 고려합니다.
+  php spark make:migration --session
+  php spark migrate
+
+This command will take the ``$savePath`` and ``$matchIP`` settings into account
+when it generates the code.
 
 .. _sessions-redishandler-driver:
 
-RedisHandler 드라이버
-============================
+RedisHandler Driver
+===================
 
-.. note:: Redis의 잠금 메커니즘에 직접 접근할 수 없으므로 ,이 드라이버의 잠금은 최대 300초 동안 유지되는 별도의 값으로 에뮬레이션됩니다.
-	``v4.3.2`` 이상에서는 **TLS** 프로토콜을 사용하여 ``Redis``\ 에 연결할 수 있습니다.
+.. note:: Since Redis doesn't have a locking mechanism exposed, locks for
+    this driver are emulated by a separate value that is kept for up
+    to 300 seconds. With ``v4.3.2`` or above, you can connect ``Redis`` with **TLS** protocol.
 
-Redis는 고성능으로 인해 캐싱에 일반적으로 사용되는 스토리지 엔진으로 'RedisHandler' 세션 드라이버를 사용하는 가장 큰 이유입니다.
+Redis is a storage engine typically used for caching and popular because
+of its high performance, which is also probably your reason to use the
+'RedisHandler' session driver.
 
-단점은 관계형 데이터베이스만큼 편재적이지 않으며 시스템에 `phpredis <https://github.com/phpredis/phpredis>`_ PHP 확장이 설치되어 있어야 하며, PHP 번들로 제공되지 않는다는 것입니다.
-이미 Redis에 익숙하고 다른 목적으로 사용하는 경우 RedisHandler 드라이버를 사용하고 있을 가능성이 있습니다.
+The downside is that it is not as ubiquitous as relational databases and
+requires the `phpredis <https://github.com/phpredis/phpredis>`_ PHP
+extension to be installed on your system, and that one doesn't come
+bundled with PHP.
+Chances are, you're only be using the RedisHandler driver only if you're already
+both familiar with Redis and using it for other purposes.
 
-RedisHandler 구성
+Configure RedisHandler
 ----------------------
 
-'FileHandler'\ 와 'DatabaseHandler' 드라이버와 마찬가지로 ``$savePath`` 설정을 통해 세션의 저장 위치를 ​​구성합니다.
-'RedisHandler' 형식(format)은 약간 다르며 복잡합니다.
-*phpredis* 확장의 README 파일에 잘 설명되므로 링크해 드립니다.
+Just as with the 'FileHandler' and 'DatabaseHandler' drivers, you must also configure
+the storage location for your sessions via the
+``$savePath`` setting.
+The format here is a bit different and complicated at the same time. It is
+best explained by the *phpredis* extension's README file, so we'll simply
+link you to it:
 
-	https://github.com/phpredis/phpredis#php-session-handler
+    https://github.com/phpredis/phpredis
 
-.. important:: CodeIgniter의 세션 라이브러리는 실제 'redis'\ 의 ``session.save_handler``\ 를 사용하지 않습니다.
-	위 링크에서 **only** 경로 형식(path format)만 참고하십시오.
+.. important:::: CodeIgniter's Session library does NOT use the actual 'redis'
+    ``session.save_handler``. Take note **only** of the path format in
+    the link above.
 
-그러나 대부분의 경우, 간단한 ``host:port``\ 쌍만 있어도 충분합니다
+For the most common case however, a simple ``host:port`` pair should be
+sufficient:
 
 .. literalinclude:: sessions/041.php
 
 .. _sessions-memcachedhandler-driver:
 
-MemcachedHandler 드라이버
-=================================
+MemcachedHandler Driver
+=======================
 
-.. note:: Memcached의 잠금 메커니즘에 직접 접근할 수 없으므로, 이 드라이버의 잠금은 최대 300초 동안 유지되는 별도의 값으로 에뮬레이션됩니다.
+.. note:: Since Memcached doesn't have a locking mechanism exposed, locks
+    for this driver are emulated by a separate value that is kept for
+    up to 300 seconds.
 
-'MemcachedHandler' 드라이버는 PHP의 `Memcached <https://www.php.net/memcached>`_ 확장이 PECL과 일부 Linux를 통해 배포되기 때문에 가용성을 제외하고 모든면에서 'RedisHandler' 드라이버와 매우 유사합니다. 
-배포판은 설치하기 쉬운 패키지로 제공됩니다.
+The 'MemcachedHandler' driver is very similar to the 'RedisHandler' one in all of its
+properties, except perhaps for availability, because PHP's `Memcached
+<https://www.php.net/memcached>`_ extension is distributed via PECL and some
+Linux distributions make it available as an easy to install package.
 
-그 외에도 Redis에 대한 의도적인 편견이 없다면 Memcached에 대해 언급할 점이 별로 다르지 않습니다. 
-일반적으로 캐싱에 사용되며 속도로 유명한 인기있는 제품이기도 합니다.
+Other than that, and without any intentional bias towards Redis, there's
+not much different to be said about Memcached - it is also a popular
+product that is usually used for caching and famed for its speed.
 
-그러나 Memcached가 제공하는 유일한 보증은 Y초 후에 값 X가 만료되도록 설정하면 Y초가 지난후에 삭제된다는 것입니다 (그러나 반드시 그 시간보다 빨리 만료되지는 않습니다).
-이것은 매우 드물게 발생하지만 세션이 손실될 수 있으므로 고려해야 합니다.
+However, it is worth noting that the only guarantee given by Memcached
+is that setting value X to expire after Y seconds will result in it being
+deleted after Y seconds have passed (but not necessarily that it won't
+expire earlier than that time). This happens very rarely, but should be
+considered as it may result in loss of sessions.
 
-MemcachedHandler 구성
+Configure MemcachedHandler
 --------------------------
 
-``$savePath`` 형식(format)은 ``host:port`` 쌍으로 매우 간단합니다.
+The ``$savePath`` format is fairly straightforward here,
+being just a ``host:port`` pair:
 
 .. literalinclude:: sessions/042.php
 
-보너스 팁
---------------
+Bonus Tip
+---------
 
-콜론으로 구분된 세 번째 (``: weight``) 값으로 옵션 *weight* 매개 변수를 사용하는 다중 서버 구성도 지원되지만, 신뢰할 수 있는지 테스트하지 않았다는 점에 유의해야 합니다.
+Multi-server configuration with an optional *weight* parameter as the
+third colon-separated (``:weight``) value is also supported, but we have
+to note that we haven't tested if that is reliable.
 
-(여러 위험을 감수하고) 이 기능을 직접 시험해보고 싶다면 서버의 여러 경로를 쉼표(,)로 구분하여 작성합니다.
+If you want to experiment with this feature (on your own risk), simply
+separate the multiple server paths with commas:
 
 .. literalinclude:: sessions/043.php

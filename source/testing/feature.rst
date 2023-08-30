@@ -1,97 +1,119 @@
 ####################
-HTTP 기능 테스트
+HTTP Feature Testing
 ####################
 
-기능 테스트를 통해 어플리케이션에 대한 단일 호출 결과를 볼 수 있습니다.
-단일 웹 양식의 결과를 반환하거나 API 엔드 포인트에 도달하는 등의 결과일 수 있습니다.
-이는 단일 요청의 전체 수명주기를 테스트하여 라우팅이 작동하고, 응답이 올바른 형식이며, 결과를 분석하는 등의 작업을 수행할 수 있기 때문에 편리합니다.
+Feature testing allows you to view the results of a single call to your application. This might be returning the
+results of a single web form, hitting an API endpoint, and more. This is handy because it allows you to test the entire
+life-cycle of a single request, ensuring that the routing works, the response is the correct format, analyze the results,
+and more.
 
 .. contents::
     :local:
     :depth: 2
 
-테스트 클래스
-=================
+The Test Class
+==============
 
-기능 테스트에서는 모든 테스트 클래스가 ``CodeIgniter\Test\DatabaseTestTrait`` \과 ``CodeIgniter\Test\FeatureTestTrait`` 특성(trait)을 사용해야 합니다.
-이러한 테스트 도구는 적절한 데이터베이스 스테이징에 의존하기 때문에 자체 메서드를 구현하는 경우 항상 ``parent::setUp()``\ 과 ``parent::tearDown()``\ 이 호출되도록 해야 합니다.
+Feature testing requires that all of your test classes use the ``CodeIgniter\Test\DatabaseTestTrait``
+and ``CodeIgniter\Test\FeatureTestTrait`` traits. Since these testing tools rely on proper database
+staging you must always ensure that ``parent::setUp()`` and ``parent::tearDown()``
+are called if you implement your own methods.
 
 .. literalinclude:: feature/001.php
 
-페이지 요청
+.. _feature-requesting-a-page:
+
+Requesting a Page
 =================
 
-기본적으로 기능 테스트를 사용하면 어플리케이션에서 엔드 포인트를 호출하여 결과를 다시 가져올 수 있습니다.
-이렇게 하려면 ``call()`` 메소드를 사용하십시오. 
-첫 번째 매개 변수는 사용할 HTTP 메소드입니다.(대부분 GET 또는 POST)
-두 번째 매개 변수는 테스트할 사이트의 경로입니다.
-세 번째 매개 변수는 사용중인 HTTP 동사에 대한 수퍼 글로벌 변수를 채우는데 사용되는 배열입니다.
-따라서 **GET** 메소드는 **$_GET** 변수가 채워지고 **post** 메소드는 **$_POST** 배열이 채워집니다.
+Essentially, feature tests simply allows you to call an endpoint on your application and get the results back.
+To do this, you use the ``call()`` method.
+
+1. The first parameter is the HTTP method to use (most frequently either GET or POST).
+2. The second parameter is the URI path on your site to test.
+3. The third parameter ``$params`` accepts an array that is used to populate the
+   superglobal variables for the HTTP verb you are using. So, a method of **GET**
+   would have the **$_GET** variable populated, while a **POST** request would
+   have the **$_POST** array populated. The ``$params`` is also used in
+   :ref:`feature-formatting-the-request`.
+
+   .. note:: The ``$params`` array does not make sense for every HTTP verb, but is
+      included for consistency.
 
 .. literalinclude:: feature/002.php
 
-타이핑을 쉽고 더 명확하게 하기 위해 각 HTTP 동사에 대한 속기 방법이 있습니다.
+Shorthand Methods
+-----------------
+
+Shorthand methods for each of the HTTP verbs exist to ease typing and make things clearer:
 
 .. literalinclude:: feature/003.php
 
-.. note:: ``$params`` 배열은 모든 HTTP 동사에 대해 의미가 없지만 일관성을 위해 포함됩니다.
-
-다른 경로(route) 설정
+Setting Different Routes
 ------------------------
 
-"routes" 배열을 ``withRoutes()`` 메소드에 전달하여 사용자 지정 경로 모음을 사용할 수 있습니다.
-이것은 시스템의 기존 경로를 무시합니다
+You can use a custom collection of routes by passing an array of "routes" into the ``withRoutes()`` method. This will
+override any existing routes in the system:
 
 .. literalinclude:: feature/004.php
 
-각 "routes"는 HTTP동사 (또는 "all"), 일치할 URI,  라우팅 대상을 포함하는 3요소 배열입니다.
+Each of the "routes" is a 3 element array containing the HTTP verb (or "add" for all),
+the URI to match, and the routing destination.
 
-
-세션 값 설정
+Setting Session Values
 ----------------------
 
-단일 테스트 중에 사용할 사용자 정의 세션 값을 ``withSession()``메소드를 사용하여 설정할 수 있습니다. 
-``$_SESSION`` 변수에 존재해야 하는 값을 키/값 쌍의 배열을 사용하거나  ``null``\ 을 전달하여 현재 ``$ _SESSION``\ 을 사용할 수 있습니다.
-인증 등을 테스트할 때 편리합니다.
+You can set custom session values to use during a single test with the ``withSession()`` method. This takes an array
+of key/value pairs that should exist within the ``$_SESSION`` variable when this request is made, or ``null`` to indicate
+that the current values of ``$_SESSION`` should be used. This is handy for testing authentication and more.
 
 .. literalinclude:: feature/005.php
 
-헤더 설정
+Setting Headers
 ---------------
 
-``withHeaders()`` 메소드를 사용하여 헤더 값을 설정할 수 있으며, 호출할 때 헤더로 전달될 키/값 쌍의 배열이 필요합니다.
+You can set header values with the ``withHeaders()`` method. This takes an array of key/value pairs that would be
+passed as a header into the call:
 
 .. literalinclude:: feature/006.php
 
-이벤트 우회
+Bypassing Events
 ----------------
 
-이벤트는 어플리케이션에서 사용하기 편리하지만 테스트중에 문제가 될 수 있습니다.
-특히 이메일을 보내는데 사용되는 이벤트. 
-``skipEvents()`` 메소드로 이벤트 처리를 건너 뛰도록 시스템에 지시할 수 있습니다
+Events are handy to use in your application, but can be problematic during testing. Especially events that are used
+to send out emails. You can tell the system to skip any event handling with the ``skipEvents()`` method:
 
 .. literalinclude:: feature/007.php
 
-request 형식 설정
+.. _feature-formatting-the-request:
+
+Formatting the Request
 -----------------------
 
-``withBodyFormat()``\ 메소드를 사용하여 요청 본문의 형식을 설정할 수 있습니다. 
-현재 이 기능은 `json` 또는 `xml`\ 을 지원하며, 설정시 ``call()``, ``post()``, ``get()``\ ...로 전달되는 매개 변수를 가져 와서 주어진 형식으로 요청 본문에 할당합니다. 
-이에 따라 요청에 대한 `Content-Type` 헤더도 설정됩니다.
-이 기능은 컨트롤러가 예상하는 형식으로 요청을 설정할 수 있도록 JSON 또는 XML API를 테스트할 때 유용합니다.
+You can set the format of your request's body using the ``withBodyFormat()`` method. Currently this supports either
+``json`` or ``xml``.
+This is useful when testing JSON or XML APIs so that you can set the request in the form that the controller will expect.
+
+This will take the parameters passed into ``call()``, ``post()``, ``get()``... and assign them to the
+body of the request in the given format.
+
+This will also set the `Content-Type` header for your request accordingly.
 
 .. literalinclude:: feature/008.php
 
-본문 설정
+.. _feature-setting-the-body:
+
+Setting the Body
 ----------------
 
-``withBody()``\ 메소드로 요청의 본문을 설정할 수 있습니다. 
-이를 통해 원하는 형식으로 본문를 형식화할  수 있습니다. 
-테스트할 XML이 복잡한 경우 이 옵션을 사용하는 것이 좋습니다. 
-이렇게 해도 Content-Type 헤더는 설정되지 않으므로, 필요한 경우 ``withHeaders()``\ 메소드를 사용하여 설정합니다.
+You can set the body of your request with the ``withBody()`` method. This allows you to format the body how you want
+to format it. It is recommended that you use this if you have more complicated XMLs to test.
 
-응답 확인
-====================
+This will not set
+the `Content-Type` header for you. If you need that, you can set it with the ``withHeaders()`` method.
 
-``FeatureTestTrait::call()``\ 은 ``TestResponse`` 인스턴스를 반환합니다. 
-이 클래스를 사용하여 테스트 케이스에서 추가 어설션 및 검증을 수행하는 방법은 :doc:`Testing Responses <response>`\ 를 참조하십시오.
+Checking the Response
+=====================
+
+``FeatureTestTrait::call()`` returns an instance of a ``TestResponse``. See :doc:`Testing Responses <response>` on
+how to use this class to perform additional assertions and verification in your test cases.

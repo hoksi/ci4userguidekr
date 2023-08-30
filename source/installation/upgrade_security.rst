@@ -8,31 +8,24 @@ Upgrade Security
 Documentations
 ==============
 
-- `CodeIgniter 3.X Security Class 문서 <http://codeigniter.com/userguide3/libraries/security.html>`_
-- :doc:`CodeIgniter 4.X Security 문서 </libraries/security>`
+- `Security Class Documentation CodeIgniter 3.X <http://codeigniter.com/userguide3/libraries/security.html>`_
+- :doc:`Security Documentation CodeIgniter 4.X </libraries/security>`
 
 .. note::
-    :doc:`../helpers/form_helper`\ 를 사용하고 CSRF 필터를 전역적으로 활성화하면 :php:func:`form_open()` 함수는 자동으로 폼에 숨겨진 CSRF 필드를 삽입합니다. 따라서 직접 업그레이드할 필요가 없습니다.
+    If you use the :doc:`../helpers/form_helper` and enable the CSRF filter globally, then :php:func:`form_open()` will automatically insert a hidden CSRF field in your forms. So you do not have to upgrade this by yourself.
 
-변경된 사항
+What has been changed
 =====================
-- CSRF 토큰을 HTML 형식으로 구현하는 방법이 변경되었습니다.
+- The method to implement CSRF tokens to HTML forms has been changed.
 
 Upgrade Guide
 =============
-1. CI4에서 CSRF 보호를 활성화하려면 **app/Config/Filters.php**\ 에서 활성화해야 합니다.
+1. To enable CSRF protection in CI4 you have to enable it in **app/Config/Filters.php**:
 
-::
+   .. literalinclude:: upgrade_security/001.php
 
-    public $globals = [
-        'before' => [
-            //'honeypot',
-            'csrf',
-        ]
-    ];
-
-2. HTML 폼에서 ``<input type="hidden" name="<?= $csrf['name'] ?>" value="<?= $csrf['hash'] ?>" />``\ 와 유사한 CSRF 입력 필드를 제거해야 합니다.
-3. ``form_open()``\ 을 사용하지 않는다면 HTML 폼(form)에 ``<?= csrf_field() ?>``\ 를 추가해야 합니다.
+2. Within your HTML forms you have to remove the CSRF input field which looks similar to ``<input type="hidden" name="<?= $csrf['name'] ?>" value="<?= $csrf['hash'] ?>" />``.
+3. Now, within your HTML forms you have to add ``<?= csrf_field() ?>`` somewhere in the form body, unless you are using ``form_open()``.
 
 Code Example
 ============

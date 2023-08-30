@@ -5,24 +5,22 @@ Upgrade Emails
     :local:
     :depth: 2
 
-
 Documentations
 ==============
 
-- `CodeIgniter 3.X Email 문서 <http://codeigniter.com/userguide3/libraries/email.html>`_
-- :doc:`CodeIgniter 4.X Email 문서 </libraries/email>`
+- `Email Documentation CodeIgniter 3.X <http://codeigniter.com/userguide3/libraries/email.html>`_
+- :doc:`Email Documentation CodeIgniter 4.X </libraries/email>`
 
-
-변경된 사항
+What has been changed
 =====================
-- 메소드 이름과 라이브러리 로딩같은 작은 부분만 변경되었습니다.
+- Only small things like the method names and the loading of the library have changed.
 
 Upgrade Guide
 =============
-1. 클래스의 ``$this->load->library('email');``\ 을 ``$email = service('email');``\ 로 변경합니다.
-2. 이제 ``$this->email``\ 로 시작하는 모든 부분은 ``$email``\ 로 바꿔야 합니다.
-3. Email 클래스의 메소드 이름이 약간 다릅니다. ``send()``, ``attach()``, ``printDebugger()``, ``clear()``를 제외한 모든 메소드에는 접두사로 ``set``\ 이 있고 그 뒤에 이전 메소드가 옵니다. ``bcc()`` 메소드는 ``setBcc()``\ 입니다.
-4. **app/Config/Email.php**\ 의 설정 속성이 변경되었습니다. 새 속성 목록을 보려면 :ref:`setting-email-preferences`\ 를 살펴봐야 합니다.
+1. Within your class change the ``$this->load->library('email');`` to ``$email = service('email');``.
+2. From that on you have to replace every line starting with ``$this->email`` to ``$email``.
+3. The methods in the Email class are named slightly different. All methods, except for ``send()``, ``attach()``, ``printDebugger()`` and ``clear()`` have a ``set`` as prefix followed by the previous method name. ``bcc()`` is now ``setBcc()`` and so on.
+4. The config attributes in **app/Config/Email.php** have changed. You should have a look at the :ref:`setting-email-preferences` to have a list of the new attributes.
 
 Code Example
 ============

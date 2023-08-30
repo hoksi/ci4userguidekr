@@ -1,100 +1,110 @@
 ###############
-문제 해결
+Troubleshooting
 ###############
 
-다음은 일반적인 설치 문제와 제안된 해결 방법입니다.
+Here are some common installation problems, and suggested workarounds.
 
 .. contents::
     :local:
     :depth: 2
 
-설치후 작동하는지 어떻게 알 수 있습니까?
--------------------------------------------
+How do I know if my install is working?
+---------------------------------------
 
-프로젝트 루트에서 명령 행 실행
+From the command line, at your project root:
 
-::
+.. code-block:: console
 
-    > php spark serve
+    php spark serve
 
-브라우저의 ``http://localhost:8080``\ 을 입력하였을 때 Codeigniter4 시작 페이지를 표시해야 합니다.
+``http://localhost:8080`` in your browser should then show the default
+welcome page:
 
 |CodeIgniter4 Welcome|
 
-URL에 index.php를 포함시켜야 동작합니다
------------------------------------------
+I have to include index.php in my URL
+-------------------------------------
 
-``/mypage/find/apple``\ 과 같은 URL은 작동하지 않지만 유사한 URL ``/index.php/mypage/find/apple``\ 은 작동한다면 (Apache의 경우) **.htaccess**
-규칙이 제대로 설정되지 않았거나, Apache의 **httpd.conf**\ 에 ``mod_rewrite`` 확장이 주석 처리되었을 수 있습니다.
-:ref:`urls-remove-index-php` 참조 하세요.
+If a URL like ``/mypage/find/apple`` doesn't work, but the similar
+URL ``/index.php/mypage/find/apple`` does, that sounds like your **.htaccess** rules
+(for Apache) are not set up properly, or the ``mod_rewrite`` extension
+in Apache's **httpd.conf** is commented out.
+See :ref:`urls-remove-index-php`.
 
-
-기본 페이지만 로드됨
+Only the default page loads
 ---------------------------
 
-URL에 입력 한 내용에 관계없이 기본 페이지만 로드되는 경우 서버가 검색 엔진 친화적인 URL을 제공하는데 필요한 REQUEST_URI 변수를 지원하지 않을 수 있습니다.
-첫 번째 단계로 **app/Config/App.php** 파일을 열고 URI 프로토콜 정보를 찾으십시오.
-몇 가지 대체 설정을 시도하는 것이 좋습니다. 
-시도한 후에도 여전히 작동하지 않으면 CodeIgniter가 URL에 물음표(``?``)를 추가하도록 해야 합니다.
-이렇게 하려면 **app/Config/App.php** 파일을 열고 아래 항목을 변경하십시오
-
-이전 
+If you find that no matter what you put in your URL only your default
+page is loading, it might be that your server does not support the
+REQUEST_URI variable needed to serve search-engine friendly URLs. As a
+first step, open your **app/Config/App.php** file and look for
+the URI Protocol information. It will recommend that you try a couple of
+alternate settings. If it still doesn't work after you've tried this
+you'll need to force CodeIgniter to add a question mark (``?``) to your URLs. To
+do this open your **app/Config/App.php** file and change this:
 
 .. literalinclude:: troubleshooting/001.php
 
-이후
+To this:
 
 .. literalinclude:: troubleshooting/002.php
 
 No input file specified
 -----------------------
 
-"No input file specified"\ 이 표시되면 다음과 같이 재작성 규칙을 변경해 보십시오. (``index.php`` 다음에 ``?``\ 를 추가)
+If you see "No input file specified", try to change the rewrite rule like the following (to add ``?`` after ``index.php``):
 
 .. code-block:: apache
 
     RewriteRule ^([\s\S]*)$ index.php?/$1 [L,NC,QSA]
 
-로컬에서는 잘 동작하지만 서버에서는 작동하지 않음
+My app works fine locally but not on the production server
 ----------------------------------------------------------
 
-폴더 및 파일 이름의 대소문자가 코드와 일치하는지 확인하십시오.
+Make sure that the case of the folder and file names matches the code.
 
-많은 개발자들은 Windows 또는 macOS에서 대소문자를 구분하지 않는 파일 시스템에서 개발합니다.
-그러나 대부분의 서버 환경은 대소문자를 구분하는 파일 시스템을 사용합니다.
+Many developers develop on case-insensitive file systems on Windows or macOS.
+However, most server environments use case-sensitive file systems.
 
-예를 들어, **app/Controllers/Product.php**\ 이 있을 때, 단축 클래스 이름으로 ``Product``\ 를 사용해야 합니다. ``product``\ 가 아닙니다.
+For example, when you have **app/Controllers/Product.php**, you must use
+``Product`` as the short classname, not ``product``.
 
-파일 이름의 대소문자가 잘못되면 서버에서 파일을 찾을 수 없습니다.
+If the file name case is incorrect, the file is not found on the server.
 
-이 자습서는 모든 곳에서 404 오류를 표시합니다. :(
----------------------------------------------------
+The tutorial gives 404 errors everywhere :(
+-------------------------------------------
 
-PHP의 내장 웹 서버를 사용하여 튜토리얼을 따라 할 수 없습니다.
-PHP의 내장 웹 서버는 요청(request)을 올바르게 라우팅하는데 필요한 **.htaccess** 파일을 처리하지 않기 때문입니다.
+You can't follow the tutorial using PHP's built-in web server.
+It doesn't process the **.htaccess** file needed to route
+requests properly.
 
-해결책 : Apache를 사용하여 사이트를 작성하거나 내장된 CodeIgniter의 ``php spark serve`` 명령을 프로젝트 루트에서 실행하십시오.
+The solution: use Apache to serve your site, or else the built-in
+CodeIgniter equivalent, ``php spark serve`` from your project root.
 
 .. |CodeIgniter4 Welcome| image:: ../images/welcome.png
 
-도움이되지 않는 "Whoops!" 페이지는 무엇인가요?
-----------------------------------------------
+What's with an unhelpful "Whoops!" page?
+----------------------------------------
 
-앱에서 "Whoops!"페이지가 표시되는 것을 발견했습니다. 그런 다음 "We seem to have hit a snag. Please try again later..."라는 텍스트 줄이 나타납니다.
+You find that your app is displaying a page with "Whoops!" and
+then the text line "We seem to have hit a snag. Please try again later...".
 
-이는 보안 모드를 향상시키기 위해 프로덕션 모드에 있으며 복구할 수 없는 오류에 도달했다는 표시입니다.
+That is a sign that you are in production mode and have hit an
+unrecoverable error, which we don't want to show to the viewer of
+the webapp, for better security.
 
-로그 파일에서 오류를 볼 수 있습니다. 아래의 `CodeIgniter 오류 로그`_\ 를 참조하세요.
+You can see the error in the log file. See `CodeIgniter Error Logs`_ below.
 
-개발 중에 이 페이지를 보지 않으려면 **.env**\ 의 환경(environment)을 "development"로 변경해야 합니다. 자세한 내용은 :ref:`setting-development-mode`\ 를 참조하세요.
-그런 다음 페이지를 새로고침합니다. 오류와 역 추적(back trace)이 표시됩니다.
+If you reach this page while developing you should change your environment to
+"development" (in **.env**). See :ref:`setting-development-mode` for more details.
+After that, reload the page. You will see the error and the back trace.
 
-CodeIgniter 오류 로그
--------------------------------------------------------
+CodeIgniter Error Logs
+----------------------
 
-CodeIgniter는 `app/Config/Logger.php`\ 의 설정에 따라 오류 메시지를 기록합니다.
+CodeIgniter logs error messages, according to the settings in **app/Config/Logger.php**.
 
-오류 임계 값을 조정하여 더 많거나 적은 메시지를 볼 수 있습니다. 자세한 내용은 :ref:`Logging <logging-configuration>`\ 을 참조하십시오.
+You can adjust the error threshold to see more or fewer messages. See :ref:`Logging <logging-configuration>` for details.
 
-기본 설정에는 로그 파일이 'writable/logs'\ 로 저정되어 있습니다.
-오류가 발생한다면 이 파일을 확인하는 것이 좋습니다.
+The default configuration has daily log files stored in **writable/logs**.
+It would be a good idea to check them if things aren't working the way you expect!

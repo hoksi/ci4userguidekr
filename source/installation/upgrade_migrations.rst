@@ -1,72 +1,73 @@
-마이그레이션 업그레이드
-#######################
+Upgrade Migrations
+##################
 
 .. contents::
     :local:
     :depth: 2
 
-관련 문서
+Documentations
 ==============
 
-- `CodeIgniter 3.X 데이터베이스 마이그레이션 설명서 <http://codeigniter.com/userguide3/libraries/migration.html>`_
-- :doc:`CodeIgniter 4.X 데이터베이스 마이그레이션 설명서 </dbmgmt/migration>`
+- `Database Migrations Documentation CodeIgniter 3.X <http://codeigniter.com/userguide3/libraries/migration.html>`_
+- :doc:`Database Migrations Documentation CodeIgniter 4.X </dbmgmt/migration>`
 
-무엇이 바뀌었습니까?
+What has been changed
 =====================
 
-- 우선 순차적 마이그레이션 이름은 (``001_create_users``, ``002_create_posts``)\  더 이상 지원되지 않습니다. CodeIgniter 버전4는 타임스탬프 구성만 (``20121031100537_create_users``, ``20121031500638_create_posts``) 지원합니다. 순차적 이름을 사용한 경우에는 각 마이그레이션 파일의 이름을 변경해야 합니다.
-- 마이그레이션 테이블 구조가 변경되었습니다. CI3에서 CI4로 업그레이드하고 동일한 데이터베이스를 사용하는 경우 마이그레이션 테이블 구조와 해당 데이터를 업그레이드해야 합니다.
-- 마이그레이션 절차도 변경되었습니다. 이제 간단한 CLI 명령을 사용하여 데이터베이스를 마이그레이션할 수 있습니다.
+- First of all, the sequential naming (``001_create_users``, ``002_create_posts``) of migrations is not longer supported. Version 4 of CodeIgniter only supports the timestamp scheme (``20121031100537_create_users``, ``20121031500638_create_posts``) . If you have used sequential naming you have to rename each migration file.
+- The migration table definition was changed. If you upgrade from CI3 to CI4 and use the same database,
+  You need to upgrade the migration table definition and its data.
+- The migration procedure has been also changed. You can now migrate the database with a simple CLI command:
 
-::
+.. code-block:: console
 
-    > php spark migrate
+    php spark migrate
 
-업그레이드 가이드
-=================
+Upgrade Guide
+=============
 
-1. v3 프로젝트에서 순차적 마이그레이션 이름을 사용한다면 타임스탬프로 마이그렝션 이름을 변경해야 합니다.
-2. 모든 마이그레이션 파일을 **app/Database/Migration** 폴더로 옮겨야 합니다.
-3. 만약 ``defined('BASEPATH') OR exit('No direct script access allowed');`` 라인이 존재한다면 제거합니다.
-4. <?php 태그 바로 아래 줄에 ``namespace App\Database\Migrations;``\ 를 추가합니다.
-5. ``namespace App\Database\Migrations;`` 아래에 ``use CodeIgniter\Database\Migration;``\ 을 추가합니다.
-6. ``extends CI_Migration``\ 을 ``extends Migration``\ 으로 대체합니다.
-7. ``Forge`` 클래스 내의 메서드 이름이 camelCase를 사용하도록 변경되었습니다.
+1. If your v3 project uses sequential migration names you have to change those to timestamp names.
+2. You have to move all migration files to the new folder **app/Database/Migrations**.
+3. Remove the line ``defined('BASEPATH') OR exit('No direct script access allowed');`` if it exists.
+4. Add this line just after the opening php tag: ``namespace App\Database\Migrations;``.
+5. Below the ``namespace App\Database\Migrations;`` line add this line: ``use CodeIgniter\Database\Migration;``
+6. Replace ``extends CI_Migration`` with ``extends Migration``.
+7. The method names within the ``Forge`` class has been changed to use camelCase. For example:
 
     - ``$this->dbforge->add_field`` to ``$this->forge->addField``
     - ``$this->dbforge->add_key`` to ``$this->forge->addKey``
     - ``$this->dbforge->create_table`` to ``$this->forge->addTable``
     - ``$this->dbforge->drop_table`` to ``$this->forge->addTable``
 
-8. (선택사항) 배열 구문을 ``array(...)``\ 에서 ``[...]``\ 로 변경할 수 있습니다.
-9. 동일한 데이터베이스를 사용하는 경우 마이그레이션 테이블을 업그레이드합니다.
+8. (optional) You can change the array syntax from ``array(...)`` to ``[...]``
+9. Upgrade the migration table, if you use the same database.
 
-    - **(development)** 개발 환경의 새로운 데이터베이스에 CI4 마이그레이션을 실행하여 마이그레이션 테이블을 만듭니다.
-    - **(development)** 마이그레이션 테이블을 내보냅니다.(Export)
-    - **(production)** CI3 마이그레이션 테이블을 삭제하거나 이름을 변경합니다.
-    - **(production)** CI4 마이그레이션 테이블과 데이터를 가져옵니다.
+    - **(development)** Run the CI4 migration in the development environment or so with brand new database, to create the new migration table.
+    - **(development)** Export the migration table.
+    - **(production)** Drop (or rename) the existing CI3 migration table.
+    - **(production)** Import the new migration table and the data.
 
-코드 예
+Code Example
 ============
 
 CodeIgniter Version 3.x
 ------------------------
 
-Path: **application/migrations**
+Path: **application/migrations**:
 
 .. literalinclude:: upgrade_migrations/ci3sample/001.php
 
 CodeIgniter Version 4.x
 -----------------------
 
-Path: **app/Database/Migrations**
+Path: **app/Database/Migrations**:
 
 .. literalinclude:: upgrade_migrations/001.php
 
-검색 및 교체
+Search & Replace
 ================
 
-CI3 파일의 다음 항목을 검색 및 교체합니다.
+You can use to following table to search & replace your old CI3 files.
 
 +------------------------------+----------------------------+
 |  Search                      | Replace                    |

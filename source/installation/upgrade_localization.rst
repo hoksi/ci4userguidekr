@@ -8,28 +8,28 @@ Upgrade Localization
 Documentations
 ==============
 
-- `CodeIgniter 3.X Language 문서 <http://codeigniter.com/userguide3/libraries/language.html>`_
-- :doc:`CodeIgniter 4.X Localization 문서 </outgoing/localization>`
+- `Language Documentation CodeIgniter 3.X <http://codeigniter.com/userguide3/libraries/language.html>`_
+- :doc:`Localization Documentation CodeIgniter 4.X </outgoing/localization>`
 
-변경된 사항
+What has been changed
 =====================
-- CI4에서 언어 파일은 언어 라인을 배열로 반환합니다.
+- In CI4 the language files return the language lines as array.
 
 Upgrade Guide
 =============
-1.**Config/App.php**\ 에서 기본 언어를 지정합니다.
+1. Specify the default language in **Config/App.php**:
 
    .. literalinclude:: upgrade_localization/001.php
 
-2. 언어 파일을 **app/Language/<locale>/**\ 로 옮깁니다.
-3. 그런 다음 언어 파일의 구문을 변경해야 합니다. 아래 코드 예제에서 언어 배열 구조를 확인할 수 있습니다.
-4. 모든 파일의 ``$this->lang->load($file, $lang);``\ 를 제거합니다.
-5. ``$this->lang->line('error_email_missing')`` 라인을  ``echo lang('Errors.errorEmailMissing');``\ 로 교체합니다.
+2. Now move your language files to **app/Language/<locale>**.
+3. After that you have to change the syntax within the language files. Below in the Code Example you will see how the language array within the file should look like.
+4. Remove from every file the language loader ``$this->lang->load($file, $lang);``.
+5. Replace the method to load the language line ``$this->lang->line('error_email_missing')`` with ``echo lang('Errors.errorEmailMissing');``.
 
 Code Example
 ============
 
-CodeignIter Version 3.x
+CodeIgniter Version 3.x
 ------------------------
 
 .. literalinclude:: upgrade_localization/ci3sample/002.php

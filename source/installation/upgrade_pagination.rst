@@ -8,26 +8,25 @@ Upgrade Pagination
 Documentations
 ==============
 
-- `CodeIgniter 3.X Pagination Class 문서 <http://codeigniter.com/userguide3/libraries/pagination.html>`_
-- :doc:`CodeIgniter 4.X Pagination 문서 </libraries/pagination>`
+- `Pagination Class Documentation CodeIgniter 3.X <http://codeigniter.com/userguide3/libraries/pagination.html>`_
+- :doc:`Pagination Documentation CodeIgniter 4.X </libraries/pagination>`
 
-변경된 사항
+What has been changed
 =====================
-- 새로운 페이징 라이브러리를 사용하려면 뷰와 컨트롤러를 변경해야 합니다.
-- 페이징 링크를 사용자 지정하려면 뷰(view) 템플릿을 만들어야 합니다.
-- CI4에서 페이징은 실제 페이지 번호만 사용합니다. CI3의 기본값인 항목에는 시작 인덱스(오프셋)를 사용할 수 없습니다.
-- :doc:`CodeIgnite\\Model </models/model>`\ 을 사용하면 Model 클래스에 내장된 페이징 메소드를 사용할 수 있습니다.
+- You have to change the views and also the controller in order to use the new pagination library.
+- If you want to customize the pagination links, you need to create View Templates.
+- In CI4 the pagination uses the actual page number only. You can't use the starting index (offset) for the items which is the default in CI3.
+- If you use :doc:`CodeIgnite\\Model </models/model>`, you can use the built-in method in the Model class.
 
 Upgrade Guide
 =============
-1. 뷰에서 다음과 같이 변경합니다.
+1. Within the views change to following:
 
-    - ``<?php echo $this->pagination->create_links(); ?>``\ 을 ``<?= $pager->links() ?>``\ 로
+    - ``<?php echo $this->pagination->create_links(); ?>`` to ``<?= $pager->links() ?>``
 
-2. 컨트롤러에서 다음과 같이 변경합니다.
+2. Within the controller you have to make the following changes:
 
-    - 모든 모델에서 내장된 ``paginate()`` 메소드를 사용할 수 있습니다. 특정 모델에 페이징을 설정하려면 아래 예제를 살펴보십시오.
-
+    - You can use the built-in ``paginate()`` method on every Model. Have a look at the code example below to see how you setup the pagination on a specific model.
 
 Code Example
 ============

@@ -1,18 +1,19 @@
-##############################
-이전 버전과의 호환성 참고 사항
-##############################
+############################
+Backward Compatibility Notes
+############################
 
-우리는 가능한 한 이전 버전과 호환되는(BC) 제품을 개발하려고 노력합니다.
+We try to develop our products to be as backward compatible (BC) as possible.
 
-주요 릴리스(예: 4.0, 5.0 등)는 이전 버전과의 호환성을 깨도록 허용합니다.
-부 릴리스(예: 4.2, 4.3 등)는 새로운 기능을 도입할 수 있지만, 기존 API를 중단하지 않고 호환 가능합니다.
+Only major releases (such as 4.0, 5.0 etc.) are allowed to break backward compatibility.
+Minor releases (such as 4.2, 4.3 etc.) may introduce new features, but must do so without breaking the existing API.
 
-그러나 모든 코드가 완성되지 않은 상태이며, 버그 수정으로 인해 부 릴리스 또는 패치 릴리스(예: 4.2.5)에서 호환성이 손상될 수 있습니다. 이 경우 모든 주요 변경 사항은 :doc:`../changelogs/index`\ 에 설명합니다.
+However, the code is not mature and bug fixes may break compatibility in minor releases, or even in patch releases (such as 4.2.5). In that case, all the breaking changes are described in the :doc:`../changelogs/index`.
 
-************************
-주요 변경 사항이 아닌 것
-************************
+*****************************
+What are not Breaking Changes
+*****************************
 
-- 사용이 중지된 Config 항목은 역호환성(BC) 지원 대상이 아닙니다. 다음 **마이너(minor)** 버전에서 제거될 수 있습니다.
-- **system/Language/en/**\ 에 정의된 시스템 메시지는 엄격하게 내부 프레임워크 사용을 위한 것이며, 이전 버전과의 호환성(BC)에 포함되지 않습니다. 개발자가 언어 문자열 출력을 함수 호출(``lang('...')``)에 의존하는 경우 이에 대해 확인해야 합니다.
-- `명명된 인수 <https://www.php.net/manual/en/functions.arguments.php#functions.named-arguments>`_\ 는 이전 버전과의 호환성(BC) 약속에 포함되지 않습니다. 코드베이스를 개선하기 위해 필요할 때 메서드/함수 매개변수 이름을 변경할 수 있습니다.
+- The deprecated Config items are not covered by backwards compatibility (BC) promise. It may be removed in the next
+  **minor** version or later.
+- System messages defined in **system/Language/en/** are strictly for internal framework use and are not covered by backwards compatibility (BC) promise. If developers are relying on language string output they should be checking it against the function call (``lang('...')``), not the content.
+- `Named arguments <https://www.php.net/manual/en/functions.arguments.php#functions.named-arguments>`_ are not covered by backwards compatibility (BC) promise. We may choose to rename method/function parameter names when necessary in order to improve the  codebase.

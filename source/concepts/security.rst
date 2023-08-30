@@ -1,209 +1,232 @@
 ###################
-보안 지침
+Security Guidelines
 ###################
 
-우리는 보안을 중요하게 생각합니다.
-CodeIgniter에는 올바른 보안 관행을 적용하거나 사용자가 쉽게 수행할 수 있도록 다양한 기능과 기술이 통합되어 있습니다.
+We take security seriously.
+CodeIgniter incorporates a number of features and techniques to either enforce
+good security practices, or to enable you to do so easily.
 
-우리는 `Open Web Application Security Project (OWASP) <https://owasp.org>`_\ 를 존중하며, 가능한 한 그들의 권고를 따릅니다.
+We respect the `Open Web Application Security Project (OWASP) <https://owasp.org>`_
+and follow their recommendations as much as possible.
 
-다음은 `OWASP Top Ten Cheat Sheet <https://www.owasp.org/www-project-top-ten/>`_\ 에서 발췌한 것으로 웹 어플리케이션의 주요 취약점입니다.
-각 항목에 대해 간략한 설명, OWASP 권장 사항과 문제를 해결하기 위한 CodeIgniter 규정을 제공합니다.
+The following comes from
+`OWASP Top Ten Cheat Sheet <https://owasp.org/www-project-top-ten/>`_,
+identifying the top vulnerabilities for web applications.
+For each, we provide a brief description, the OWASP recommendations, and then
+the CodeIgniter provisions to address the problem.
 
 .. contents::
     :local:
     :depth: 1
 
-*******************
-A1 주입(Injection)
-*******************
+************
+A1 Injection
+************
 
-주입(Injection)은 클라이언트에서 애플리케이션으로 입력 데이터를 통해 부분 또는 전체 데이터를 부적절하게 삽입하는 것입니다. 
-공격 벡터에는 SQL, XML, ORM, code와 버퍼 오버플로우가 포함됩니다.
+An injection is the inappropriate insertion of partial or complete data via
+the input data from the client to the application. Attack vectors include SQL,
+XML, ORM, code & buffer overflows.
 
-OWASP 추천 사항
+OWASP recommendations
 =====================
 
-- 프레젠테이션: 올바른 콘텐츠 유형, 문자 집합과 로케일을 설정합니다.
-- 제출: 필드를 확인하고 피드백을 제공합니다.
-- 컨트롤러: 입력을 정리합니다. 올바른 문자 집합을 사용하여 입력 유효성을 검사합니다.
-- 모델: 매개 변수화된 쿼리사용
+- Presentation: set correct content type, character set & locale
+- Submission: validate fields and provide feedback
+- Controller: sanitize input; positive input validation using correct character set
+- Model: parameterized queries
 
-CodeIgniter 규약
-=====================
+CodeIgniter provisions
+======================
 
-- :doc:`HTTP 라이브러리 <../incoming/incomingrequest>`\ 는 입력 필드 필터링 및 컨텐츠 메타데이터를 제공합니다.
-- 유효성 검사(Validation) 라이브러리 제공
+- :ref:`invalidchars` filter
+- :doc:`../libraries/validation` library
+- :doc:`HTTP library <../incoming/incomingrequest>` provides for :ref:`input field filtering <incomingrequest-filtering-input-data>` & content metadata
 
 *********************************************
-A2 약한(Weak) 인증과 세션 관리
+A2 Weak authentication and session management
 *********************************************
 
-인증이 잘못되거나 세션 관리가 잘못되면 사용자에게 부여된 권한보다 더 많은 권한을 부여될 수 있습니다.
+Inadequate authentication or improper session management can lead to a user
+getting more privileges than they are entitled to.
 
-OWASP 추천 사항
+OWASP recommendations
 =====================
 
-- 프레젠테이션: 인증 및 역할을 확인하고 CSRF 토큰을 양식과 함께 보냅니다.
-- 설계: 내장 세션 관리만 사용합니다.
-- 컨트롤러: 사용자, 역할(role), CSRF 토큰을 확인합니다.
-- 모델: 역할(role)을 확인합니다.
-- 팁: 요청(request) 관리자의 사용을 고려합니다.
+- Presentation: validate authentication & role; send CSRF token with forms
+- Design: only use built-in session management
+- Controller: validate user, role, CSRF token
+- Model: validate role
+- Tip: consider the use of a request governor
 
-CodeIgniter 규약
-=====================
+CodeIgniter provisions
+======================
 
-- :doc:`세션 <../libraries/sessions>` 라이브러리
-- CSRF 유효성 검사를 제공하는 :doc:`Security </libraries/security>`
-- 타사(third party ) 인증을 쉽게 추가할 수 있습니다.
+- :doc:`Session <../libraries/sessions>` library
+- :doc:`Security </libraries/security>` library provides for CSRF validation
+- An official authentication and authorization framework :ref:`CodeIgniter Shield <shield>`
+- Easy to add third party authentication
 
 *****************************
 A3 Cross Site Scripting (XSS)
 *****************************
 
-입력 유효성 검사 부족으로 악의적인 사용자에 의해 다른 사용자가 웹 사이트를 볼 때 악의적일 수 있는 콘텐츠를 추가할 수 있습니다.
+Insufficient input validation where one user can add content to a web site
+that can be malicious when viewed by other users to the web site.
 
-OWASP 추천 사항
+OWASP recommendations
 =====================
 
-- 프레젠테이션: 출력은 출력 컨텍스트에 따라 모든 사용자 데이터를 인코딩하고, 입력 제약 조건을 설정합니다.
-- 컨트롤러: 긍적적인(positive) 입력 유효성 검사
-- 팁: 신뢰할 수 있는 데이터만 처리하고 DB에 인코딩된 HTML을 저장하지 않습니다.
+- Presentation: output encode all user data as per output context; set input constraints
+- Controller: positive input validation
+- Tips: only process trustworthy data; do not store data HTML encoded in DB
 
-CodeIgniter 규약
+CodeIgniter provisions
+======================
+
+- :php:func:`esc()` function
+- :doc:`../libraries/validation` library
+- Support for :ref:`content-security-policy`
+
+***********************************
+A4 Insecure Direct Object Reference
+***********************************
+
+Insecure Direct Object References occur when an application provides direct
+access to objects based on user-supplied input. As a result of this vulnerability
+attackers can bypass authorization and access resources in the system directly,
+for example database records or files.
+
+OWASP recommendations
 =====================
 
-- esc 헬퍼 함수
-- 유효성 검사(Validation) 라이브러리 제공
+- Presentation: don't expose internal data; use random reference maps
+- Controller: obtain data from trusted sources or random reference maps
+- Model: validate user roles before updating data
 
-*****************************************************************
-A4 안전하지 않은 직접 객체 참조(Insecure Direct Object Reference)
-*****************************************************************
+CodeIgniter provisions
+======================
 
-안전하지 않은 직접 개체(Insecure Direct Object) 참조는 어플리케이션이 사용자가 제공한 입력에 따라 개체에 직접 액세스할 때 발생합니다. 
-이 취약점으로 인해 공격자는 권한 부여를 무시하고 시스템의 리소스(예: 데이터베이스 레코드 또는 파일)에 직접 액세스할 수 있습니다.
+- :doc:`../libraries/validation` library
+- An official authentication and authorization framework :ref:`CodeIgniter Shield <shield>`
+- Easy to add third party authentication
 
-OWASP 추천 사항
+****************************
+A5 Security Misconfiguration
+****************************
+
+Improper configuration of an application architecture can lead to mistakes
+that might compromise the security of the whole architecture.
+
+OWASP recommendations
 =====================
 
-- 프리젠테이션: 내부 데이터를 노출하지 않고, 무작위 참조 맵을 사용합니다.
-- 컨트롤러: 신뢰할 수 있는 출처 또는 무작위 참조 맵에서 데이터를 가져옵니다.
-- 모델: 데이터를 업데이트하기 전에 사용자 역할(role)을 확인합니다.
+- Presentation: harden web and application servers; use HTTP strict transport security
+- Controller: harden web and application servers; protect your XML stack
+- Model: harden database servers
 
-CodeIgniter 규약
+CodeIgniter provisions
+======================
+
+- Sanity checks during bootstrap
+
+**************************
+A6 Sensitive Data Exposure
+**************************
+
+Sensitive data must be protected when it is transmitted through the network.
+Such data can include user credentials and credit cards. As a rule of thumb,
+if data must be protected when it is stored, it must be protected also during
+transmission.
+
+OWASP recommendations
 =====================
 
-- 유효성 검사(Validation) 라이브러리 제공
-- 타사(third party ) 인증을 쉽게 추가할 수 있습니다.
+- Presentation: use TLS1.2; use strong ciphers and hashes; do not send keys or hashes to browser
+- Controller: use strong ciphers and hashes
+- Model: mandate strong encrypted communications with servers
+
+CodeIgniter provisions
+======================
+
+- The config for global secure access (``Config\App::$forceGlobalSecureRequests``)
+- :php:func:`force_https()` function
+- :doc:`../libraries/encryption`
+- The :ref:`database config <database-config-explanation-of-values>` (``encrypt``)
 
 ****************************************
-A5 보안 구성(Security Misconfiguration)
+A7 Missing Function Level Access Control
 ****************************************
 
-어플리케이션 아키텍처를 잘못 구성하면 전체 아키텍처의 보안을 손상시킬 수 있는 오류가 발생할 수 있습니다.
+Sensitive data must be protected when it is transmitted through the network.
+Such data can include user credentials and credit cards. As a rule of thumb,
+if data must be protected when it is stored, it must be protected also during
+transmission.
 
-OWASP 추천 사항
+OWASP recommendations
 =====================
 
-- 프레젠테이션: 웹 및 애플리케이션 서버를 강화하고 엄격한 전송 보안 HTTP를 사용합니다.
-- 컨트롤러: 웹 및 어플리케이션 서버를 강화하고 XML 스택을 보호합니다.
-- 모델: 데이터베이스 서버를 강화합니다.
+- Presentation: ensure that non-web data is outside the web root; validate users and roles; send CSRF tokens
+- Controller: validate users and roles; validate CSRF tokens
+- Model: validate roles
 
-CodeIgniter 규약
+CodeIgniter provisions
+======================
+
+- :ref:`Public <application-structure-public>` folder, with application and system outside
+- :doc:`Security </libraries/security>` library provides for :ref:`CSRF validation <cross-site-request-forgery>`
+
+************************************
+A8 Cross Site Request Forgery (CSRF)
+************************************
+
+CSRF is an attack that forces an end user to execute unwanted actions on a web
+application in which he/she is currently authenticated.
+
+OWASP recommendations
 =====================
 
-- 부트스트랩 중에 무결성을 검사합니다.
+- Presentation: validate users and roles; send CSRF tokens
+- Controller: validate users and roles; validate CSRF tokens
+- Model: validate roles
 
-***********************************************
-A6 중요한 데이터 노출(Sensitive Data Exposure)
-***********************************************
+CodeIgniter provisions
+======================
 
-민감한 데이터는 네트워크를 통해 전송될 때 보호되어야 합니다.
-이러한 데이터에는 사용자 자격 증명 및 신용 카드 정보가 포함될 수 있습니다. 
-일반적으로 데이터를 저장할 때 데이터를 보호해야 한다면 전송 중에도 보호해야 합니다.
+- :doc:`Security </libraries/security>` library provides for :ref:`CSRF validation <cross-site-request-forgery>`
 
-OWASP 추천 사항
+**********************************************
+A9 Using Components with Known Vulnerabilities
+**********************************************
+
+Many applications have known vulnerabilities and known attack strategies that
+can be exploited in order to gain remote control or to exploit data.
+
+OWASP recommendations
 =====================
 
-- 프레젠테이션: TLS1.2 사용, 강력한 암호 및 해시 사용, 브라우저에 키 또는 해시를 보내지 않습니다.
-- 컨트롤러: 강력한 암호와 해시를 사용합니다.
-- 모델: 서버와의 강력한 암호화된 통신을 요구합니다.
+- Don't use any of these
 
-CodeIgniter 규약
+CodeIgniter provisions
+======================
+
+- Third party libraries incorporated must be vetted
+
+**************************************
+A10 Unvalidated Redirects and Forwards
+**************************************
+
+Faulty business logic or injected actionable code could redirect the user
+inappropriately.
+
+OWASP recommendations
 =====================
 
-- 세션 키가 암호화되어 저장됩니다.
+- Presentation: don't use URL redirection; use random indirect references
+- Controller: don't use URL redirection; use random indirect references
+- Model: validate roles
 
-**********************************************************************
-A7 누락된 기능 레벨 액세스 제어(Missing Function Level Access Control)
-**********************************************************************
+CodeIgniter provisions
+======================
 
-민감한 데이터는 네트워크를 통해 전송될 때 보호되어야 합니다.
-이러한 데이터에는 사용자 자격 증명 및 신용 카드 정보가 포함될 수 있습니다. 
-일반적으로 데이터를 저장할 때 데이터를 보호해야 한다면 전송 중에도 보호해야 합니다.
-
-OWASP 추천 사항
-=====================
-
-- 프레젠테이션: 웹 이외의 데이터가 웹 루트 외부에 있는지 확인합니다. 사용자와 역할을 검증하고, CSRF 토큰을 보냅니다.
-- 컨트롤러: 사용자와 역할을 확인하고 CSRF 토큰을 확인합니다.
-- 모델: 역할을 확인합니다.
-
-CodeIgniter 규약
-=====================
-
-- 공용 폴더제공, 어플리케이션 및 시스템이 웹 루트 외부에 있습니다.
-- CSRF 유효성 검사를 제공하는 :doc:`Security </libraries/security>`
-
-*********************************************************
-A8 사이트간 요청 위조(Cross Site Request Forgery (CSRF))
-*********************************************************
-
-CSRF는 최종 사용자가 현재 인증된 웹 어필리케이션에서 원하지 않는 작업을 실행하도록 강제하는 공격입니다.
-
-OWASP 추천 사항
-=====================
-
-- 프레젠테이션: 사용자와 역할을 확인하고 CSRF 토큰을 보냅니다.
-- 컨트롤러: 사용자와 역할과 CSRF 토큰을 확인합니다.
-- 모델: 역할을 확인합니다.
-
-CodeIgniter 규약
-=====================
-
-- CSRF 유효성 검사를 제공하는 :doc:`Security </libraries/security>`
-
-************************************************************************************
-A9 알려진 취약성이 있는 구성 요소 사용(Using Components with Known Vulnerabilities)
-************************************************************************************
-
-많은 어플리케이션에서 원격 제어 또는 데이터 이용을 위해 이용할 수 있는 취약성과 알려진 공격 전략을 알고 있습니다.
-
-OWASP 추천 사항
-=====================
-
-- 이것들 중 어느 것도 사용하지 마세요.
-
-CodeIgniter 규약
-=====================
-
-- 통합된 타사 라이브러리를 검사해야 합니다.
-
-**********************************************************************
-A10 유효하지 않은 리디렉션 및 전달(Unvalidated Redirects and Forwards)
-**********************************************************************
-
-잘못된 비즈니스 로직이나 주입된 실행 가능한 코드가 사용자를 부적절하게 리디렉션할 수 있습니다.
-
-OWASP 추천 사항
-=====================
-
-- 프레젠테이션: URL 리디렉션은 사용하지 않고, 무작위 간접 참조를 사용합니다.
-- 컨트롤러: URL 리디렉션은 사용하지 않고, 무작위 간접 참조를 사용합니다.
-- 모델: 역할을 확인합니다.
-
-CodeIgniter 규약
-=====================
-
-- :doc:`HTTP 라이브러리 <../incoming/incomingrequest>` 제공
-- :doc:`세션 <../libraries/sessions>`\ 가 제공하는 flashdata 사용
+- :doc:`HTTP library <../incoming/incomingrequest>` provides for ...
+- :doc:`Session <../libraries/sessions>` library provides :ref:`sessions-flashdata`

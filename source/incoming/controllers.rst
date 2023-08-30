@@ -1,111 +1,127 @@
-####################
-컨트롤러(Controller)
-####################
+###########
+Controllers
+###########
 
-컨트롤러는 HTTP 요청 처리 방법을 결정하며, 어플리케이션의 핵심입니다.
+Controllers are the heart of your application, as they determine how HTTP requests should be handled.
 
 .. contents::
     :local:
     :depth: 2
 
+What is a Controller?
+*********************
 
-컨트롤러란 무엇입니까?
-***********************
+A Controller is simply a class file that handles a HTTP request. :doc:`URI Routing <routing>` associates a URI with a controller.
 
-컨트롤러는 HTTP 요청을 처리하는 간단한 클래스 파일입니다. :doc:`URI Routing <routing>`\ 은 URI를 컨트롤러와 연결합니다.
-
-생성하는 모든 컨트롤러는 ``BaseController`` 클래스를 확장해야 합니다.
-이 클래스는 모든 컨트롤러에서 사용할 수 있는 몇 가지 기능을 제공합니다.
+Every controller you create should extend ``BaseController`` class.
+This class provides several features that are available to all of your controllers.
 
 .. _controller-constructor:
 
-생성자(Constructor)
-*******************
+Constructor
+***********
 
-CodeIgniter의 컨트롤러에는 특별한 생성자 ``initController()``\ 가 있습니다.
-PHP의 생성자 ``__construct()`` 실행 후 프레임워크에 의해 호출됩니다.
+The CodeIgniter's Controller has a special constructor ``initController()``.
+It will be called by the framework after PHP's constructor ``__construct()`` execution.
 
-``initController()``\ 를 재정의할 때 ``parent::initController($request, $response, $logger);``\ 를 추가하는 것을 잊지 마십시오.
+If you want to override the ``initController()``, don't forget to add ``parent::initController($request, $response, $logger);`` in the method:
 
 .. literalinclude:: controllers/023.php
 
-.. important:: 생성자에서 ``return``을 사용할 수 없습니다. 따라서 ``return redirect()->to('route');``\ 는 작동하지 않습니다.
+.. important:: You cannot use ``return`` in the constructor. So ``return redirect()->to('route');`` does not work.
 
-``initController()`` 메소드는 다음 세 가지 속성을 설정합니다.
+The ``initController()`` method sets the following three properties.
 
-
-포함된 속성
+Included Properties
 *******************
 
-CodeIgniter의 컨트롤러는 다음 3가지 속성을 제공합니다.
+The CodeIgniter's Controller provides these properties.
 
 Request Object
 ==============
 
-애플리케이션의 기본 :doc:`Request Instance </incoming/incomingrequest>`\ 는 클래스 속성 ``$this->request``\ 로 사용할 수 있습니다.
+The application's main :doc:`Request Instance </incoming/incomingrequest>` is always available
+as a class property, ``$this->request``.
 
 Response Object
 ===============
 
-애플리케이션의 기본 :doc:`Response Instance </outgoing/response>`\ 는 클래스 속성 ``$this->response``\ 로 사용할 수 있습니다.
+The application's main :doc:`Response Instance </outgoing/response>` is always available
+as a class property, ``$this->response``.
 
 Logger Object
 =============
 
-:doc:`Logger <../general/logging>` 클래스의 인스턴스는 클래스 속성 ``$this->logger``\ 로 사용할 수 있습니다.
+An instance of the :doc:`Logger <../general/logging>` class is available as a class property,
+``$this->logger``.
 
 .. _controllers-helpers:
 
-헬퍼
+Helpers
 =======
 
-헬퍼 파일 배열을 클래스 속성으로 정의할 수 있습니다.
-컨트롤러가 로드될 때마다 속성으로 정의된 헬퍼 파일이 자동으로 메모리에 로드되어 컨트롤러 내 어디서나 해당 메소드를 사용할 수 있습니다.
+You can define an array of helper files as a class property. Whenever the controller is loaded
+these helper files will be automatically loaded into memory so that you can use their methods anywhere
+inside the controller:
 
 .. literalinclude:: controllers/001.php
-
-.. _controllers-validating-data:
 
 forceHTTPS
 **********
 
-모든 컨트롤러에서 HTTPS를 통해 메서드에 강제로 액세스하도록 하는 편리한 메소드를 사용할 수 있습니다.
+A convenience method for forcing a method to be accessed via HTTPS is available within all
+controllers:
 
 .. literalinclude:: controllers/002.php
 
-이 메소드는 기본적으로 **HTTP Strict Transport Security** 헤더를 지원하는 최신 브라우저에서 1년 동안 HTTP 호출을 HTTPS 호출로 변환하도록 합니다.
-첫 번째 매개변수로 기간(초)을 전달하여 수정할 수 있습니다.
+By default, and in modern browsers that support the HTTP Strict Transport Security header, this
+call should force the browser to convert non-HTTPS calls to HTTPS calls for one year. You can
+modify this by passing the duration (in seconds) as the first parameter:
 
 .. literalinclude:: controllers/003.php
 
-.. note:: :doc:`time-based constants </general/common_functions>`\ 에서 정의된 ``YEAR``, ``MONTH`` 등을 사용할 수 있습니다.
+.. note:: A number of :doc:`time-based constants </general/common_functions>` are always available for you to use, including ``YEAR``, ``MONTH``, and more.
+
+.. _controllers-validating-data:
+
+Validating Data
+***************
 
 .. _controller-validate:
-
-데이터 검증
-***************
 
 $this->validate()
 =================
 
-컨트롤러는 데이터 검사를 단순화하기 위해 ``validate()`` 메소드도 제공합니다.
-이 메소드는 첫 번째 매개변수에 검증 규칙 배열과 옵션으로 유효하지 않은 항목에 대해 표시할 사용자 지정 오류 메시지 배열을 두 번째 매개변수로 허용합니다.
-검증은 내부적으로 컨트롤러의 ``$this->request`` 인스턴스를 사용하여 검증할 데이터를 가져옵니다.
+To simplify data checking, the controller also provides the convenience method ``validate()``.
+The method accepts an array of rules in the first parameter,
+and in the optional second parameter, an array of custom error messages to display
+if the items are not valid. Internally, this uses the controller's
+``$this->request`` instance to get the data to be validated.
 
-.. warning::
-    ``validate()`` 메소드는 :ref:`Validation::withRequest() <validation-withrequest>` 메소드를 사용합니다.
-    :ref:`$request->getJSON() <incomingrequest-getting-json-data>`, :ref:`$request->getRawInput() <incomingrequest-retrieving-raw-data>`, :ref:`$request->getVar() <incomingrequest-getting-data>`\ 에서 데이터를 검증합니다.
-    사용되는 데이터는 요청에 따라 다릅니다. 공격자는 자유롭게 서버에 요청을 보낼 수 있다는걸 기억하십시오.
-
-:doc:`Validation Library </libraries/validation>` 문서에는 검증 규칙 및 메시지 배열 형식과 사용 가능한 규칙에 대한 세부 정보가 있습니다.
+The :doc:`Validation Library docs </libraries/validation>` have details on
+rule and message array formats, as well as available rules:
 
 .. literalinclude:: controllers/004.php
 
-구성 파일에 규칙을 유지하는 것이 더 간단하다고 생각된다면 ``$rules`` 배열을 **app/Config\Validation.php**\ 에 정의된 그룹 이름으로 바꿀 수 있습니다.
+.. warning:: When you use the ``validate()`` method, you should use the
+    :ref:`getValidated() <validation-getting-validated-data>` method to get the
+    validated data. Because the ``validate()`` method uses the
+    :ref:`Validation::withRequest() <validation-withrequest>` method internally,
+    and it validates data from
+    :ref:`$request->getJSON() <incomingrequest-getting-json-data>`
+    or :ref:`$request->getRawInput() <incomingrequest-retrieving-raw-data>`
+    or :ref:`$request->getVar() <incomingrequest-getting-data>`, and an attacker
+    could change what data is validated.
+
+.. note:: The :ref:`$this->validator->getValidated() <validation-getting-validated-data>`
+    method can be used since v4.4.0.
+
+If you find it simpler to keep the rules in the configuration file, you can replace
+the ``$rules`` array with the name of the group as defined in **app/Config/Validation.php**:
 
 .. literalinclude:: controllers/005.php
 
-.. note:: 유효성 검사는 모델에서 자동으로 처리될 수도 있지만 때로는 컨트롤러에서 수행하는 것이 더 쉽습니다. 선택은 당신에게 달려 있습니다.
+.. note:: Validation can also be handled automatically in the model, but sometimes it's easier to do it in the controller. Where is up to you.
 
 .. _controller-validatedata:
 
@@ -114,411 +130,481 @@ $this->validateData()
 
 .. versionadded:: 4.2.0
 
-``$this->validateData()`` 메소드를 사용하면 컨트롤러의 메소드 매개변수와 기타 사용자 정의 데이터를 확인할 수 있습니다.
-이 메소드는 유효성을 검사할 데이터 배열을 첫 번째 매개변수로 허용합니다.
+Sometimes you may want to check the controller method parameters or other custom data.
+In that case, you can use the ``$this->validateData()`` method.
+The method accepts an array of data to validate in the first parameter:
 
 .. literalinclude:: controllers/006.php
 
-메소드 보호
-*************
+Protecting Methods
+******************
 
-특정 메서드를 공개하지 않고 숨기고 싶은 메소드는 ``private`` 또는 ``protected``로 선언합니다.
-그러면 URL 요청에 의해 접근하는 것을 방지할 수 있습니다. 
-예를 들어 ``Helloworld`` 컨트롤러에 대해 다음과 같이 메소드를 정의하면
+In some cases, you may want certain methods hidden from public access.
+To achieve this, simply declare the method as ``private`` or ``protected``.
+That will prevent it from being served by a URL request.
+
+For example, if you were to define a method like this for the ``Helloworld`` controller:
 
 .. literalinclude:: controllers/007.php
 
-메소드에 대한 경로(``helloworld/utility``)를 정의합니다. 다음 URL을 사용하여 액세스하려고 하면 작동하지 않습니다.
-
-::
+and to define a route (``helloworld/utitilty``) for the method. Then trying to access it using the following URL will not work::
 
     example.com/index.php/helloworld/utility
 
-자동 라우팅(Auto-routing)도 작동하지 않습니다.
+Auto-routing also will not work.
 
 .. _controller-auto-routing-improved:
 
-Auto Routing (개선)
+Auto Routing (Improved)
 ************************
 
 .. versionadded:: 4.2.0
 
-v4.2.0부터 더 안전한 새로운 자동 라우팅이 도입되었습니다.
+Since v4.2.0, the new more secure Auto Routing has been introduced.
 
-.. note:: CodeIgniter 3에서 4.1.x까지 기본적으로 활성화된 Auto Routing에 익숙하다면 :ref:`ChangeLog v4.2.0 <v420-new-improved-auto-routing>`\ 에서 차이점을 확인할 수 있습니다.
+.. note:: If you are familiar with Auto Routing, which was enabled by default
+    from CodeIgniter 3 through 4.1.x, you can see the differences in
+    :ref:`ChangeLog v4.2.0 <v420-new-improved-auto-routing>`.
 
-이 섹션에서는 새로운 자동 라우팅의 기능에 대해 설명합니다.
-HTTP 요청을 자동으로 라우팅하고 경로 정의 없이 해당 컨트롤러 메서드를 실행합니다.
+This section describes the functionality of the new auto-routing.
+It automatically routes an HTTP request, and executes the corresponding controller method
+without route definitions.
 
-v4.2.0부터 자동 라우팅은 기본적으로 비활성화되어 있습니다. 
-활성화하려면 :ref:`enabled-auto-routing-improved`\ 를 참조하십시오.
+Since v4.2.0, the auto-routing is disabled by default. To use it, see :ref:`enabled-auto-routing-improved`.
 
-다음 URI를 고려하십시오.
-
-::
+Consider this URI::
 
     example.com/index.php/helloworld/
 
-위의 예에서 CodeIgniter는 자동 라우팅(Auto Routing)이 활성화되었을 때 ``App\Controllers\Helloworld``\ 라는 이름의 컨트롤러를 찾아 로드하려고 시도합니다.
+In the above example, CodeIgniter would attempt to find a controller named ``App\Controllers\Helloworld`` and load it, when auto-routing is enabled.
 
-.. note:: 컨트롤러의 짧은 이름이 URI의 첫 번째 세그먼트와 일치하면 로드됩니다.
+.. note:: When a controller's short name matches the first segment of a URI, it will be loaded.
 
-Hello World!
-============
+Let's try it: Hello World!
+==========================
 
-이제 간단한 컨트롤러를 만들어 실제 작동하는 모습을 보도록 하겠습니다. 
+Let's create a simple controller so you can see it in action. Using your text editor, create a file called **Helloworld.php**,
+and put the following code in it. You will notice that the ``Helloworld`` Controller is extending the ``BaseController``. you can
+also extend the ``CodeIgniter\Controller`` if you do not need the functionality of the BaseController.
 
-텍스트 편집기를 사용하여 **Hellowworld.php**\ 라는 파일을 만들고 다음 코드를 입력합니다.
-``Helloworld`` 컨트롤러가 ``BaseController``\ 를 확장하고 있음을 알 수 있습니다.
-BaseController 기능이 필요하지 않은 경우 ``CodeIgniter\\Controller``\ 를 확장(extend)합니다.
-
-BaseController는 구성 요소를 로드하고 모든 사용자가 필요로 하는 기능을 수행할 수 있는 편리한 장소를 제공합니다.
-새로 만드는 모든 컨트롤러에서 이 클래스를 확장할 수 있습니다.
+The BaseController provides a convenient place for loading components and performing functions that are needed by all your
+controllers. You can extend this class in any new controller.
 
 .. literalinclude:: controllers/020.php
 
-이 파일을 **/app/Controllers/** 디렉토리에 저장합니다.
+Then save the file to your **app/Controllers** directory.
 
-.. important:: 파일 이름은 **Helloworld.php**\ 여야 하며 ``H``\ 는 대문자여야 합니다. 자동 라우팅을 사용할 때 컨트롤러 클래스 이름은 대문자로 시작해야 하며 첫 번째 문자만 대문자일 수 있습니다.
+.. important:: The file must be called **Helloworld.php**, with a capital ``H``. When you use Auto Routing, Controller class names MUST start with an uppercase letter and ONLY the first character can be uppercase.
 
-.. important:: Auto Routing(개선)에 의해 실행될 컨트롤러 메소드는 ``getIndex()``, ``postCreate()``\ 와 같이 접두사로 HTTP 동사(``get``, ``post``, ``put`` 등)가 필요합니다.
+.. important:: A controller method that will be executed by Auto Routing (Improved) needs HTTP verb (``get``, ``post``, ``put``, etc.) prefix like ``getIndex()``, ``postCreate()``.
 
-이제 이와 유사한 URL을 사용하여 사이트를 방문하십시오.
-
-::
+Now visit your site using a URL similar to this::
 
     example.com/index.php/helloworld
 
-제대로 했다면 결과는
-
-::
+If you did it right you should see::
 
     Hello World!
 
-올바른 예
+This is valid:
 
 .. literalinclude:: controllers/009.php
 
-틀린 예1
+This is **not** valid:
 
 .. literalinclude:: controllers/010.php
 
-틀린 예2
+This is **not** valid:
 
 .. literalinclude:: controllers/011.php
 
-여러분이 작성한 컨트롤러가 모든 메소드를 상속받을 수 있도록 상위 컨트롤러 클래스를 확장해야 합니다.
+Also, always make sure your controller extends the parent controller
+class so that it can inherit all its methods.
 
-.. note:: 시스템은 정의된 경로에 대해 일치 항목을 찾지 못한 경우 **app/Controllers/**\ 의 폴더/파일에 대해 각 세그먼트를 일치시켜 컨트롤러와 URI를 일치시키려고 시도합니다.
-    그렇기 때문에 폴더/파일은 반드시 대문자로 시작하고 나머지는 소문자로 시작해야 합니다.
+.. note::
+    The system will attempt to match the URI against Controllers by matching each segment against
+    directories/files in **app/Controllers**, when a match wasn't found against defined routes.
+    That's why your directories/files MUST start with a capital letter and the rest MUST be lowercase.
 
-    다른 명명 규칙을 사용하고 싶다면 :ref:`Defined Route Routing <defined-route-routing>`\ 을 사용하여 수동으로 정의해야 합니다.
-    다음은 `PSR-4: Autoloader`\ 에 기반으로 한 예입니다. 
+    If you want another naming convention you need to manually define it using the
+    :ref:`Defined Route Routing <defined-route-routing>`.
+    Here is an example based on PSR-4 Autoloader:
 
     .. literalinclude:: controllers/012.php
 
-메소드(Method)
-================
+Methods
+=======
 
-메소드 가시성
+Method Visibility
 -----------------
 
-HTTP 요청을 통해 실행 가능한 메소드를 정의할 때, 해당 메소드는 ``public``\ 으로 선언되어야 합니다.
+When you define a method that is executable via HTTP request, the method must be
+declared as ``public``.
 
-.. warning:: 보안상의 이유로 새로운 유틸리티 메소드는 ``protected`` 또는 ``private``\ 으로 선언해야 합니다.
+.. warning:: For security reasons be sure to declare any new utility methods as ``protected`` or ``private``.
 
-디폴트 메소드
+Default Method
 --------------
 
-위 예제에서 메소드 이름은 ``getIndex()``\ 입니다.
-(HTTP 동사 + ``Index()`` 메소드는 **디폴트 메소드**\ 라고 하며, URI의 **두 번째 세그먼트**\ 가 비어있을 경우 로드됩니다.
+In the above example, the method name is ``getIndex()``.
+The method (HTTP verb + ``Index()``) is called the **default method**, and is loaded if the **second segment** of the URI is empty.
 
-일반적인 메소드
-----------------
+Normal Methods
+--------------
 
-URI의 두 번째 세그먼트는 컨트롤러에서 호출되는 메소드를 결정합니다.
+The second segment of the URI determines which method in the
+controller gets called.
 
-컨트롤러에 새로운 메소드를 추가해 봅시다.
+Let's try it. Add a new method to your controller:
 
 .. literalinclude:: controllers/021.php
 
-
-이제 다음 URL을 로드하여 ``getComment()`` 메소드를 봅니다.
-
-::
+Now load the following URL to see the ``getComment()`` method::
 
     example.com/index.php/helloworld/comment/
 
-새로운 메시지가 표시됩니다.
+You should see your new message.
 
-메소드에 URI 세그먼트 전달
+Passing URI Segments to Your Methods
 ====================================
 
-URI에 세 개 이상의 세그먼트가 포함되어 있으면 메소드에 매개 변수(parameters)로 전달됩니다.
+If your URI contains more than two segments they will be passed to your
+method as parameters.
 
-예를 들어 이와 같은 URI가 있다고 가정 해 봅시다.::
+For example, let's say you have a URI like this::
 
     example.com/index.php/products/shoes/sandals/123
 
-메소드에 URI 세그먼트 3과 세그먼트 4가 전달됩니다. (``'sandals'`` 와 ``'123'``)
+Your method will be passed URI segments 3 and 4 (``'sandals'`` and ``'123'``):
 
 .. literalinclude:: controllers/022.php
 
-.. note:: URI에 메소드 매개변수보다 더 많은 매개변수가 있는 경우, 자동 라우팅(개선된)은 해당 메소드를 실행하지 않으며 404 Not Found 오류가 발생합니다.
+Default Controller
+==================
 
-기본 컨트롤러 정의
-=============================
+The Default Controller is a special controller that is used when a URI ends with
+a directory name or when a URI is not present, as will be the case when only your
+site root URL is requested.
 
-CodeIgniter는 URI가 아닐 때 기본 컨트롤러를 로드하도록 지시할 수 있습니다.
-사이트 루트 URL만 요청되는 경우 ``Helloworld`` 컨트롤러가 로드되도록 시도해 보겠습니다.
+Defining a Default Controller
+-----------------------------
 
-기본 컨트롤러를 지정하려면 **app/Config/Routes.php** 파일을 열고 아래 부분을 수정하십시오.
+Let's try it with the ``Helloworld`` controller.
+
+To specify a default controller open your **app/Config/Routes.php**
+file and set this variable:
 
 .. literalinclude:: controllers/015.php
 
-여기서 'Helloworld'는 사용하려는 기본 컨트롤러 클래스의 이름입니다.
-**Routes.php**\ 의 라인 코멘트 "Route Definitions" 섹션 몇 줄 아래 있습니다.
+Where ``Helloworld`` is the name of the controller class you want to be used.
+
+A few lines further down **Routes.php** in the "Route Definitions" section, comment out the line:
 
 .. literalinclude:: controllers/016.php
 
-URI 세그먼트를 지정하지 않고 사이트를 탐색하면 "Hello World" 메시지가 표시됩니다.
+If you now browse to your site without specifying any URI segments you'll
+see the "Hello World" message.
 
-.. note:: ``$routes->get('/', 'Home::index');``\ 은 "실제" 앱에서 사용하는 최적화된 경로입니다. 시연 목적으로 이 기능을 사용하고 싶지 않습니다. ``$routes->get()``\ 에 대한 설명은 :doc:`URI 라우팅 <routing>`\ 을 살펴보세요.
+.. important:: When you use Auto Routing (Improved), you must remove the line
+    ``$routes->get('/', 'Home::index');``. Because defined routes take
+    precedence over Auto Routing, and controllers defined in the defined routes
+    are denied access by Auto Routing (Improved) for security reasons.
 
+For more information, please refer to the :ref:`routes-configuration-options` section of the
+:ref:`URI Routing <routing-auto-routing-improved-configuration-options>` documentation.
 
-자세한 내용은 :doc:`URI 라우팅 <routing>` 설명서의 :ref:`routes-configuration-options` 섹션을 참조하십시오.
+.. _controller-default-method-fallback:
 
-컨트롤러를 하위 디렉터리로 구성
+Default Method Fallback
+=======================
+
+.. versionadded:: 4.4.0
+
+If the controller method corresponding to the URI segment of the method name
+does not exist, and if the default method is defined, the remaining URI segments
+are passed to the default method for execution.
+
+.. literalinclude:: controllers/024.php
+
+Load the following URL::
+
+    example.com/index.php/product/15/edit
+
+The method will be passed URI segments 2 and 3 (``'15'`` and ``'edit'``):
+
+.. important:: If there are more parameters in the URI than the method parameters,
+    Auto Routing (Improved) does not execute the method, and it results in 404
+    Not Found.
+
+Fallback to Default Controller
+------------------------------
+
+If the controller corresponding to the URI segment of the controller name
+does not exist, and if the default controller (``Home`` by default) exists in
+the directory, the remaining URI segments are passed to the default controller's
+default method.
+
+For example, when you have the following default controller ``Home`` in the
+**app/Controllers/News** directory:
+
+.. literalinclude:: controllers/025.php
+
+Load the following URL::
+
+    example.com/index.php/news/101
+
+The ``News\Home`` controller and the default ``getIndex()`` method will be found.
+So the default method will be passed URI segments 2 (``'101'``):
+
+.. note:: If there is ``App\Controllers\News`` controller, it takes precedence.
+    The URI segments are searched sequentially and the first controller found
+    is used.
+
+.. note:: If there are more parameters in the URI than the method parameters,
+    Auto Routing (Improved) does not execute the method, and it results in 404
+    Not Found.
+
+Organizing Your Controllers into Sub-directories
 ================================================
 
-대규모 애플리케이션을 구축하는 경우 컨트롤러를 하위 디렉터리로 계층적으로 구성하거나 구조화할 수 있습니다.
-CodeIgniter는 이를 허용합니다.
+If you are building a large application you might want to hierarchically
+organize or structure your controllers into sub-directories. CodeIgniter
+permits you to do this.
 
-기본 **app/Controllers/** 아래에 하위 디렉터리를 만들고 그 안에 컨트롤러 클래스를 배치하기만 하면 됩니다.
+Simply create sub-directories under the main **app/Controllers**,
+and place your controller classes within them.
 
-.. important:: 폴더 이름은 반드시 대문자로 시작해야 하며 첫 번째 문자만 대문자일 수 있습니다.
+.. important:: Directory names MUST start with an uppercase letter and ONLY the first character can be uppercase.
 
-이 기능을 사용할 때 URI의 첫 번째 세그먼트는 폴더를 지정해야 합니다.
-예를 들어 아래와 같은 컨트롤러가 있다고 가정해 보겠습니다.
-
-::
+When using this feature the first segment of your URI must
+specify the directory. For example, let's say you have a controller located here::
 
     app/Controllers/Products/Shoes.php
 
-위의 컨트롤러 호출 URI는 다음과 같습니다.
-
-::
+To call the above controller your URI will look something like this::
 
     example.com/index.php/products/shoes/show/123
 
-.. note:: **app/Controllers/**\ 와 **public/**\ 에 같은 이름의 디렉토리를 가질 수 없습니다.
-     디렉토리가 있으면 웹 서버가 디렉토리를 검색하고 CodeIgniter로 라우팅되지 않기 때문입니다.
+.. note:: You cannot have directories with the same name in **app/Controllers**
+    and **public**.
+    This is because if there is a directory, the web server will search for it and
+    it will not be routed to CodeIgniter.
 
-각 하위 디렉터리에는 URL에 *하위 디렉터리만* 호출될 때 사용될 기본 컨트롤러가 포함될 수 있습니다.
-**app/Config/Routes.php** 파일에 지정된 기본 컨트롤러의 이름과 일치하는 컨트롤러를 그 곳에 넣으면 됩니다.
+Each of your sub-directories may contain a default controller which will be
+called if the URL contains *only* the sub-directory. Simply put a controller
+in there that matches the name of your default controller as specified in
+your **app/Config/Routes.php** file.
 
-CodeIgniter는 또한 :ref:`Defined Route Routing <defined-route-routing>`\ 을 사용하여 URI를 매핑할 수 있습니다.
+CodeIgniter also permits you to map your URIs using its :ref:`Defined Route Routing <defined-route-routing>`..
 
 .. _controller-auto-routing-legacy:
 
-Auto Routing (기존)
+Auto Routing (Legacy)
 *********************
 
-이 섹션에서는 CodeIgniter 3의 라우팅 시스템인 Auto Routing(기존)의 기능에 대해 설명합니다.
-HTTP 요청을 자동으로 라우팅하고 경로 정의 없이 해당 컨트롤러 메서드를 실행합니다.
-Auto Routing은 기본적으로 비활성화되어 있습니다.
+This section describes the functionality of Auto Routing (Legacy) that is a routing system from CodeIgniter 3.
+It automatically routes an HTTP request, and executes the corresponding controller method
+without route definitions. The auto-routing is disabled by default.
 
-.. warning:: 잘못된 구성 및 잘못된 코딩을 방지하려면 Auto Routing(기존)을 사용하지 않는 것이 좋습니다.
-     컨트롤러 필터 또는 CSRF 보호가 우회되는 취약한 앱을 만들기 쉽습니다.
+.. warning:: To prevent misconfiguration and miscoding, we recommend that you do not use
+    Auto Routing (Legacy). It is easy to create vulnerable apps where controller filters
+    or CSRF protection are bypassed.
 
-.. important:: Auto Routing(기존)은 **모든** HTTP 메서드를 사용하여 HTTP 요청을 컨트롤러 메서드로 라우팅합니다.
+.. important:: Auto Routing (Legacy) routes a HTTP request with **any** HTTP method to a controller method.
 
-다음 URI를 고려해봅시다.
-
-::
+Consider this URI::
 
     example.com/index.php/helloworld/
 
-위의 예에서 CodeIgniter는 **Helloworld.php**\ 라는 컨트롤러를 찾아 로드하려고 시도합니다.
+In the above example, CodeIgniter would attempt to find a controller named **Helloworld.php** and load it.
 
-.. note:: 컨트롤러의 짧은 이름이 URI의 첫 번째 세그먼트와 일치하면 로드됩니다.
+.. note:: When a controller's short name matches the first segment of a URI, it will be loaded.
 
-Hello World!
-============
+Let's try it: Hello World! (Legacy)
+===================================
 
-작동하는 모습을 볼 수 있도록 간단한 컨트롤러를 만들어 보겠습니다.
-텍스트 편집기를 사용하여 **Helloworld.php**\ 라는 파일을 만들고 다음 코드를 그 안에 넣습니다.
-``Helloworld`` 컨트롤러가 ``BaseController``\ 를 확장하고 있음을 알 수 있습니다.
-BaseController의 기능이 필요하지 않다면 ``CodeIgniter\Controller``\ 를 확장할 수 있습니다.
+Let's create a simple controller so you can see it in action. Using your text editor, create a file called **Helloworld.php**,
+and put the following code in it. You will notice that the ``Helloworld`` Controller is extending the ``BaseController``. you can
+also extend the ``CodeIgniter\Controller`` if you do not need the functionality of the BaseController.
 
-BaseController는 구성 요소를 로드하고 모든 컨트롤러에 필요한 기능을 수행하기 위한 편리한 장소를 제공합니다.
-모든 새 컨트롤러에서 이 클래스를 확장할 수 있습니다.
+The BaseController provides a convenient place for loading components and performing functions that are needed by all your
+controllers. You can extend this class in any new controller.
 
-보안상의 이유로 새 유틸리티 메소드는 ``protected`` 또는 ``private``\ 로 선언해야 합니다.
+For security reasons be sure to declare any new utility methods as ``protected`` or ``private``:
 
 .. literalinclude:: controllers/008.php
 
-그런 다음 파일을 **app/Controllers/** 디렉터리에 저장합니다.
+Then save the file to your **app/Controllers** directory.
 
-.. important:: 파일 이름은 **Helloworld.php**\ 여야 하며 ``H``\ 는 대문자여야 합니다. 자동 라우팅을 사용할 때 컨트롤러 클래스 이름은 대문자로 시작해야 하며 첫 번째 문자만 대문자일 수 있습니다.
+.. important:: The file must be called **Helloworld.php**, with a capital ``H``. When you use Auto Routing, Controller class names MUST start with an uppercase letter and ONLY the first character can be uppercase.
 
-이제 다음과 유사한 URL을 사용하여 사이트를 방문하십시오.
-
-::
+Now visit your site using a URL similar to this::
 
     example.com/index.php/helloworld
 
-다음과 같은 결과를 확인할 수 있습니다.
-
-::
+If you did it right you should see::
 
     Hello World!
 
-올바른 예
+This is valid:
 
 .. literalinclude:: controllers/009.php
 
-틀린 예1
+This is **not** valid:
 
 .. literalinclude:: controllers/010.php
 
-틀린 예2
+This is **not** valid:
 
 .. literalinclude:: controllers/011.php
 
-또한 컨트롤러가 모든 메서드를 상속할 수 있도록 부모 컨트롤러 클래스를 확장하는지 항상 확인하십시오.
+Also, always make sure your controller extends the parent controller
+class so that it can inherit all its methods.
 
 .. note::
-    시스템은 정의된 경로에 대해 일치 항목을 찾지 못한 경우 **app/Controllers/**\ 의 폴더/파일에 대해 각 세그먼트를 일치시켜 컨트롤러와 URI를 일치시키려고 시도합니다.
-    그렇기 때문에 폴더/파일은 반드시 대문자로 시작하고 나머지는 소문자로 시작해야 합니다.
+    The system will attempt to match the URI against Controllers by matching each segment against
+    directories/files in **app/Controllers**, when a match wasn't found against defined routes.
+    That's why your directories/files MUST start with a capital letter and the rest MUST be lowercase.
 
-    다른 명명 규칙을 원하면 :ref:`Defined Route Routing <defined-route-routing>`\ 을 사용하여 수동으로 정의해야 합니다.
-    다음은 PSR-4 Autoloader를 기반으로 한 예입니다.
+    If you want another naming convention you need to manually define it using the
+    :ref:`Defined Route Routing <defined-route-routing>`.
+    Here is an example based on PSR-4 Autoloader:
 
     .. literalinclude:: controllers/012.php
 
-메소드
-=======
+Methods (Legacy)
+================
 
-위의 예에서 메소드 이름은 ``index()``입니다. 
-URI의 **두 번째 세그먼트**\ 가 비어 있으면 ``index()`` 메소드가 항상 기본적으로 로드됩니다.
-"Hello World" 메시지를 표시하는 또 다른 방법은 다음과 같습니다.
-
-::
+In the above example, the method name is ``index()``. The ``index()`` method
+is always loaded by default if the **second segment** of the URI is
+empty. Another way to show your "Hello World" message would be this::
 
     example.com/index.php/helloworld/index/
 
-**URI의 두 번째 세그먼트는 컨트롤러에서 호출되는 메소드를 결정합니다.**
+**The second segment of the URI determines which method in the
+controller gets called.**
 
-컨트롤러에 새 메서드를 추가해 봅시다.
+Let's try it. Add a new method to your controller:
 
 .. literalinclude:: controllers/013.php
 
-이제 다음 URL을 로드하여 comment 메소드를 확인하세요.
-
-::
+Now load the following URL to see the comment method::
 
     example.com/index.php/helloworld/comment/
 
-새 메시지가 표시되어야 합니다.
+You should see your new message.
 
-메소드에 URI 세그먼트 전달하기
-====================================
+Passing URI Segments to Your Methods (Legacy)
+=============================================
 
-URI에 세 개 이상의 세그먼트가 포함되어 있으면 매개변수로 메소드에 전달됩니다.
+If your URI contains more than two segments they will be passed to your
+method as parameters.
 
-예를 들어 다음과 같은 URI가 있다고 가정해 보겠습니다.
-
-::
+For example, let's say you have a URI like this::
 
     example.com/index.php/products/shoes/sandals/123
 
-메소드에 URI 세그먼트 3\ 과 4로 전달됩니다. (``'sandals'``\ 와 ``'123'``):
+Your method will be passed URI segments 3 and 4 (``'sandals'`` and ``'123'``):
 
 .. literalinclude:: controllers/014.php
 
-기본 컨트롤러 정의
-=============================
+Default Controller (Legacy)
+===========================
 
+The Default Controller is a special controller that is used when a URI end with
+a directory name or when a URI is not present, as will be the case when only your
+site root URL is requested.
 
-CodeIgniter는 URI가 없을 때 기본 컨트롤러를 로드하도록 지시할 수 있으며, 이는 사이트 루트 URL만 요청되는 경우와 마찬가지입니다.
-``Helloworld`` 컨트롤러로 시도해 보겠습니다.
+Defining a Default Controller (Legacy)
+--------------------------------------
 
-기본 컨트롤러를 지정하려면 **app/Config/Routes.php** 파일을 열고 다음 변수를 설정하세요.
+Let's try it with the ``Helloworld`` controller.
+
+To specify a default controller open your **app/Config/Routes.php**
+file and set this variable:
 
 .. literalinclude:: controllers/015.php
 
-여기서 ``Helloworld``\ 는 사용하려는 컨트롤러 클래스의 이름입니다.
+Where ``Helloworld`` is the name of the controller class you want to be used.
 
-"Route Definitions" 섹션의 **Routes.php** 아래 몇 줄에서 다음 줄을 주석 처리합니다.
+A few lines further down **Routes.php** in the "Route Definitions" section, comment out the line:
 
 .. literalinclude:: controllers/016.php
 
-이제 URI 세그먼트를 지정하지 않고 사이트를 탐색하면 "Hello World" 메시지가 표시됩니다.
+If you now browse to your site without specifying any URI segments you'll
+see the "Hello World" message.
 
-.. note:: ``$routes->get('/', 'Home::index');`` 행은 "실제" 앱에서 사용하려는 최적화입니다. 그러나 데모 목적으로 해당 기능을 사용하고 싶지 않습니다. ``$routes->get()``\ 은 :doc:`URI Routing <routing>`\ 에 설명되어 있습니다.
+.. note:: The line ``$routes->get('/', 'Home::index');`` is an optimization that you will want to use in a "real-world" app. But for demonstration purposes we don't want to use that feature. ``$routes->get()`` is explained in :doc:`URI Routing <routing>`
 
-자세한 내용은 :doc:`URI Routing <routing>` 문서의 :ref:`routes-configuration-options` 섹션을 참조하세요.
+For more information, please refer to the :ref:`routes-configuration-options` section of the
+:ref:`URI Routing <routing-auto-routing-legacy-configuration-options>` documentation.
 
-컨트롤러를 하위 디렉터리로 구성
-================================================
+Organizing Your Controllers into Sub-directories (Legacy)
+=========================================================
 
-대규모 애플리케이션을 구축하는 경우 컨트롤러를 하위 디렉터리로 계층적으로 구성하거나 구조화할 수 있습니다.
-CodeIgniter는 이를 허용합니다.
+If you are building a large application you might want to hierarchically
+organize or structure your controllers into sub-directories. CodeIgniter
+permits you to do this.
 
-기본 **app/Controllers/** 아래에 하위 디렉터리를 만들고 그 안에 컨트롤러 클래스를 배치하기만 하면 됩니다.
+Simply create sub-directories under the main **app/Controllers**,
+and place your controller classes within them.
 
-.. important:: 폴더 이름은 반드시 대문자로 시작해야 하며 첫 번째 문자만 대문자일 수 있습니다.
+.. important:: Directory names MUST start with an uppercase letter and ONLY the first character can be uppercase.
 
-이 기능을 사용할 때 URI의 첫 번째 세그먼트는 폴더를 지정해야 합니다.
-예를 들어 다음과 같이 컨트롤러가 있다고 가정해 보겠습니다.
-
-::
+When using this feature the first segment of your URI must
+specify the directory. For example, let's say you have a controller located here::
 
     app/Controllers/Products/Shoes.php
 
-위의 컨트롤러를 호출하기 위한 URI는 다음과 같이 보일 것입니다.
-
-::
+To call the above controller your URI will look something like this::
 
     example.com/index.php/products/shoes/show/123
 
-.. note:: **app/Controllers/**\ 와 **public/**\ 에 같은 이름의 디렉토리를 가질 수 없습니다.
-     디렉토리가 있으면 웹 서버가 디렉토리를 검색하고 CodeIgniter로 라우팅되지 않기 때문입니다.
+.. note:: You cannot have directories with the same name in **app/Controllers** and **public/**.
+    This is because if there is a directory, the web server will search for it and
+    it will not be routed to CodeIgniter.
 
-각 하위 디렉터리에는 URL에 *하위 디렉터리만* 호출될 때 사용될 기본 컨트롤러가 포함될 수 있습니다.
-**app/Config/Routes.php** 파일에 지정된 기본 컨트롤러의 이름과 일치하는 컨트롤러를 그 곳에 넣으면 됩니다.
+Each of your sub-directories may contain a default controller which will be
+called if the URL contains *only* the sub-directory. Simply put a controller
+in there that matches the name of your default controller as specified in
+your **app/Config/Routes.php** file.
 
-CodeIgniter는 또한 :ref:`Defined Route Routing <defined-route-routing>`\ 을 사용하여 URI를 매핑할 수 있습니다.
+CodeIgniter also permits you to map your URIs using its :ref:`Defined Route Routing <defined-route-routing>`..
 
-메소드 호출 재정의
+Remapping Method Calls
 **********************
 
-.. note:: **자동 라우팅(개선된)**\ 은 이 기능을 일부러 지원하지 않습니다.
+.. note:: **Auto Routing (Improved)** does not support this feature intentionally.
 
-위에서 언급했듯이 URI의 두 번째 세그먼트는 일반적으로 컨트롤러에서 호출되는 메서드를 결정합니다.
-CodeIgniter는 ``_remap()`` 메서드를 사용하여 이 동작을 재정의할 수 있습니다.
+As noted above, the second segment of the URI typically determines which
+method in the controller gets called. CodeIgniter permits you to override
+this behavior through the use of the ``_remap()`` method:
 
 .. literalinclude:: controllers/017.php
 
-.. important:: 컨트롤러에 ``_remap()``\ 이라는 메서드가 포함되어 있으면 URI에 포함된 내용에 관계없이 **항상** 호출됩니다.
-     URI가 호출되는 메서드를 결정하는 일반적인 동작을 재정의하여 고유한 메소드 라우팅 규칙을 정의할 수 있습니다.
+.. important:: If your controller contains a method named ``_remap()``,
+    it will **always** get called regardless of what your URI contains. It
+    overrides the normal behavior in which the URI determines which method
+    is called, allowing you to define your own method routing rules.
 
-재정의된 메서드 호출(일반적으로 URI의 두 번째 세그먼트)은 ``_remap()`` 메서드에 매개변수로 전달됩니다.
+The overridden method call (typically the second segment of the URI) will
+be passed as a parameter to the ``_remap()`` method:
 
 .. literalinclude:: controllers/018.php
 
-메소드 이름 뒤의 모든 추가 세그먼트는 ``_remap()``\ 으로 전달됩니다.
-이 매개변수는 메소드에 전달되어 CodeIgniter의 기본 동작을 에뮬레이트할 수 있습니다.
+Any extra segments after the method name are passed into ``_remap()``. These parameters can be passed to the method
+to emulate CodeIgniter's default behavior.
+
+Example:
 
 .. literalinclude:: controllers/019.php
 
-컨트롤러 확장
+Extending the Controller
 ************************
 
-컨트롤러를 확장하려면 :doc:`../extending/basecontroller`\ 를 참조하세요.
+If you want to extend the controller, see :doc:`../extending/basecontroller`.
 
-이게 다임!
-************
+That's it!
+**********
 
-이것이 컨트롤러에 대해 알아야 할 모든 것입니다.
+That, in a nutshell, is all there is to know about controllers.

@@ -1,28 +1,31 @@
 ############
-코드 모듈
+Code Modules
 ############
 
-CodeIgniter는 재사용 가능한 코드를 작성하는데 도움이 되는 코드 모듈화를 지원합니다.
-모듈은 일반적으로 특정 주제를 중심으로 이루어지며, 대규모 어플리케이션내의 미니 어플리케이션으로 생각할 수 있습니다.
-컨트롤러, 모델, 뷰, 구성 파일, 헬퍼, 언어 파일 등과 같이 프레임워크내의 모든 표준 파일 형식에 지원됩니다.
-모듈은 적거나 많을 수 있습니다.
+CodeIgniter supports a form of code modularization to help you create reusable code. Modules are typically
+centered around a specific subject, and can be thought of as mini-applications within your larger application.
+
+Any
+of the standard file types within the framework are supported, like controllers, models, views, config files, helpers,
+language files, etc. Modules may contain as few, or as many, of these as you like.
+
+If you want to create a module as a Composer package, see also :doc:`../extending/composer_packages`.
 
 .. contents::
     :local:
     :depth: 2
 
-==============================
-네임스페이스(Namespaces)
-==============================
+**********
+Namespaces
+**********
 
-모듈 기능의 핵심 요소는 CodeIgniter가 사용하는 :doc:`PSR-4 호환 자동 로딩 <../concepts/autoloader>`\ 에서 비롯됩니다.
-어떤 코드든 PSR-4 오토로더 및 네임스페이스를 사용할 수 있지만, 모듈을 최대한 활용하는 일차적인 방법은 코드를 네임스페이스로 묶고 **app/Config/Autoload.php**\ 의 ``$psr4`` 속성에 추가하는 것입니다.
+The core element of the modules functionality comes from the :doc:`PSR-4 compatible autoloading <../concepts/autoloader>`
+that CodeIgniter uses. While any code can use the PSR-4 autoloader and namespaces, the primary way to take full advantage of
+modules is to namespace your code and add it to **app/Config/Autoload.php**, in the ``$psr4`` property.
 
-어플리케이션 간에 재사용할 수 있는 간단한 블로그 모듈을 예로 들어보겠습니다.
-Acme라는 회사 이름으로 폴더를 만들어 모든 모듈을 그 안에 저장합니다.
-우리는 프로젝트 루트의 **app** 디렉토리와 같은 위치에 이 모듈을 놓도록 하겠습니다.
-
-::
+For example, let's say we want to keep a simple blog module that we can re-use between applications. We might create
+folder with our company name, Acme, to store all of our modules within. We will put it right alongside our **app**
+directory in the main project root::
 
     acme/        // New modules directory
     app/
@@ -31,17 +34,15 @@ Acme라는 회사 이름으로 폴더를 만들어 모든 모듈을 그 안에 �
     tests/
     writable/
 
-**app/Config/Autoload.php**\ 를 열고 ``Acme\Blog`` 네임스페이스를 ``$psr4`` 배열 속성에 추가합니다.
+Open **app/Config/Autoload.php** and add the ``Acme\Blog`` namespace to the ``$psr4`` array property:
 
 .. literalinclude:: modules/001.php
 
-이제 이 설정으로 ``Acme\Blog`` 네임스페이스를 통해 **acme/Blog** 폴더 내의 모든 파일에 액세스할 수 있습니다. 
-이 작업만으로도 모듈이 작동하는 데 필요한 작업의 80%를 처리할 수 있으므로, 네임스페이스에 익숙해져야 하며, 모듈 사용에 익숙해져야 합니다. 
-여기에서 정의된 모든 네임스페이스를 통해 여러 파일 형식이 자동으로 검색므로 설정은 모듈 작업에 중요한 요소입니다.
+Now that this is set up, we can access any file within the **acme/Blog** folder through the ``Acme\Blog`` namespace. This alone
+takes care of 80% of what is needed for modules to work, so you should be sure to familiarize yourself with namespaces
+and become comfortable with their use. Several file types will be scanned for automatically through all defined namespaces - a crucial ingredient for working with modules.
 
-모듈 내의 공통 디렉토리 구조는 어플리케이션 폴더의 구조를 모방합니다.
-
-::
+A common directory structure within a module will mimic the main application folder::
 
     acme/
         Blog/
@@ -57,170 +58,217 @@ Acme라는 회사 이름으로 폴더를 만들어 모든 모듈을 그 안에 �
             Models/
             Views/
 
-물론, 이 구조를 반드시 사용하도록 강요 할 필요는 없으며, 모듈에 가장 적합한 방식으로 조직화하여 필요하지 않은 디렉토리는 제거하고, 엔티티, 인터페이스 또는 저장소 등을 위한 새 디렉토리를 작성합니다.
+Of course, there is nothing forcing you to use this exact structure, and you should organize it in the manner that
+best suits your module, leaving out directories you don't need, creating new directories for Entities, Interfaces,
+or Repositories, etc.
 
-===========================
-Non-class 파일 자동로드
-===========================
+***************************
+Autoloading Non-class Files
+***************************
 
-모듈에는 PHP 클래스뿐만 아니라 프로시저 함수, 부트스트래핑 파일, 모듈 상수 파일 등과 같은 클래스도 포함되어 있는 경우가 있으며, 이러한 파일들은 일반적으로 클래스가 로드되는 방식으로 로드되지 않습니다. 
-이를 위한 한 가지 방법은 파일 시작 부분에 ``require``\ 를 사용하여 파일을 포함하는 것입니다.
+More often than not that your module will not contain only PHP classes but also others like procedural
+functions, bootstrapping files, module constants files, etc. which are not normally loaded the way classes
+are loaded. One approach for this is using ``require``-ing the file(s) at the start of the file where it
+would be used.
 
-CodeIgniter는 자동 로드하고자 하는 파일에 대한 경로 목록을 ``app/Config/Autoload.php``\ 파일의 ``$files`` 속성에 포함하면, 클래스를 자동 로드하는 방법으로 *비클래스* 파일을 자동으로 로드할 수 있습니다. 
+Another approach provided by CodeIgniter is to autoload these *non-class* files like how you would autoload
+your classes. All we need to do is provide the list of paths to those files and include them in the
+``$files`` property of your **app/Config/Autoload.php** file.
 
 .. literalinclude:: modules/002.php
 
-======================
-자동 검색(Discovery)
-======================
+.. _auto-discovery:
 
-포함할 파일에  전체 네임스페이스를 지정해야 하는 경우가 많지만, CodeIgniter는 다음과 같은 다양한 파일 형식을 자동으로 검색하여 어플리케이션에 모듈을 통합하도록 구성할 수 있습니다.
+**************
+Auto-Discovery
+**************
+
+Many times, you will need to specify the full namespace to files you want to include, but CodeIgniter can be
+configured to make integrating modules into your applications simpler by automatically discovering many different
+file types, including:
 
 - :doc:`Events <../extending/events>`
 - :doc:`Filters <../incoming/filters>`
-- :doc:`Registrars <./configuration>`
+- :ref:`registrars`
 - :doc:`Route files <../incoming/routing>`
 - :doc:`Services <../concepts/services>`
 
-이것은 **app/Config/Modules.php** 파일에 구성되어 있습니다.
+This is configured in the file **app/Config/Modules.php**.
 
-자동 검색 시스템은 **Config/Autoload.php**\ 에 정의된 psr4 네임스페이스 내의 특정 디렉토리 및 파일을 검색하여 작동합니다.
+The auto-discovery system works by scanning for particular directories and files within psr4 namespaces that have been defined in **Config/Autoload.php** and Composer packages.
 
-검색 프로세스는 해당 경로에서 검색 가능한 항목을 찾습니다.  **/acme/Blog/Config/Routes.php**\ 에서 경로 파일을 찾아야 합니다.
+The discovery process would look for discoverable items on that path and should, for example, find the routes file at **acme/Blog/Config/Routes.php**.
 
-검색 활성화 / 비활성화
-=========================
-
-``$enabled`` 클래스 변수를 사용하여, 시스템의 모든 자동 검색을 설정하거나 해제할 수 있습니다.
-False는 모든 검색을 비활성화하고 성능을 최적화하지만, 모듈의 특수 기능은 무시됩니다.
-
-검색 항목 지정
+Enable/Disable Discover
 =======================
 
-``$aliases`` 옵션을 사용하면 자동으로 검색할 항목을 지정할 수 있습니다.
-항목이 없으면 해당 항목에 대해 자동 검색이 수행되지 않지만 배열의 다른 항목은 계속 검색됩니다.
+You can turn on or off all auto-discovery in the system with the ``$enabled`` class variable. False will disable
+all discovery, optimizing performance, but negating the special capabilities of your modules and Composer packages.
 
-Composer 패키지 검색
+Specify Discovery Items
 =======================
 
-Composer를 통해 설치된 패키지도 PSR-4 네임스페이스를 사용한다면 검색됩니다.
-단, PSR-0 네임스페이스 패키지는 검색되지 않습니다.
+With the ``$aliases`` option, you can specify which items are automatically discovered. If the item is not
+present, then no auto-discovery will happen for that item, but the others in the array will still be discovered.
 
-파일을 찾을 때 Composer의 패키지를 검사하지 않으려면 ``Config\Modules.php``\ 의 ``$discoverInComposer`` 변수를 수정하여 이 기능를 끌 수 있습니다.
+Discovery and Composer
+======================
+
+Packages installed via Composer using PSR-4 namespaces will also be discovered by default.
+PSR-0 namespaced packages will not be detected.
+
+.. _modules-specify-composer-packages:
+
+Specify Composer Packages
+-------------------------
+
+.. versionadded:: 4.3.0
+
+To avoid wasting time scanning for irrelevant Composer packages, you can manually specify packages to discover by editing the ``$composerPackages`` variable in **app/Config/Modules.php**:
+
+.. literalinclude:: modules/013.php
+
+Alternatively, you can specify which packages to exclude from discovery.
+
+.. literalinclude:: modules/014.php
+
+Disable Composer Package Discovery
+----------------------------------
+
+If you do not want all of Composer's known directories to be scanned when locating files, you can turn this off
+by editing the ``$discoverInComposer`` variable in **app/Config/Modules.php**:
 
 .. literalinclude:: modules/004.php
 
-==================
-파일 작업
-==================
+******************
+Working with Files
+******************
 
-이 섹션에서는 각 파일 형식과 모듈 내에서 파일 형식(컨트롤러, 뷰, 언어 파일 등)을 사용하는 방법을 살펴 봅니다.
-이 정보 중 일부는 사용자 가이드의 관련 위치에 자세히 설명되어 있지만, 모든 조각이 어떻게 결합되는지 쉽게 파악할 수 있도록 하였습니다.
+This section will take a look at each of the file types (controllers, views, language files, etc) and how they can
+be used within the module. Some of this information is described in more detail in the relevant location of the user
+guide, but is being reproduced here so that it's easier to grasp how all of the pieces fit together.
 
-라우트
-========
+Routes
+======
 
-기본적으로 모듈 내에서 :doc:`라우트 <../incoming/routing>`\ 가 자동으로 검색됩니다. 위에서 설명한 **모듈** 구성 파일에서 끌 수 있습니다.
+By default, :doc:`routes <../incoming/routing>` are automatically scanned for within modules. It can be turned off in
+the **Modules** config file, described above.
 
-.. note:: 파일이 현재 범위에 포함되므로 ``$routes`` 인스턴스가 이미 정의되어 있습니다. 해당 클래스를 재정의하려고 하면 오류가 발생합니다.
+.. note:: Since the files are being included into the current scope, the ``$routes`` instance is already defined for you.
+    It will cause errors if you attempt to redefine that class.
 
-모듈로 작업할 때 애플리케이션의 경로에 와일드카드가 포함되어 있으면 문제가 될 수 있습니다.
-:ref:`routing-priority`\ 를 참조하십시오.
+When working with modules, it can be a problem if the routes in the application contain wildcards.
+In that case, see :ref:`routing-priority`.
 
 Filters
 =======
 
-기본적으로 :doc:`filters <../incoming/filters>`\ 는 모듈 내에서 자동으로 검색됩니다.
-위에서 설명한 **Modules** 구성 파일에서 이 기능을 해제할 수 있습니다.
+By default, :doc:`filters <../incoming/filters>` are automatically scanned for within modules.
+It can be turned off in the **Modules** config file, described above.
 
-.. note:: 파일이 현재 범위에 포함되어 있으므로 ``$filters`` 인스턴스가 이미 정의되어 있습니다.
-    이 클래스를 재정의하려고 하면 오류가 발생합니다.
+.. note:: Since the files are being included into the current scope, the ``$filters`` instance is already defined for you.
+    It will cause errors if you attempt to redefine that class.
 
-모듈의 **Config/Filters.php** 파일에서 사용하는 필터의 별칭(aliase)을 정의해야 합니다.
+In the module's **Config/Filters.php** file, you need to define the aliases of the filters you use:
 
 .. literalinclude:: modules/005.php
 
-컨트롤러
+Controllers
 ===========
 
- **app/Controllers** 디렉토리 외부에 작성된 컨트롤러는 URI 감지를 통해 자동으로 라우팅할 수 없으므로 Routes 파일에서 지정해야 합니다.
+Controllers outside of the main **app/Controllers** directory cannot be automatically routed by URI detection,
+but must be specified within the Routes file itself:
 
 .. literalinclude:: modules/006.php
 
-**group** 라우팅 기능을 사용하면 여기에 필요한 입력양을 줄일수 있습니다.
+To reduce the amount of typing needed here, the **group** routing feature is helpful:
 
 .. literalinclude:: modules/007.php
 
-구성 파일
+Config Files
 ============
 
-구성 파일은 특별한 변경이 필요하지 않습니다. 네임스페이스와 클래스를 ``new`` 명령을 사용하여 로드합니다.
+No special change is needed when working with configuration files. These are still namespaced classes and loaded
+with the ``new`` command:
 
 .. literalinclude:: modules/008.php
 
-구성 파일은 항상 사용 가능한 ``config()`` 기능을 사용할 때마다 자동으로 감지됩니다.
+Config files are automatically discovered whenever using the :php:func:`config()` function that is always available, and you pass a short classname to it.
+
+.. note:: We don't recommend you use the same short classname in modules.
+    Modules that need to override or add to known configurations in **app/Config/** should use :ref:`Implicit Registrars <registrars>`.
+
+.. note:: Prior to v4.4.0, ``config()`` finds the file in **app/Config/** when there
+    is a class with the same shortname,
+    even if you specify a fully qualified class name like ``config(\Acme\Blog\Config\Blog::class)``.
+    This behavior has been fixed in v4.4.0, and returns the specified instance.
+
+Migrations
+==========
+
+Migration files will be automatically discovered within defined namespaces. All migrations found across all
+namespaces will be run every time.
+
+Seeds
+=====
+
+Seed files can be used from both the CLI and called from within other seed files as long as the full namespace
+is provided. If calling on the CLI, you will need to provide double backslashes:
 
 
-.. note:: 모듈에서 동일한 짧은 클래스 이름을 사용하지 않는 것이 좋습니다.
-    **app/Config/**\ 의 알려진 구성을 재정의하거나 추가해야 하는 모듈은 :ref:`registrars`\ 를 사용해야 합니다.
+For Unix:
 
-.. note:: ``config()``\ 는 ``config(\Acme\Blog\Config\Blog::class)``\ 와 같이 정규화된 클래스 이름을 지정하더라도 동일한 단축 이름을 가진 클래스가 있는 경우 **app/Config/**\ 에서 파일을 찾습니다.
-    그 이유는 ``config()``\ 가 기본적으로 ``preferApp``\ 을 사용하는 ``Factories`` 클래스의 래퍼이기 때문입니다. 자세한 내용은 :ref:`Factories Example <factories-example>`\ 를 참조하세요.
+.. code-block:: console
 
-마이그레이션
-==============
+    php spark db:seed Acme\\Blog\\Database\\Seeds\\TestPostSeeder
 
-마이그레이션 파일은 정의된 네임스페이스내에서 자동으로 검색됩니다.
-모든 네임스페이스에서 발견된 모든 마이그레이션은 매번 실행됩니다.
+For Windows:
 
-시드(Seeds)
-=============
+.. code-block:: console
 
-시드 파일은 전체 네임스페이스가 제공된다면 CLI와 다른 시드 파일 내에서 호출할 수 있습니다.
-CLI를 통하여 호출하는 경우 이중 백 슬래시(\\\\)를 사용해야 합니다.
+    php spark db:seed Acme\Blog\Database\Seeds\TestPostSeeder
 
-::
-
-    > php public/index.php migrations seed Acme\\Blog\\Database\\Seeds\\TestPostSeeder
-
-헬퍼
+Helpers
 =======
 
-헬퍼는 ``helper()`` 함수를 사용할 때 네임스페이스 **Helpers** 디렉토리에 정의된 네임스페이스에서 자동으로 찿습니다.
+Helpers will be automatically discovered within defined namespaces when using the ``helper()`` function, as long as it
+is within the namespaces **Helpers** directory:
 
 .. literalinclude:: modules/009.php
 
-네임스페이스를 지정할 수 있습니다. 자세한 내용은 :ref:`helpers-loading-from-non-standard-locations`\ 를 참조하세요.
+You can specify namespaces. See :ref:`helpers-loading-from-non-standard-locations` for details.
 
-언어(Language) 파일
-======================
+Language Files
+==============
 
-기본 어플리케이션 디렉토리와 동일한 디렉토리 구조를 따른다면 ``lang()`` 메소드를 사용하여 언어 파일을 자동으로 찾을 수 있습니다.
+Language files are located automatically from defined namespaces when using the ``lang()`` method, as long as the
+file follows the same directory structures as the main application directory.
 
-라이브러리
-============
+Libraries
+=========
 
-라이브러리는 항상 정규화된 클래스 이름으로 인스턴스화되므로 특별한 액세스 방법을 제공하지 않습니다.
+Libraries are always instantiated by their fully-qualified class name, so no special access is provided:
 
 .. literalinclude:: modules/010.php
 
-모델
+Models
 ======
 
- ``new`` 키워드를 사용하여 정규화된 클래스 이름의 모델을 인스턴스화하면 특별한 액세스가 제공되지 않습니다.
+If you instantiate models with ``new`` keyword by their fully-qualified class names, no special access is provided:
 
 .. literalinclude:: modules/011.php
 
-모델 파일은 :php:func:`model()` 함수를 사용하면 자동으로 검색됩니다.
+Model files are automatically discovered whenever using the :php:func:`model()` function that is always available.
 
-.. note:: 모듈에서 동일한 짧은 클래스 이름을 사용하지 않는 것이 좋습니다.
+.. note:: We don't recommend you use the same short classname in modules.
 
-.. note:: ``model()``은 ``model(\Acme\Blog\Model\PostModel::class)``\ 와 같이 정규화된 클래스 이름을 지정하더라도 동일한 단축 이름을 가진 클래스가 있는 경우 **app/Models/**\ 에서 파일을 찾습니다.
-    그 이유는 ``model()``\ 이 ``preferApp``\ 을 사용하는 ``Factories`` 클래스의 래퍼이기 때문입니다. 자세한 내용은 :ref:`Factories Example <factories-example>`\ 를 참조하십시오.
+.. note:: ``model()`` finds the file in **app/Models/** when there is a class with the same shortname,
+    even if you specify a fully qualified class name like ``model(\Acme\Blog\Model\PostModel::class)``.
+    This is because ``model()`` is a wrapper for the ``Factories`` class which uses ``preferApp`` by default. See :ref:`factories-loading-class` for more information.
 
-뷰
+Views
 =====
 
-:doc:`뷰 </outgoing/views>` 문서에 설명된대로 클래스 네임스페이스를 사용하여 뷰를 로드 할 수 있습니다.
+Views can be loaded using the class namespace as described in the :doc:`views </outgoing/views>` documentation:
 
 .. literalinclude:: modules/012.php

@@ -1,148 +1,159 @@
 ################
-Inflector 헬퍼
+Inflector Helper
 ################
 
-Inflector 헬퍼에는 **영어** 단어를 복수, 단수, camel 등으로 변경할 수 있는 함수가 포함되어 있습니다.
+The Inflector Helper file contains functions that permit you to change
+**English** words to plural, singular, camel case, etc.
 
 .. contents::
     :local:
     :depth: 2
 
-헬퍼 로드
+Loading this Helper
 ===================
 
-이 헬퍼는 다음 코드를 사용하여 로드됩니다.
+This helper is loaded using the following code:
 
 .. literalinclude:: inflector_helper/001.php
 
-사용 가능한 함수
+Available Functions
 ===================
 
-사용 가능한 함수는 다음과 같습니다.
+The following functions are available:
 
 .. php:function:: singular($string)
 
-    :param	string	$string: 입력 문자열
-    :returns:	단수형 단어
-    :rtype:	string
+    :param    string    $string: Input string
+    :returns:    A singular word
+    :rtype:    string
 
-    복수형 단어를 단수형으로 바꿉니다.
-    
+    Changes a plural word to singular. Example:
+
     .. literalinclude:: inflector_helper/002.php
 
 .. php:function:: plural($string)
 
-    :param	string	$string: 입력 문자열
-    :returns:	복수형 단어
-    :rtype:	string
+    :param    string    $string: Input string
+    :returns:    A plural word
+    :rtype:    string
 
-    단수형 단어를 복수형으로 바꿉니다.
-    
+    Changes a singular word to plural. Example:
+
     .. literalinclude:: inflector_helper/003.php
 
 .. php:function:: counted($count, $string)
 
-    :param	int 	$count:  항목 수
-    :param	string	$string: 입력 문자열
-    :returns:	단수 또는 복수구
-    :rtype:	string
+    :param    int     $count:  Number of items
+    :param    string    $string: Input string
+    :returns:    A singular or plural phrase
+    :rtype:    string
 
-    단어와 그 수를 구문으로 변경합니다.
-    
+    Changes a word and its count to a phrase. Example:
+
     .. literalinclude:: inflector_helper/004.php
 
 .. php:function:: camelize($string)
 
-    :param	string	$string: 입력 문자열
-    :returns:	Camel case 문자열
-    :rtype:	string
+    :param    string    $string: Input string
+    :returns:    Camel case string
+    :rtype:    string
 
-    공백이나 밑줄로 구분된 단어 문자열을 Camel case 문자열로 변경합니다.
-    
+    Changes a string of words separated by spaces or underscores to camel
+    case. Example:
+
     .. literalinclude:: inflector_helper/005.php
 
 .. php:function:: pascalize($string)
 
-    :param	string	$string: 입력 문자열
-    :returns:	Pascal case 문자열
-    :rtype:	string
+    :param    string    $string: Input string
+    :returns:    Pascal case string
+    :rtype:    string
 
-    공백 또는 밑줄로 구분된 문자열을 Pascal case 문자열로 변경합니다. 
-    첫 번째 문자가 대문자로 표시되는 Camel case 문자열입니다.
+    Changes a string of words separated by spaces or underscores to Pascal
+    case, which is camel case with the first letter capitalized. Example:
 
     .. literalinclude:: inflector_helper/006.php
 
 .. php:function:: underscore($string)
 
-    :param	string	$string: 입력 문자열
-    :returns:	공백 대신 밑줄을 포함하는 문자열
-    :rtype:	string
+    :param    string    $string: Input string
+    :returns:    String containing underscores instead of spaces
+    :rtype:    string
 
-    여러 단어를 구분하는 공백을 밑줄로 표시합니다.
-    
+    Takes multiple words separated by spaces and underscores them.
+    Example:
+
     .. literalinclude:: inflector_helper/007.php
 
-. php:function:: decamelize($string)
+.. php:function:: decamelize($string)
 
     :param    string    $string: Input string
     :returns:    String containing underscores between words
     :rtype:    string
 
-    camelCase 또는 PascalCase로 작성된 여러 단어를 snake_case로 변환합니다.
+    Takes multiple words in camelCase or PascalCase and converts them to snake_case.
+    Example:
 
-    .. literalinclude:: inflector_helper/007.php
+    .. literalinclude:: inflector_helper/014.php
 
 .. php:function:: humanize($string[, $separator = '_'])
 
-    :param	string	$string: 입력 문자열
-    :param	string	$separator: 입력 구분자
-    :returns:	Humanized 문자열
-    :rtype:	string
+    :param    string    $string: Input string
+    :param    string    $separator: Input separator
+    :returns:    Humanized string
+    :rtype:    string
 
-    여러 단어를 구분하는 밑줄을 공백으로 표시합니다. 각 단어의 첫 글자는 대문자입니다.
+    Takes multiple words separated by underscores and adds spaces between
+    them. Each word is capitalized.
+
+    Example:
 
     .. literalinclude:: inflector_helper/008.php
 
-    밑줄 대신 대시(-)를 사용할 수 있습니다.
-    
+    To use dashes instead of underscores:
+
     .. literalinclude:: inflector_helper/009.php
 
 .. php:function:: is_pluralizable($word)
 
-    :param	string	$word: 입력 문자열
-    :returns:	단어가 복수형이면 true, 그렇지 않은 경우 false
-    :rtype:	bool
+    :param    string    $word: Input string
+    :returns:    true if the word is countable or false if not
+    :rtype:    bool
 
-    주어진 단어가 복수형인지 확인합니다.
-    
+    Checks if the given word has a plural version. Example:
+
     .. literalinclude:: inflector_helper/010.php
 
 .. php:function:: dasherize($string)
 
-    :param	string	$string: 입력 문자열
-    :returns:	Dasherized 문자열
-    :rtype:	string
+    :param    string    $string: Input string
+    :returns:    Dasherized string
+    :rtype:    string
 
-    문자열에서 밑줄을 대시로 바꿉니다.
-    
+    Replaces underscores with dashes in the string. Example:
+
     .. literalinclude:: inflector_helper/011.php
 
 .. php:function:: ordinal($integer)
 
-    :param	int	$integer: 접미사를 결정하는 정수
-    :returns:	서수 접미사
-    :rtype:	string
+    :param    int    $integer: The integer to determine the suffix
+    :returns:    Ordinal suffix
+    :rtype:    string
 
-    1st, 2nd, 3rd, 4th등 위치를 나타 내기 위해 숫자에 추가해야 하는 접미사를 반환합니다.
-    
+    Returns the suffix that should be added to a
+    number to denote the position such as
+    1st, 2nd, 3rd, 4th. Example:
+
     .. literalinclude:: inflector_helper/012.php
 
 .. php:function:: ordinalize($integer)
 
-    :param	int	$integer: 순서화할 정수
-    :returns:	서수 정수
-    :rtype:	string
+    :param    int    $integer: The integer to ordinalize
+    :returns:    Ordinalized integer
+    :rtype:    string
 
-    숫자를 1st, 2nd, 3rd, 4th등 위치를 나타내는 서수 문자열로 바꿉니다.
+    Turns a number into an ordinal string used
+    to denote the position such as 1st, 2nd, 3rd, 4th.
+    Example:
 
     .. literalinclude:: inflector_helper/013.php

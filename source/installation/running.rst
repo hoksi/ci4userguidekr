@@ -1,99 +1,132 @@
-앱 실행
-###############################################################################
+################
+Running Your App
+################
 
 .. contents::
     :local:
-    :depth: 2
+    :depth: 3
 
-CodeIgniter 4 앱은 웹 서버에서 호스팅하거나 가상화, CodeIgniter의 커맨드 라인(command line) 도구를 사용하여 테스트할 수 있습니다.
-이 절에서는 각 기법을 사용하는 방법을 다루며, 이들의 장단점을 설명합니다.
+A CodeIgniter 4 app can be run in a number of different ways: hosted on a web server,
+using virtualization, or using CodeIgniter's command line tool for testing.
+This section addresses how to use each technique, and explains some of the pros and cons of them.
 
-.. important:: 파일 이름의 대소문자를 항상 주의해야 합니다. 
-    많은 개발자들은 Windows나 macOS에서 대소문자를 구분하지 않는 파일 시스템에서 개발을 하지만, 대부분의 서버 환경에서는 대소문자를 구분하는 파일 시스템을 사용합니다. 
-    파일 이름의 대소문자가 잘못되면, 로컬에서는 작동하는 코드가 서버에서는 작동하지 않을 수 있습니다.
+.. important:: You should always be careful about the case of filenames. Many
+    developers develop on case-insensitive file systems on Windows or macOS.
+    However, most server environments use case-sensitive file systems. If the
+    file name case is incorrect, code that works locally will not work on the
+    server.
 
-CodeIgniter를 처음 사용하는 경우 사용자 가이드의 :doc:`Getting Started </intro/index>`\ 을 
-참조하여 동적 PHP 어플리케이션을 구축하는 방법에 대해 알아보십시오. 해피 코딩!
+If you're new to CodeIgniter, please read the :doc:`Getting Started </intro/index>`
+section of the User Guide to begin learning how to build dynamic PHP applications. Enjoy!
 
 .. _initial-configuration:
 
-초기 구성 및 설정
-==================
+*********************
+Initial Configuration
+*********************
 
-#. 텍스트 편집기로 **app/Config/App.php** 파일을 열고 기본(base) URL을 ``$baseURL``\ 로 설정하십시오.
-   좀 더 유연하게 작성하고 싶다면 ``.env`` 파일의 **app.baseURL = "http://example.com/"** 
-   항목에 설정해도 됩니다.
-   (항상 기본 URL에 슬래시를 추가합니다!)
-#. 데이터베이스를 사용하려면 **app/Config/Database.php** 파일에  데이터베이스 정보를 설정하십시오.
-   ``.env`` 파일에 설정해도 됩니다.
-#. 프로덕션(production) 서버가 아니면 **.env** 파일의 ``CI_ENVIRONMENT``\ 를 ``development``\ 로 설정하여 제공된 디버깅 도구를 활용하세요.
-   자세한 내용은 :ref:`setting-development-mode`\ 를 참조하세요.
+#. Open the **app/Config/App.php** file with a text editor and
+   set your base URL to ``$baseURL``. If you need more flexibility, the baseURL may
+   be set within the :ref:`.env <dotenv-file>` file as ``app.baseURL = 'http://example.com/'``.
+   (Always use a trailing slash on your base URL!)
 
-.. important:: 프로덕션(production) 환경에서는 오류 표시 및 기타 개발 전용 기능을 비활성화해야 합니다.
-        CodeIgniter에서는 환경을 "production"으로 설정하여 이를 수행할 수 있습니다. 
-        기본적으로 애플리케이션은 "production" 환경을 사용하여 실행됩니다. 
-        :ref:`environment-constant`\ 를 참조하십시오.
+    .. note:: If you don't set the ``baseURL`` correctly, in development mode,
+        the debug toolbar may not load properly and web pages may take considerably
+        longer to display.
 
-.. note:: 웹 서버(예: Apache 또는 Nginx)를 사용하여 사이트를 실행할때는 
-    프로젝트 내의 ``writable`` 폴더에 대한 사용 권한을 수정하여 웹 서버에서 쓰기 가능하도록 해야 합니다.
+#. If you intend to use a database, open the
+   **app/Config/Database.php** file with a text editor and set your
+   database settings. Alternately, these could be set in your **.env** file.
+#. If it is not on the production server, set ``CI_ENVIRONMENT`` to ``development``
+   in **.env** file to take advantage of the debugging tools provided. See
+   :ref:`setting-development-mode` for the detail.
 
-로컬 개발 서버
-=================================================
+    .. important:: In production environments, you should disable error display and
+        any other development-only functionality. In CodeIgniter, this can be done
+        by setting the environment to "production". By default, the application will
+        run using the "production" environment. See also :ref:`environment-constant`.
 
-CodeIgniter4는 PHP의 내장 웹 서버를 활용하여 CodeIgniter 라우팅이 동작하는 로컬 개발 서버와 함께 제공합니다.
-프로젝트 기본 디렉터리에서 제공되는 다음 명령과 ``serve`` 를 사용하여 실행할 수 있습니다.::
+.. note:: If you will be running your site using a web server (e.g., Apache or Nginx),
+    you will need to modify the permissions for the **writable** folder inside
+    your project, so that it is writable by the user or account used by your
+    web server.
 
-    > php spark serve
+************************
+Local Development Server
+************************
 
-이렇게 하면 서버가 실행되고, 이제 브라우저에서 http://localhost:8080를 통하여 실행된 앱을 볼 수 있습니다.
+CodeIgniter 4 comes with a local development server, leveraging PHP's built-in web server
+with CodeIgniter routing. You can launch it, with the following command line
+in the main directory:
 
-.. note:: 내장된 개발 서버는 개발 환경에서만 사용해야 합니다. 
-    프로덕션(production) 서버에서 절대 사용하지 마세요.
+.. code-block:: console
 
-도메인을 localhost가 아닌 다른 도메인으로 실행해야 한다면 ``hosts`` 파일에 추가해야 합니다.
-대부분의 Unix 유형 시스템(OS X/Linux 포함)은 일반적으로 파일을 **/etc/hosts**\ 에 보관하지만, 파일의 정확한 위치는 운영 체제에 따라 다를수 있습니다.
+    php spark serve
 
-로컬 개발 서버는 사용자 정의 가능한 세 가지 커맨드 라인 옵션을 제공 합니다.:
+This will launch the server and you can now view your application in your browser at http://localhost:8080.
 
-- 앱 실행시 ``--host`` 옵션을 사용하여 localhost가 아닌 다른 도메인을 지정할 수 있습니다.::
+.. note:: The built-in development server should only be used on local development machines. It should NEVER
+    be used on a production server.
 
-    > php spark serve --host example.dev
+If you need to run the site on a host other than simply localhost, you'll first need to add the host
+to your **hosts** file. The exact location of the file varies in each of the main operating systems, though
+all unix-type systems (including macOS) will typically keep the file at **/etc/hosts**.
 
-- 기본적으로 서버는 포트 8080에서 실행되지만 둘 이상의 사이트가 실행 중이거나 이미 해당 포트를 사용하는 다른 어플리케이션이 있을 수 있습니다. 
-  ``--port`` 옵션을 사용하여 바꿀 수 있습니다.
-  
-  ::
+The local development server can be customized with three command line options:
 
-    > php spark serve --port 8081
+- You can use the ``--host`` CLI option to specify a different host to run the application at:
 
-- 사용할 PHP의 특정 버전을 ``--php`` 옵션과 함께 PHP 실행 파일의 경로를 지정할 수 있습니다
+    .. code-block:: console
 
-    > php spark serve --php /usr/bin/php7.6.5.4
+        php spark serve --host example.dev
 
-Apache를 사용한 호스팅
-=================================================
+- By default, the server runs on port 8080 but you might have more than one site running, or already have
+  another application using that port. You can use the ``--port`` CLI option to specify a different one:
 
-CodeIgniter4 웹앱 (webapp)은 일반적으로 웹 서버에서 호스트됩니다.
+    .. code-block:: console
 
-아파치의 ``httpd``\ 는 "표준" 플랫폼이며, 사용자 가이드는 이를 가정하고 작성되었습니다.
+        php spark serve --port 8081
 
-Apache는 여러 플랫폼과 함께 번들로 제공되지만, `Bitnami (https://bitnami.com/stacks/infrastructure)`\ 에서 
-데이터베이스 엔진과 함께 PHP를 번들로 다운로드할 수 있습니다.
+- You can also specify a specific version of PHP to use, with the ``--php`` CLI option, with its value
+  set to the path of the PHP executable you want to use:
 
-.htaccess
--------------------------------------------------------
+    .. code-block:: console
 
-"mod_rewrite" 모듈은 "index.php"\ 가 없는 URL을 활성화합니다. 사용자 가이드는 이를 가정하여 작성되었습니다.
+        php spark serve --php /usr/bin/php7.6.5.4
 
-기본 구성 파일에서 rewrite 모듈을 활성화(주석삭제)했는지 확인하십시오. eg. ``apache2/conf/httpd.conf``
+*******************
+Hosting with Apache
+*******************
 
-::
+A CodeIgniter4 webapp is normally hosted on a web server.
+Apache HTTP Server is the "standard" platform, and assumed in much of our documentation.
+
+Apache is bundled with many platforms, but can also be downloaded in a bundle
+with a database engine and PHP from `Bitnami <https://bitnami.com/stacks/infrastructure>`_.
+
+Configure Main Config File
+==========================
+
+Enabling mod_rewrite
+--------------------
+
+The "mod_rewrite" module enables URLs without "index.php" in them, and is assumed
+in our user guide.
+
+Make sure that the rewrite module is enabled (uncommented) in the main
+configuration file, e.g., **apache2/conf/httpd.conf**:
+
+.. code-block:: apache
 
     LoadModule rewrite_module modules/mod_rewrite.so
 
-기본 문서 루트(default document root)의 <Directory> 요소중 "AllowOverride" 기능을 사용하도록 설정했는지 확인하십시오.
+Setting Document Root
+---------------------
 
-::
+Also make sure that the default document root's ``<Directory>`` element enables this too,
+in the ``AllowOverride`` setting:
+
+.. code-block:: apache
 
     <Directory "/opt/lamp/apache2/htdocs">
         Options Indexes FollowSymLinks
@@ -101,136 +134,237 @@ Apache는 여러 플랫폼과 함께 번들로 제공되지만, `Bitnami (https:
         Require all granted
     </Directory>
 
-index.php 제거
---------------
+Hosting with VirtualHost
+========================
 
-:ref:`CodeIgniter URLs <urls-remove-index-php-apache>`\ 를 참조하세요.
+We recommend using "virtual hosting" to run your apps.
+You can set up different aliases for each of the apps you work on,
 
-가상 호스팅(Virtual Hosting)
-----------------------------
+Enabling vhost_alias_module
+---------------------------
 
-"virtual hosting"\ 을 사용하여 어플리케이션 실행 권장합니다.
-작업하는 각 앱에 대해 서로 다른 별칭을 설정할 수 있습니다.
+Make sure that the virtual hosting module is enabled (uncommented) in the main
+configuration file, e.g., **apache2/conf/httpd.conf**:
 
-가상 호스팅 모듈이 기본 구성 파일에서 활성화(주석삭제)되었는지 확인하십시오. eg. ``apache2/conf/httpd.conf``::
+.. code-block:: apache
 
     LoadModule vhost_alias_module modules/mod_vhost_alias.so
 
-호스트 별칭을 "hosts"  파일에 추가하십시오.
-유닉스 유형 플랫폼의 경우 ``/etc/hosts``, 윈도우즈의 경우 ``c:/Windows/System32/drivers/etc/hosts``\ 에 위치합니다.
-다음 줄을 추가 하십시오. 예를 들어 "myproject.local" 또는 "myproject.test"
+Adding Host Alias
+-----------------
 
-::
+Add a host alias in your "hosts" file, typically **/etc/hosts** on unix-type platforms,
+or **c:\Windows\System32\drivers\etc\hosts** on Windows.
+
+Add a line to the file.
+This could be ``myproject.local`` or ``myproject.test``, for instance::
 
     127.0.0.1 myproject.local
 
-가상 호스팅 구성 내에 웹 앱의 <VirtualHost> 요소 추가. eg. ``apache2/conf/extra/httpd-vhost.conf``::
+Setting VirtualHost
+-------------------
+
+Add a ``<VirtualHost>`` element for your webapp inside the virtual hosting configuration,
+e.g., **apache2/conf/extra/httpd-vhost.conf**:
+
+.. code-block:: apache
 
     <VirtualHost *:80>
-        DocumentRoot "/opt/lamp/apache2/htdocs/myproject/public"
-        ServerName myproject.local
-        ErrorLog "logs/myproject-error_log"
-        CustomLog "logs/myproject-access_log" common
+        DocumentRoot "/opt/lamp/apache2/myproject/public"
+        ServerName   myproject.local
+        ErrorLog     "logs/myproject-error_log"
+        CustomLog    "logs/myproject-access_log" common
+
+        <Directory "/opt/lamp/apache2/myproject/public">
+            AllowOverride All
+            Require all granted
+        </Directory>
     </VirtualHost>
 
-프로젝트 폴더가 Apache 문서 루트의 하위 폴더가 아닌 경우, 파일에 대한 웹서버 액세스 권한을 부여하기 위해 
-<VirtualHost>에 중첩된 <Directory> 요소(element)가 필요할 수 있습니다.
+The above configuration assumes the project folder is located as follows:
 
-mod_userdir 사용(공유 호스트)
---------------------------------
+.. code-block:: text
 
-공유 호스팅 환경의 일반적인 관행은 Apache 모듈 "mod_userdir"\ 을 사용하여 사용자별 가상 호스트를 자동으로 활성화하는 것입니다. 이러한 사용자별 디렉터리에서 CodeIgniter4를 실행하려면 추가 구성이 필요합니다.
+    apache2/
+       ├── myproject/      (Project Folder)
+       │      └── public/  (DocumentRoot for myproject.local)
+       └── htdocs/
 
-다음은 서버가 이미 mod_userdir이 구성되어 있다고 가정합니다. 이 모듈을 활성화하는 방법은 `Apache 문서 <https://httpd.apache.org/docs/2.4/howto/public_html.html>`_\ 에 있습니다.
+Restart Apache.
 
-CodeIgniter4는 기본적으로 서버가 프레임워크 프론트 컨트롤러를 ``/public/index.php``\ 에서 찾을 것으로 예상하기 때문에 요청을 검색하기 위한 대안으로 이 위치를 지정해야 합니다. (CodeIgniter4가 사용자별 웹 디렉토리 내에 설치된 경우에도 마찬가지입니다.)
+Testing
+-------
 
-기본 사용자 웹 디렉토리 ``~/public_html``\ 은 ``UserDir`` 지시문에 의해 지정되며 일반적으로 ``/apache2/mods-available/userdir.conf`` 또는 ``/apache2/conf/extra/httpd-userdir.conf``\ 에 있습니다. 
+With the above configuration, your webapp would be accessed with the URL **http://myproject.local/** in your browser.
 
-::
+Apache needs to be restarted whenever you change its configuration.
+
+Hosting with Subfolder
+======================
+
+If you want a baseURL like **http://localhost/myproject/** with a subfolder,
+there are three ways.
+
+Making Symlink
+--------------
+
+Place your project folder as follows, where **htdocs** is the Apache document root::
+
+    ├── myproject/ (project folder)
+    │      └── public/
+    └── htdocs/
+
+Navigate to the **htdocs** folder and create a symbolic link as follows:
+
+.. code-block:: console
+
+    cd htdocs/
+    ln -s ../myproject/public/ myproject
+
+Using Alias
+-----------
+
+Place your project folder as follows, where **htdocs** is the Apache document root::
+
+    ├── myproject/ (project folder)
+    │      └── public/
+    └── htdocs/
+
+Add the following in the main configuration file, e.g., **apache2/conf/httpd.conf**:
+
+.. code-block:: apache
+
+    Alias /myproject /opt/lamp/apache2/myproject/public
+    <Directory "/opt/lamp/apache2/myproject/public">
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+Restart Apache.
+
+Adding .htaccess
+----------------
+
+The last resort is to add **.htaccess** to the project root.
+
+It is not recommended that you place the project folder in the document root.
+However, if you have no other choice, like on a shared server, you can use this.
+
+Place your project folder as follows, where **htdocs** is the Apache document root,
+and create the **.htaccess** file::
+
+    └── htdocs/
+        └── myproject/ (project folder)
+            ├── .htaccess
+            └── public/
+
+And edit **.htaccess** as follows:
+
+.. code-block:: apache
+
+    <IfModule mod_rewrite.c>
+        RewriteEngine On
+        RewriteRule ^(.*)$ public/$1 [L]
+    </IfModule>
+
+    <FilesMatch "^\.">
+        Require all denied
+        Satisfy All
+    </FilesMatch>
+
+Hosting with mod_userdir (Shared Hosts)
+=======================================
+
+A common practice in shared hosting environments is to use the Apache module "mod_userdir" to enable per-user Virtual Hosts automatically. Additional configuration is required to allow CodeIgniter4 to be run from these per-user directories.
+
+The following assumes that the server is already configured for mod_userdir. A guide to enabling this module is available `in the Apache documentation <https://httpd.apache.org/docs/2.4/howto/public_html.html>`_.
+
+Because CodeIgniter4 expects the server to find the framework front controller at **public/index.php** by default, you must specify this location as an alternative to search for the request (even if CodeIgniter4 is installed within the per-user web directory).
+
+The default user web directory **~/public_html** is specified by the ``UserDir`` directive, typically in **apache2/mods-available/userdir.conf** or **apache2/conf/extra/httpd-userdir.conf**:
+
+.. code-block:: apache
 
     UserDir public_html
 
-따라서 기본 서비스를 제공하기 전에 먼저 CodeIgniter의 공개 디렉토리를 찾도록 Apache를 구성해야 합니다.
+So you will need to configure Apache to look for CodeIgniter's public directory first before trying to serve the default:
 
-::
+.. code-block:: apache
 
     UserDir "public_html/public" "public_html"
 
-CodeIgniter public 디렉터리에 대한 옵션과 권한도 지정해야 합니다. ``userdir.conf``\ 는 다음과 같습니다.
+Be sure to specify options and permissions for the CodeIgniter public directory as well. A **userdir.conf** might look like:
 
-::
+.. code-block:: apache
 
     <IfModule mod_userdir.c>
         UserDir "public_html/public" "public_html"
         UserDir disabled root
 
         <Directory /home/*/public_html>
-                AllowOverride All
-                Options MultiViews Indexes FollowSymLinks
-                <Limit GET POST OPTIONS>
-                        # Apache <= 2.2:
-                        # Order allow,deny
-                        # Allow from all
+            AllowOverride All
+            Options MultiViews Indexes FollowSymLinks
+            <Limit GET POST OPTIONS>
+                # Apache <= 2.2:
+                # Order allow,deny
+                # Allow from all
 
-                        # Apache >= 2.4:
-                        Require all granted
-                </Limit>
-                <LimitExcept GET POST OPTIONS>
-                        # Apache <= 2.2:
-                        # Order deny,allow
-                        # Deny from all
+                # Apache >= 2.4:
+                Require all granted
+            </Limit>
+            <LimitExcept GET POST OPTIONS>
+                # Apache <= 2.2:
+                # Order deny,allow
+                # Deny from all
 
-                        # Apache >= 2.4:
-                        Require all denied
-                </LimitExcept>
+                # Apache >= 2.4:
+                Require all denied
+            </LimitExcept>
         </Directory>
 
         <Directory /home/*/public_html/public>
-                AllowOverride All
-                Options MultiViews Indexes FollowSymLinks
-                <Limit GET POST OPTIONS>
-                        # Apache <= 2.2:
-                        # Order allow,deny
-                        # Allow from all
+            AllowOverride All
+            Options MultiViews Indexes FollowSymLinks
+            <Limit GET POST OPTIONS>
+                # Apache <= 2.2:
+                # Order allow,deny
+                # Allow from all
 
-                        # Apache >= 2.4:
-                        Require all granted
-                </Limit>
-                <LimitExcept GET POST OPTIONS>
-                        # Apache <= 2.2:
-                        # Order deny,allow
-                        # Deny from all
+                # Apache >= 2.4:
+                Require all granted
+            </Limit>
+            <LimitExcept GET POST OPTIONS>
+                # Apache <= 2.2:
+                # Order deny,allow
+                # Deny from all
 
-                        # Apache >= 2.4:
-                        Require all denied
-                </LimitExcept>
+                # Apache >= 2.4:
+                Require all denied
+            </LimitExcept>
         </Directory>
     </IfModule>
 
-환경 설정
----------
+Removing the index.php
+======================
 
-:ref:`Handling Multiple Environments <environment-apache>`\ 를 참조하세요.
+See :ref:`CodeIgniter URLs <urls-remove-index-php-apache>`.
 
-테스트
-------
+Setting Environment
+===================
 
-위의 구성을 따른다면 브라우저에서 ``http://myproject.local``\ 로 웹앱에 액세스하게 됩니다.
+See :ref:`Handling Multiple Environments <environment-apache>`.
 
-구성을 변경할 때마다 Apache를 다시 시작해야 합니다.
+******************
+Hosting with Nginx
+******************
 
-Nginx를 사용한 호스트
-=====================
-
-Nginx는 웹 호스팅에 두 번째로 널리 사용되는 HTTP 서버입니다.
-아래의 구성은 Ubuntu Server에서 PHP 7.3 FPM (unix sockets)을 사용한 예제입니다.
+Nginx is the second most widely used HTTP server for web hosting.
+Here you can find an example configuration using PHP 8.1 FPM (unix sockets) under Ubuntu Server.
 
 default.conf
-------------
+============
 
-이 구성을 사용하면 "index.php"\ 가 없는 URL을 활성화하고 ".php"\ 로 끝나는 URL에 CodeIgniter의 "404-File Not Found"\ 를 보여줍니다.
-
+This configuration enables URLs without "index.php" in them and using CodeIgniter's "404 - File Not Found" for URLs ending with ".php".
 
 .. code-block:: nginx
 
@@ -251,7 +385,7 @@ default.conf
             include snippets/fastcgi-php.conf;
 
             # With php-fpm:
-            fastcgi_pass unix:/run/php/php7.3-fpm.sock;
+            fastcgi_pass unix:/run/php/php8.1-fpm.sock;
             # With php-cgi:
             # fastcgi_pass 127.0.0.1:9000;
         }
@@ -264,19 +398,20 @@ default.conf
         }
     }
 
+Setting Environment
+===================
 
-환경 설정
----------
+See :ref:`Handling Multiple Environments <environment-nginx>`.
 
-:ref:`Handling Multiple Environments <environment-nginx>`\ 를 참조하세요.
+*********************
+Bootstrapping the App
+*********************
 
+In some scenarios you will want to load the framework without actually running the whole
+application. This is particularly useful for unit testing your project, but may also be
+handy for using third-party tools to analyze and modify your code. The framework comes
+with a separate bootstrap script specifically for this scenario: **system/Test/bootstrap.php**.
 
-앱 부트스트랩
-=================================================
-
-일부 시나리오에서는 전체 애플리케이션을 실제로 실행하지 않고 프레임워크를 로드할 필요가 있습니다.
-이렇게 하면 프로젝트 단위 테스트나 타사 도구를 사용하여 코드를 분석하고 수정할 때 특히 유용합니다.
-코드이그나이터 프레임워크는 이 시나리오를 위한 별도의 부트스트랩 스크립트인 ``system/Test/bootstrap.php``\ 가 제공됩니다.
-
-프로젝트에 대한 대부분의 경로는 부트스트랩 프로세스 중에 정의됩니다.
-미리 정의된 상수를 재정의할 수 있지만 코드이그나이터의 기본값을 재정의하여 사용할 때는 경로가 설치 방법에 필요한 디렉터리 구조와 일치하는지 확인하십시오.
+Most of the paths to your project are defined during the bootstrap process. You may use
+pre-defined constants to override these, but when using the defaults be sure that your
+paths align with the expected directory structure for your installation method.

@@ -9,11 +9,13 @@ Release Date: October 30, 2022
     :local:
     :depth: 2
 
-**4.2.8에서 PHPUnit 오류를 수정하기 위한 핫픽스 릴리스; 다른 내용은 변경되지 않습니다.**
+**Hotfix release to fix PHPUnit errors in 4.2.8; no other content changes.**
 
 Bugs Fixed
 **********
 
-- PHPUnit을 실행할 때 `PHP Fatal error:  Trait "Nexus\PHPUnit\Extension\Expeditable" not found`\ 을 유발하는 버그 수정.
+- Fixed a bug that causes `PHP Fatal error:  Trait "Nexus\PHPUnit\Extension\Expeditable" not found` when running PHPUnit.
 
-수정된 전체 버그 목록은 `CHANGELOG.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/CHANGELOG.md>`_\ 를 참조하세요.
+See the repo's
+`CHANGELOG_4.2.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/changelogs/CHANGELOG_4.2.md>`_
+for a complete list of bugs fixed.

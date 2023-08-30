@@ -1,164 +1,190 @@
 ##################
-컨트롤러 필터
+Controller Filters
 ##################
 
 .. contents::
     :local:
     :depth: 2
 
-컨트롤러 필터를 사용하면 컨트롤러 실행 전후에 작업을 수행할 수 있습니다.
-:doc:`이벤트 <../extending/events>`\ 와 달리 필터를 적용할 특정 URI를 선택할 수 있습니다.
-수신(Incoming) 필터는 요청을 수정하는 반면 사후(after)필터는 응답에 대해 작동하고 데이터를 수정할 수 있기 때문에 많은 유연성과 성능을 제공합니다.
-필터로 수행할 수있는 일반적인 예는 다음과 같습니다:
+Controller Filters allow you to perform actions either before or after the controllers execute. Unlike :doc:`events <../extending/events>`,
+you can choose the specific URIs or routes in which the filters will be applied to. Before filters may
+modify the Request while after filters can act on and even modify the Response, allowing for a lot of flexibility
+and power.
 
-* 수신 요청(request)에 대한 CSRF 보호
-* 역할(role)에 따른 사이트 영역 제한
-* 특정 엔드 포인트의 속도 제한
-* "유지 보수 또는 서버 점검" 페이지 표시
-* 자동 컨텐츠 협상(content negotiation)
-* and more..
+Some common examples of tasks that might be performed with filters are:
+
+* Performing CSRF protection on the incoming requests
+* Restricting areas of your site based upon their Role
+* Perform rate limiting on certain endpoints
+* Display a "Down for Maintenance" page
+* Perform automatic content negotiation
+* and more...
 
 *****************
-필터 만들기
+Creating a Filter
 *****************
 
-필터는 ``CodeIgniter\Filters\FilterInterface``\ 를 구현(implement)하는 간단한 클래스입니다.
-두 개의 메소드 ``before()`` 와 ``after()``\ 를 가지고 있으며, 컨트롤러 전후에 각각 실행됩니다.
-클래스에는 두 메소드가 모두 포함되어야하지만 필요하지 않은 경우 메소드를 비워둘 수 있습니다.
-스켈레톤 필터 클래스는 다음과 같습니다.
+Filters are simple classes that implement ``CodeIgniter\Filters\FilterInterface``.
+They contain two methods: ``before()`` and ``after()`` which hold the code that
+will run before and after the controller respectively. Your class must contain both methods
+but may leave the methods empty if they are not needed. A skeleton filter class looks like:
 
 .. literalinclude:: filters/001.php
 
-사전(Before) 필터
-======================
+Before Filters
+==============
 
 Replacing Request
 -----------------
 
-모든 필터는 ``$request`` 오브젝트를 반환할 수 있으며, 컨트롤러가 실행될 때 변경 사항을 적용할 수 있도록 현재 요청(Request)을 대체합니다.
+From any filter, you can return the ``$request`` object and it will replace the current Request, allowing you
+to make changes that will still be present when the controller executes.
 
 Stopping Later Filters
 ----------------------
 
-또한 일련의 필터가 있는 경우 특정 필터 이후에 나중에 실행되는 필터의 실행을 중지하려는 경우가 있습니다.
-이를 위해 **비어 있지 않은** 결과를 반환하면 됩니다.
-만약 이전 필터가 빈 결과를 반환하면, 컨트롤러 액션 또는 이후 필터는 여전히 실행됩니다.
+Also, when you have a series of filters you may also want to
+stop the execution of the later filters after a certain filter. You can easily do this by returning
+**any non-empty** result. If the before filter returns an empty result, the controller actions or the later
+filters will still be executed.
 
-비어 있지 않은 결과 규칙의 예외는 ``Request`` 인스턴스입니다.
-이전 필터에서 이를 반환하면 실행이 중지되지 않고 현재 ``$request`` 객체가 대체됩니다.
+An exception to the non-empty result rule is the ``Request`` instance.
+Returning it in the before filter will not stop the execution but only replace the current ``$request`` object.
 
 Returning Response
 ------------------
 
-before 필터는 컨트롤러가 실행되기 전에 실행되므로, 때로는 컨트롤러에서 발생하는 작업을 중지하고 싶을 수 있습니다.
+Since before filters are executed prior to your controller being executed, you may at times want to stop the
+actions in the controller from happening.
 
-아래 예는 리디렉션을 수행합니다.
+This is typically used to perform redirects, like in this example:
 
 .. literalinclude:: filters/002.php
 
-``응답(Response)`` 인스턴스가 리턴되면 응답이 클라이언트로 전송되고 컨트롤러 실행이 중지됩니다.
-API 요청에 대한 속도 제한을 구현하는데 유용하며, 이에 대한 예는 :doc:`Throttler <../libraries/throttler>`\ 를 참조하십시오.
+If a ``Response`` instance is returned, the Response will be sent back to the client and script execution will stop.
+This can be useful for implementing rate limiting for APIs. See :doc:`Throttler <../libraries/throttler>` for an
+example.
 
 .. _after-filters:
 
-사후(After) 필터
-====================
+After Filters
+=============
 
-사후(After) 필터는 ``$response`` 객체만 반환할 수 있으며, 컨트롤러 실행을 중지할 수 없다는 점을 제외하면 사전(After) 필터와 거의 동일합니다.
-이를 통해 최종 출력을 수정하거나, 최종 출력으로 무언가를 수행할 수 있습니다.
-이를 이용하여 특정 보안 헤더가 올바른 방식으로 설정되도록 하거나, 최종 출력을 캐시하거나, 나쁜(bad) 단어 필터로 최종 출력을 필터링하는 데 사용할 수 있습니다.
+After filters are nearly identical to before filters, except that you can only return the ``$response`` object,
+and you cannot stop script execution. This does allow you to modify the final output, or simply do something with
+the final output. This could be used to ensure certain security headers were set the correct way, or to cache
+the final output, or even to filter the final output with a bad words filter.
 
 *******************
-필터 구성
+Configuring Filters
 *******************
 
-필터를 만든 후에는 실행시기를 구성해야 하며, 이 작업은 ``app/Config/Filters``\ 에서 이루어집니다.
-이 파일에는 필터가 실행될 때 구성할 수 있는 네 가지 속성이 포함되어 있습니다.
+Once you've created your filters, you need to configure when they get run. This is done in **app/Config/Filters.php** or **app/Config/Routes.php**.
 
-.. Note:: 필터를 적용하는 가장 안전한 방법은 :ref:`자동 라우팅 비활성화 <use-defined-routes-only>`\ 와 :ref:`경로에 필터를 설정 <applying-filters>`\ 하는 것입니다.
+.. Note:: The safest way to apply filters is to :ref:`disable auto-routing <use-defined-routes-only>`, and :ref:`set filters to routes <applying-filters>`.
 
-.. Warning:: 필터 설정에서 URI 끝에 항상 ``*``\ 를 추가하는 것이 좋습니다.
-    컨트롤러 메서드는 생각보다 다른 URL에서 액세스하는 경우가 많기 때문입니다.
-    예를 들어,  :ref:`auto-routing-legacy`\ 가 활성화된 상태에서 ``Blog::index``\ 가 설정되어 있는 경우 ``blog``, ``blog/index``, ``blog/index/1``\ 등으로 액세스할 수 있습니다.
+The **app/Config/Filters.php** file contains four properties that allow you to
+configure exactly when the filters run.
+
+.. Warning:: It is recommended that you should always add ``*`` at the end of a URI in the filter settings.
+    Because a controller method might be accessible by different URLs than you think.
+    For example, when :ref:`auto-routing-legacy` is enabled, if you have ``Blog::index``,
+    it can be accessible with ``blog``, ``blog/index``, and ``blog/index/1``, etc.
 
 $aliases
 ========
 
-``$aliases`` 배열은 하나 이상의 정규화된 클래스 이름을 실행될 간단한 필터 이름으로 연결하는 데 사용합니다.
+The ``$aliases`` array is used to associate a simple name with one or more fully-qualified class names that are the
+filters to run:
 
 .. literalinclude:: filters/003.php
 
-별명은 필수이며 이후 전체 클래스 이름을 사용하려고 하면 시스템에서 오류가 발생합니다.
-이런 식으로 정의하면 필터에 사용되는 클래스를 간단하게 전환할 수 있습니다.
-필터의 클래스만 변경하면 전환 완료되므로, 다른 인증 시스템으로 변경해야할 때 유용합니다.
+Aliases are mandatory and if you try to use a full class name later, the system will throw an error. Defining them
+in this way makes it simple to switch out the class used. Great for when you decided you need to change to a
+different authentication system since you only change the filter's class and you're done.
 
-여러 필터를 하나의 별칭으로 결합하여 복잡한 필터 세트를 간단하게 적용할 수 있습니다.
+You can combine multiple filters into one alias, making complex sets of filters simple to apply:
 
 .. literalinclude:: filters/004.php
 
-필요한만큼 별칭을 정의해야 합니다.
+You should define as many aliases as you need.
 
 $globals
 ========
 
-두 번째 섹션에서는 프레임워크의 모든 요청에 적용해야하는 필터를 정의할 수 있습니다.
-모든 요청에 너무 많은 작업을 적용하는 것은 성능에 영향을 미칠 수 있으므로 여기에 얼마나 많은 것을 사용할지 주의해야 합니다.
-사전(before) 또는 사후(after) 배열에 별칭을 추가하여 필터를 지정할 수 있습니다.
+The second section allows you to define any filters that should be applied to every request made by the framework.
+You should take care with how many you use here, since it could have performance implications to have too many
+run on every request. Filters can be specified by adding their alias to either the before or after array:
 
 .. literalinclude:: filters/005.php
 
 Except for a Few URIs
 ---------------------
 
-모든 요청에 필터를 적용하고 싶을 때도 있지만, 몇 개만 남겨두어야 할 경우도 있습니다.
-한 가지 일반적인 예는 CSRF 보호 필터에 몇 개의 URI를 제외하여 제3자 웹 사이트의 요청이 하나 또는 두 개의 특정 URI를 도달할 수 있도록 하고 나머지 URI는 보호해야 하는 경우입니다.
-이렇게 하려면 ``except`` 키가 있는 배열을 별칭 과 함께 값으로 일치시킬 URI를 추가하십시오.
+There are times where you want to apply a filter to almost every request, but have a few that should be left alone.
+One common example is if you need to exclude a few URI's from the CSRF protection filter to allow requests from
+third-party websites to hit one or two specific URI's, while keeping the rest of them protected. To do this, add
+an array with the ``except`` key and a URI path (relative to BaseURL) to match as the value alongside the alias:
 
 .. literalinclude:: filters/006.php
 
-필터 설정에서 URI를 사용할 수 있는 모든 장소, 정규 표현식을 사용하거나 이 예에서와 같이 와일드 카드 별표(``*``)를 사용하여 그 이후의 모든 문자를 일치시킬 수 있습니다.
-다음 예는 ``api/``\ 로 시작하는 URL은 CSRF 보호에서 제외되지만 양식(Form)은 모두 보호됩니다.
-여러 개의 URI를 지정해야 하는 경우 URI 패턴 배열을 사용할 수 있습니다.
+Any place you can use a URI path (relative to BaseURL) in the filter settings, you can use a regular expression or, like in this example, use
+an asterisk (``*``) for a wildcard that will match all characters after that. In this example, any URI path starting with ``api/``
+would be exempted from CSRF protection, but the site's forms would all be protected. If you need to specify multiple
+URI paths, you can use an array of URI path patterns:
 
 .. literalinclude:: filters/007.php
 
 $methods
 ========
 
-.. Warning:: 만약 ``$methods`` 필터를 사용한다면, :ref:`자동 라우팅 비활성화 (레거시) <use-defined-routes-only>` 해야 합니다. 왜냐하면 :ref:`자동 라우팅 레거시 <auto-routing-legacy>`\ 는 
-    어떤 HTTP 메소드든 컨트롤러에 접근할 수 있기 때문입니다. 예상하지 않은 메소드로 컨트롤러에 접근하면 필터가 우회될 수 있습니다.
+.. Warning:: If you use ``$methods`` filters, you should :ref:`disable Auto Routing (Legacy) <use-defined-routes-only>`
+    because :ref:`auto-routing-legacy` permits any HTTP method to access a controller.
+    Accessing the controller with a method you don't expect could bypass the filter.
 
-특정 HTTP 메소드(POST, GET, PUT 등)의 모든 요청에 필터를 적용할 수 있습니다. 이 배열에서는 **소문자**\ 로 메소드 이름을 지정합니다.
-그리고 실행할 필터의 배열을 값으로 지정합니다.
+You can apply filters to all requests of a certain HTTP method, like POST, GET, PUT, etc. In this array, you would
+specify the method name in **lowercase**. It's value would be an array of filters to run:
 
 .. literalinclude:: filters/008.php
 
-.. note:: ``$globals``\ 나 ``$filters`` 속성과 달리, 이 속성은 사전(before) 필터로만 실행됩니다.
+.. note:: Unlike the ``$globals`` or the
+    ``$filters`` properties, these will only run as before filters.
 
-표준 HTTP 메소드 외에도, ``cli``\ 라는 특별한 경우도 지원합니다.
-``cli`` 메소드는 명령줄에서 실행된 모든 요청에 적용됩니다.
+In addition to the standard HTTP methods, this also supports one special case: ``cli``. The ``cli`` method would apply to
+all requests that were run from the command line.
 
 $filters
 ========
 
-이 속성은 필터의 별칭 배열입니다. 각 별칭에 대해, 적용할 필터의 URI 패턴 목록을 포함하는 ``before``\ 와 ``after`` 배열을 지정할 수 있습니다.
+This property is an array of filter aliases. For each alias, you can specify ``before`` and ``after`` arrays that contain
+a list of URI path (relative to BaseURL) patterns that filter should apply to:
 
 .. literalinclude:: filters/009.php
 
-필터 인수(arguments)
-=======================
+.. _filters-filters-filter-arguments:
 
-라우터에 필터를 구성할 때 필터에 필요한 추가 인수를 전달할 수 있습니다.
+Filter Arguments
+================
 
-.. literalinclude:: filters/010.php
+Filter Arguments
+----------------
 
-이 예에서 ``['dual', 'noreturn']`` 배열은 필터의 ``before()``\ 와 ``after()`` 메소드에 ``$arguments``\ 로 전달됩니다.
+.. versionadded:: 4.4.0
+
+When configuring ``$filters``, additional arguments may be passed to a filter:
+
+.. literalinclude:: filters/012.php
+
+In this example, when the URI matches ``admin/*'``, the array ``['admin', 'superadmin']``
+will be passed in ``$arguments`` to the ``group`` filter's ``before()`` methods.
+When the URI matches ``admin/users/*'``, the array ``['users.manage']``
+will be passed in ``$arguments`` to the ``permission`` filter's ``before()`` methods.
 
 ******************
-필터 확인
+Confirming Filters
 ******************
 
-CodeIgniter는 라우트의 필터를 확인하기 위한 다음과 같은 :doc:`명령어 <../cli/spark_commands>`\ 를 가지고 있습니다.
+CodeIgniter has the following :doc:`command <../cli/spark_commands>` to check the filters for a route.
 
 .. _spark-filter-check:
 
@@ -167,13 +193,13 @@ filter:check
 
 .. versionadded:: 4.3.0
 
-**GET** 메서드를 사용하여 라우트 ``/``\ 의 필터를 확인합니다.
+Check the filters for the route ``/`` with **GET** method:
 
-::
+.. code-block:: console
 
-    > php spark filter:check get /
+    php spark filter:check get /
 
-출력은 다음과 같습니다.
+The output is like the following:
 
 .. code-block:: none
 
@@ -183,34 +209,36 @@ filter:check
     | GET    | /     |                | toolbar       |
     +--------+-------+----------------+---------------+
 
-``spark routes`` 명령어를 사용하여 라우트와 필터를 확인할 수 있습니다.
-자세한 내용은 :ref:`URI 라우팅 <routing-spark-routes>`\ 을 참조하세요
+You can also see the routes and filters by the ``spark routes`` command.
+See :ref:`URI Routing <routing-spark-routes>`.
 
 ****************
-제공되는 필터
+Provided Filters
 ****************
 
-CodeIgniter4에 3개의 필터가 번들로 제공됩니다: :doc:`Honeypot <../libraries/honeypot>`, :ref:`CSRF <cross-site-request-forgery>`, ``InvalidChars``, ``SecureHeaders``, :ref:`DebugToolbar <the-debug-toolbar>`
+The filters bundled with CodeIgniter4 are: :doc:`Honeypot <../libraries/honeypot>`, :ref:`CSRF <cross-site-request-forgery>`, ``InvalidChars``, ``SecureHeaders``, and :ref:`DebugToolbar <the-debug-toolbar>`.
 
-.. note:: 필터는 구성 파일에 정의되어 선언된 순서대로 실행됩니다. 그러나 ``DebugToolbar``\ 를 활성화하면 다른 필터에서 발생하는 모든 것을 캡처해야 하므로 선언된 순서와 상관없이 항상 마지막에 실행됩니다.
+.. note:: The filters are executed in the order defined in the config file. However, if enabled, ``DebugToolbar`` is always executed last because it should be able to capture everything that happens in the other filters.
+
+.. _invalidchars:
 
 InvalidChars
 =============
 
-이 필터는 사용자 입력 데이터(``$_GET``, ``$_POST``, ``$_COOKIE``, ``php://input``)가 다음 문자를 포함하는 것을 금지합니다.
+This filter prohibits user input data (``$_GET``, ``$_POST``, ``$_COOKIE``, ``php://input``) from containing the following characters:
 
-- 잘못된 UTF-8 문자
-- 줄 바꿈 및 탭 코드를 제외한 제어 문자
+- invalid UTF-8 characters
+- control characters except line break and tab code
 
 .. _secureheaders:
 
 SecureHeaders
 =============
 
-이 필터는 프로그램의 보안을 강화하는 데 사용할 수 있는 HTTP 응답 헤더를 추가합니다.
+This filter adds HTTP response headers that your application can use to increase the security of your application.
 
-헤더를 사용자 정의하려면 ``CodeIgniter\Filters\SecureHeaders``\ 를 확장하고 ``$headers`` 속성을 재정의한 후 **app/Config/Filters.php**\ 에서 ``$aliases`` 속성을 변경합니다.
+If you want to customize the headers, extend ``CodeIgniter\Filters\SecureHeaders`` and override the ``$headers`` property. And change the ``$aliases`` property in **app/Config/Filters.php**:
 
 .. literalinclude:: filters/011.php
 
-보안 헤더에 대해 알고 싶다면 `OWASP Secure Headers Project <https://owasp.org/www-project-secure-headers/>`_\ 를 살펴보십시오.
+If you want to know about secure headers, see `OWASP Secure Headers Project <https://owasp.org/www-project-secure-headers/>`_.

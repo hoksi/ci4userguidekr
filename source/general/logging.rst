@@ -1,5 +1,5 @@
 ###################
-로깅 정보
+Logging Information
 ###################
 
 .. contents::
@@ -9,114 +9,125 @@
 Log Levels
 ==========
 
-:php:func:`log_message()` 메소드를 사용하여 로컬 로그 파일에 정보를 기록할 수 있습니다.
-첫 번째 매개 변수에 오류의 "수준"을 제공해야 하며 메시지 유형(디버그, 오류 등)을 나타냅니다.
-두 번째 매개 변수는 메시지 자체입니다
+You can log information to the local log files by using the :php:func:`log_message()` method. You must supply
+the "level" of the error in the first parameter, indicating what type of message it is (debug, error, etc).
+The second parameter is the message itself:
 
 .. literalinclude:: logging/001.php
 
-`RFC 5424 <https://tools.ietf.org/html/rfc5424>`_ 레벨과 일치하는 8가지 로그 레벨이 있으며 다음과 같습니다.
+There are eight different log levels, matching to the `RFC 5424 <https://tools.ietf.org/html/rfc5424>`_ levels, and they are as follows:
 
 =========== ==================================================================
 Level       Description
 =========== ==================================================================
-debug       자세한 디버그 정보
-info        사용자 로그인, SQL 쿼리 로깅 등과 같은 어플리케이션의 흥미로운 이벤트
-notice      어플리케이션에서 정상이지만 중요한 이벤트
-warning     사용되지 않는 API 사용, API 사용 불량 또는 반드시 잘못된 것은 아니지만 다른 바람직하지 않은 오류와 같은 예외 발생
-error       즉각적인 조치가 필요하지 않지만 일반적으로 기록 및 모니터링되어야하는 런타임 오류
-critical    어플리케이션 구성 요소를 사용할 수 없거나 예기치 않은 예외와 같은 중요한 조건
-alert       전체 웹 사이트가 다운되거나 데이터베이스를 사용할 수 없는 경우등 즉시 조치를 취해야 하는 경우
-emergency   시스템 사용 불가
+debug       Detailed debug information.
+info        Interesting events in your application, like a user logging in, logging SQL queries, etc.
+notice      Normal, but significant events in your application.
+warning     Exceptional occurrences that are not errors, like the use of deprecated APIs,
+            poor use of an API, or other undesirable things that are not necessarily wrong.
+error       Runtime errors that do not require immediate action but should typically be logged and monitored.
+critical    Critical conditions, like an application component not available, or an unexpected exception.
+alert       Action must be taken immediately, like when an entire website is down, the database unavailable, etc.
+emergency   The system is unusable.
 =========== ==================================================================
 
-로깅 시스템은 시스템 관리자 또는 웹 마스터에게 이러한 이벤트에 대해 경고하는 방법을 제공하지 않으며 정보만 기록합니다.
-보다 중요한 여러 이벤트 수준의 경우 위에서 설명한 오류 처리기가 로깅을 자동으로 수행합니다.
+The logging system does not provide ways to alert sysadmins or webmasters about these events, they solely log
+the information. For many of the more critical event levels, the logging happens automatically by the
+Error Handler, described above.
 
 .. _logging-configuration:
 
-구성
+Configuration
 =============
 
-``app/Config/Logger.php`` 구성 파일 내에서 실제로 로깅된 레벨을 수정하고 다른 로거를 지정하여 다른 레벨을 처리할 수 있습니다.
+You can modify which levels are actually logged, as well as assign different Loggers to handle different levels, within
+the **app/Config/Logger.php** configuration file.
 
-구성 파일의 ``threshold`` 값은 어플리케이션에서 기록되는 수준을 결정합니다.
-어플리케이션에서 수준을 기록하도록 요청해도 ``threshold``\ 에 지정된 수준에 따라 기록 할 수 없는 경우 무시됩니다.
-로그를 사용하는 가장 간단한 방법은 ``threshold`` 값을 최소 수준으로 설정하는 것입니다. 
-예를 들어 정보 메시지가 아닌 경고(warning) 메시지를 기록하려는 경우 ``threshold`` 값을 ``5``\ 로 설정합니다. 
-5 이하의 레벨(런타임 오류, 시스템 오류 등)의 모든 로그 요청은 기록되고 정보(info), 알림(notice) 및 디버그(debug)는 무시됩니다.
+The ``threshold`` value of the config file determines which levels are logged across your application. If any levels
+are requested to be logged by the application, but the threshold doesn't allow them to log currently, they will be
+ignored. The simplest method to use is to set this value to the minimum level that you want to have logged. For example,
+if you want to log warning messages, and not information messages, you would set the threshold to ``5``. Any log requests with
+a level of 5 or less (which includes runtime errors, system errors, etc) would be logged and info, notices, and debug
+would be ignored:
 
 .. literalinclude:: logging/002.php
 
-전체 레벨 목록과 해당 ``threshold`` 값은 참조용 구성 파일에 있습니다.
+A complete list of levels and their corresponding threshold value is in the configuration file for your reference.
 
-``threshold`` 값을 특정 레벨로 여러개 선택하여 배열로 지정할 수 있습니다.
+You can pick and choose the specific levels that you would like logged by assigning an array of log level numbers
+to the threshold value:
 
 .. literalinclude:: logging/003.php
 
-다중 로그 처리기 사용
+Using Multiple Log Handlers
 ---------------------------
 
-로깅 시스템은 동시에 실행중인 로깅을 처리하는 여러 가지 방법을 지원할 수 있습니다.
-각 처리기는 특정 수준을 처리하고 나머지는 무시하도록 설정할 수 있습니다.
-3가지의 핸들러가 기본적으로 설치되어 제공됩니다.
+The logging system can support multiple methods of handling logging running at the same time. Each handler can
+be set to handle specific levels and ignore the rest. Currently, three handlers come with a default install:
 
-- **File Handler**\ 는 기본 핸들러이며, 매일 로컬로 단일 파일을 작성합니다. 권장되는 로깅 방법입니다.
-- **ChromeLogger Handler**\ 는 Chrome 웹 브라우저에 `ChromeLogger extension <https://craig.is/writing/chrome-logger>`_\ 이 설치되어 있다면, Chrome의 콘솔 창에 로그 정보를 표시 할 수 있습니다.
-- **Errorlog Handler** 이 핸들러는 PHP의 네이티브 ``error_log()`` 함수를 활용하고 거기에 로그를 작성합니다. 현재는 ``error_log()``\ 의 ``0``\ 과\ ``4`` 메시지 유형만 지원됩니다.
+- **File Handler** is the default handler and will create a single file for every day locally. This is the
+  recommended method of logging.
+- **ChromeLogger Handler** If you have the `ChromeLogger extension <https://craig.is/writing/chrome-logger>`_
+  installed in the Chrome web browser, you can use this handler to display the log information in
+  Chrome's console window.
+- **Errorlog Handler** This handler will take advantage of PHP's native ``error_log()`` function and write
+  the logs there. Currently, only the ``0`` and ``4`` message types of ``error_log()`` are supported.
 
-핸들러는 로그 구성 파일의 ``$handlers`` 속성에 지정할 수 있으며, 핸들러 및 핸들러에 대한 설정값으로 이루어진 배열입니다.
-Each handler is specified with the key being the fully name-spaced class name. 
-각 핸들러의 키는 네임스페이스를 포함한 클래스명(fully name-spaced class name)으로 지정되어야 합니다.
-값은 각 핸들러에 따른 다양한 속성을 지정한 배열이 됩니다.
-각 핸들러 섹션에는 ``handles``\ 라는 공통 속성이 있으며, 핸들러가 정보를 기록할 때 사용되는 로그 레벨 *수준*\ 을 지정한  배열입니다.
+The handlers are configured in the main configuration file, in the ``$handlers`` property, which is simply
+an array of handlers and their configuration. Each handler is specified with the key being the fully
+name-spaced class name. The value will be an array of varying properties, specific to each handler.
+Each handler's section will have one property in common: ``handles``, which is an array of log level
+*names* that the handler will log information for.
 
 .. literalinclude:: logging/004.php
 
-컨텍스트를 사용하여 메시지 수정
+Modifying the Message with Context
 ==================================
 
-기록되는 이벤트의 컨텍스트에 따라 메시지 세부 사항을 수정하려는 경우가 종종 있습니다.
-사용자 ID, IP 주소, 현재 POST 변수등을 기록해야 할 수도 있습니다.
-메시지에 자리 표시자를 사용하여 이 작업을 수행 할 수 있습니다. 각 자리 표시자는 중괄호로 묶어야합니다.
-세 번째 매개 변수에는 자리 표시자 이름(중괄호없이)에 상응하는 키/값 배열입니다. 
-이들은 메시지 문자열에 삽입됩니다.
+You will often want to modify the details of your message based on the context of the event being logged.
+You might need to log a user id, an IP address, the current POST variables, etc. You can do this by use
+placeholders in your message. Each placeholder must be wrapped in curly braces. In the third parameter,
+you must provide an array of placeholder names (without the braces) and their values. These will be inserted
+into the message string:
 
 .. literalinclude:: logging/005.php
 
-예외 또는 오류를 기록할 때 'exception' 키와 값을 예외 또는 오류 자체로 사용할 수 있습니다.
-오류 메시지, 파일 이름 및 줄 번호가 포함 된 개체에서 문자열이 생성됩니다.
-이를 위해 메시지에 exception 자리 표시자를 제공해야합니다.
+If you want to log an Exception or an Error, you can use the key of 'exception', and the value being the
+Exception or Error itself. A string will be generated from that object containing the error message, the
+file name and line number. You must still provide the exception placeholder in the message:
 
 .. literalinclude:: logging/006.php
 
-현재 페이지 요청에 따라 자동으로 확장되는 몇 가지 핵심 자리 표시자가 있습니다.
+Several core placeholders exist that will be automatically expanded for you based on the current page request:
 
 +----------------+---------------------------------------------------+
-| 자리 표시자    | 삽입 된 값                                        |
+| Placeholder    | Inserted value                                    |
 +================+===================================================+
-| {post_vars}    | $_POST 변수                                       |
+| {post_vars}    | $_POST variables                                  |
 +----------------+---------------------------------------------------+
-| {get_vars}     | $_GET 변수                                        |
+| {get_vars}     | $_GET variables                                   |
 +----------------+---------------------------------------------------+
-| {session_vars} | $_SESSION 변수                                    |
+| {session_vars} | $_SESSION variables                               |
 +----------------+---------------------------------------------------+
-| {env}          | 사용중인 환경변수 이름, 예) development           |
+| {env}          | Current environment name, i.e., development       |
 +----------------+---------------------------------------------------+
-| {file}         | 로거를 호출하는 파일 이름                         |
+| {file}         | The name of file calling the logger               |
 +----------------+---------------------------------------------------+
-| {line}         | 로거가 호출 된 {file}의 행                        |
+| {line}         | The line in {file} where the logger was called    |
 +----------------+---------------------------------------------------+
-| {env:foo}      | $_ENV 배열의 'foo' 값                             |
+| {env:foo}      | The value of 'foo' in $_ENV                       |
 +----------------+---------------------------------------------------+
 
-타사(third-party) 로거 사용
-==============================
+Using Third-Party Loggers
+=========================
 
-`PSR-3 <http://www.php-fig.org/psr/psr-3/>`_\ 와 호환 가능한 다른 로거를 ``Psr\Log\LoggerInterface``\ 를 확장하여 사용할 수 있습니다.
-즉, PSR-3 호환 로거를 쉽게 사용하거나 직접 생성할 수 있습니다.
+You can use any other logger that you might like as long as it extends from either
+``Psr\Log\LoggerInterface`` and is `PSR-3 <https://www.php-fig.org/psr/psr-3/>`_ compatible. This means
+that you can easily drop in use for any PSR-3 compatible logger, or create your own.
 
-시스템에서 타사 로거를 찾을수 있도록 ``app/Config/Autoload.php`` 구성 파일에 추가하거나, Composer와 같은 다른 자동 로더를 통해 타사 로거를 찾을 수 있는지 확인해야합니다.
-그 다음, 별칭 ``logger``\ 가 새 클래스 이름으로 가리키도록 ``app/Config/Services.php``\ 를 수정해야 합니다.
+You must ensure that the third-party logger can be found by the system, by adding it to either
+the **app/Config/Autoload.php** configuration file, or through another autoloader,
+like Composer. Next, you should modify **app/Config/Services.php** to point the ``logger``
+alias to your new class name.
 
-이렇게 하면 :php:func:`log_message()` 함수 호출을 통해 수행된 모든 작업은 수정된 새로운 라이브러리를 사용하게 됩니다.
+Now, any call that is done through the :php:func:`log_message()` function will use your library instead.

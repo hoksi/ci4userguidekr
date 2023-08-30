@@ -1,56 +1,60 @@
-뉴스 섹션
+News Section
 ############
 
 .. contents::
     :local:
     :depth: 2
 
-이전 섹션에서는 정적 페이지(static page)를 참조하는 클래스를 작성하여 프레임워크의 몇 가지 기본 개념을 살펴 보고 사용자 정의 라우팅 규칙을 추가하여 URI를 정리했습니다.
-이제 동적(dinamic) 컨텐츠를 소개하고 데이터베이스를 사용할 차례입니다.
+In the last section, we went over some basic concepts of the framework
+by writing a class that references static pages. We cleaned up the URI by
+adding custom routing rules. Now it's time to introduce dynamic content
+and start using a database.
 
-작업할 데이터베이스 생성
-**************************
+Create a Database to Work with
+******************************
 
-먼저, CodeIgniter 설치시 :ref:`requirements <requirements-supported-databases>`\ 에 요약 된대로 적절한 데이터베이스를 설정했다고 가정합니다.
-이 튜토리얼에서는 MySQL 데이터베이스에 대한 SQL을 제공하며, 데이터베이스 명령을 실행하기에 적합한 클라이언트(mysql, MySQL Workbench 또는 phpMyAdmin)가 있다고 가정합니다.
+The CodeIgniter installation assumes that you have set up an appropriate
+database, as outlined in the :ref:`requirements <requirements-supported-databases>`.
+In this tutorial, we provide SQL code for a MySQL database, and
+we also assume that you have a suitable client for issuing database
+commands (mysql, MySQL Workbench, or phpMyAdmin).
 
-이 섹션을 진행하기 위해서는 데이터베이스 ``ci4tutorial``\ 를 만든 다음 CodeIgniter를 구성하여 사용해야 합니다.
+You need to create a database ``ci4tutorial`` that can be used for this tutorial,
+and then configure CodeIgniter to use it.
 
-데이터베이스 클라이언트를 사용하여 데이터베이스에 연결하고 아래의 SQL(MySQL)을 실행하십시오.
-
-::
+Using your database client, connect to your database and run the SQL command below (MySQL)::
 
     CREATE TABLE news (
-        id int(11) NOT NULL AUTO_INCREMENT,
-        title varchar(128) NOT NULL,
-        slug varchar(128) NOT NULL,
-        body text NOT NULL,
+        id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        title VARCHAR(128) NOT NULL,
+        slug VARCHAR(128) NOT NULL,
+        body TEXT NOT NULL,
         PRIMARY KEY (id),
         UNIQUE slug (slug)
     );
 
-또한, 몇 개의 시드(seed) 레코드를 추가합니다.
-지금은 테이블을 만드는데 필요한 SQL문을 보여 주지만 CodeIgniter에 익숙해지면 프로그래밍 방식으로이 작업을 수행할 수 있습니다. 
-나중에 더 유용한 데이터베이스 설정을 작성하기 위해 :doc:`마이그레이션 <../dbmgmt/migration>` 및 :doc:`시드(Seeds) <../dbmgmt/seeds>`\ 에 대해 읽어보세요.
+Also, add some seed records. For now, we'll just show you the SQL statements needed
+to create the table, but you should be aware that this can be done programmatically
+once you are more familiar with CodeIgniter; you can read about :doc:`Migrations <../dbmgmt/migration>`
+and :doc:`Seeds <../dbmgmt/seeds>` to create more useful database setups later.
 
-관심사항: 웹과 관련하여 슬러그(slug)는 URL을 사용하여 리소스를 식별하고 설명하는데 사용되는 SEO 친화적인 짧은 텍스트입니다.
+A note of interest: a "slug", in the context of web publishing, is a
+user- and SEO-friendly short text used in a URL to identify and describe a resource.
 
-시드(seed) 레코드는 다음과 같습니다.
+The seed records might be something like::
 
-::
-
-    INSERT INTO news VALUES 
+    INSERT INTO news VALUES
     (1,'Elvis sighted','elvis-sighted','Elvis was sighted at the Podunk internet cafe. It looked like he was writing a CodeIgniter app.'),
     (2,'Say it isn\'t so!','say-it-isnt-so','Scientists conclude that some programmers have a sense of humor.'),
     (3,'Caffeination, Yes!','caffeination-yes','World\'s largest coffee shop open onsite nested coffee shop for staff only.');
 
-데이터베이스에 연결
-*********************
+Connect to Your Database
+************************
 
-CodeIgniter를 설치할 때 생성한 로컬 구성 파일 ``.env``\ 를 열어 데이터베이스 속성의 주석을 해제하고 사용하려는 데이터베이스에 맞게 설정하십시오.
-:doc:`여기 <../database/configuration>`\ 에 설명된 대로 데이터베이스를 올바르게 구성했는지 확인합니다.
-
-::
+The local configuration file, **.env**, that you created when you installed
+CodeIgniter, should have the database property settings uncommented and
+set appropriately for the database you want to use. Make sure you've configured
+your database properly as described in :doc:`../database/configuration`::
 
     database.default.hostname = localhost
     database.default.database = ci4tutorial
@@ -58,112 +62,158 @@ CodeIgniter를 설치할 때 생성한 로컬 구성 파일 ``.env``\ 를 열어
     database.default.password = root
     database.default.DBDriver = MySQLi
 
-모델(model) 설정
-******************
+Setting up Your Model
+*********************
 
-컨트롤러에서 데이터베이스 작업을 바로 작성하는 대신 쿼리를 모델에 배치하면 나중에 쉽게 재사용 할 수 있습니다.
-모델은 데이터베이스 또는 다른 데이터 저장소에서 정보를 검색, 삽입 및 업데이트하는 장소이자, 데이터에 대한 액세스를 제공합니다.
-자세한 내용은 :doc:`../models/model`\ 를 참조하십시오.
+Instead of writing database operations right in the controller, queries
+should be placed in a model, so they can easily be reused later. Models
+are the place where you retrieve, insert, and update information in your
+database or other data stores. They provide access to your data.
+You can read more about it in :doc:`../models/model`.
 
-**app/Models/** 디렉터리에 **NewsModel.php**\ 라는 새 파일을 만들고 다음 코드를 추가하십시오.
-:doc:`여기 <../database/configuration>`\ 에 설명 된대로 데이터베이스를 올바르게 구성했는지 확인하십시오.
+Create NewsModel
+================
+
+Open up the **app/Models** directory and create a new file called
+**NewsModel.php** and add the following code.
 
 .. literalinclude:: news_section/001.php
 
-이 코드는 앞서 사용한 컨트롤러 코드와 비슷합니다.
-``CodeIgniter\Model``\ 을 확장하여 새 모델을 만들고 데이터베이스 라이브러리를 로드합니다.
-이렇게 하면 ``$this->db`` 객체를 통해 데이터베이스 클래스를 사용할 수 있게 됩니다.
+This code looks similar to the controller code that was used earlier. It
+creates a new model by extending ``CodeIgniter\Model`` and loads the database
+library. This will make the database class available through the
+``$this->db`` object.
 
-데이터베이스와 모델이 설정되었으므로 데이터베이스에서 모든 게시물을 가져올 방법이 필요합니다.
-CodeIgniter 포함된 데이터베이스 추상화 계층 - :doc:`Query Builder <../database/query_builder>` - 는 ``CodeIgniter\Mode``\ 에 사용됩니다.
-이를 통해 한 번 작성된 쿼리는 :doc:`지원되는 모든 데이터베이스 시스템 <../intro/requirements>`\ 에서 작동할 수 있습니다.
-Model 클래스를 사용하면 Query Builder로 쉽게 작업 할 수 있으며 데이터 작업을 보다 간단하게 수행할 수 있는 추가 도구도 제공됩니다.
-다음 코드를 모델에 추가하십시오.
+Add NewsModel::getNews() Method
+===============================
+
+Now that the database and a model have been set up, you'll need a method
+to get all of our posts from our database. To do this, the database
+abstraction layer that is included with CodeIgniter -
+:doc:`Query Builder <../database/query_builder>` - is used in the ``CodeIgniter\Model``. This makes it
+possible to write your 'queries' once and make them work on :doc:`all
+supported database systems <../intro/requirements>`. The Model class
+also allows you to easily work with the Query Builder and provides
+some additional tools to make working with data simpler. Add the
+following code to your model.
 
 .. literalinclude:: news_section/002.php
     :lines: 11-18
 
-이 코드를 사용하면 두 가지 다른 쿼리를 수행 할 수 있습니다.
-모든 뉴스 레코드를 얻거나, `slug <#>`_\ 를 통해 뉴스 항목을 얻을 수 있습니다.
-:doc:`Query Builder <../database/query_builder>`\ 를 실행하기 전 ``$slug`` 변수에 값이 제거되지 않았습니다.
+With this code, you can perform two different queries. You can get all
+news records, or get a news item by its slug. You might have
+noticed that the ``$slug`` variable wasn't escaped before running the
+query; :doc:`Query Builder <../database/query_builder>` does this for you.
 
-여기서 사용되는 두 가지 메소드 ``findAll()``\ 과 ``first()``\ 는 ``CodeIgniter\Model`` 클래스에 의해 제공됩니다.
-이 두 메소드는 이미 우리가 앞서 **NewsModel** 클래스에 설정한 ``$table`` 속성을 기준으로 사용할 테이블를 알고 있습니다.
-이 메소드는 Query Builder를 사용하여 현재 테이블에서 명령을 실행하고 원하는 형식으로 결과 배열을 반환하는 도우미(helper) 메소드입니다.
-이 예에서 ``findAll()``\ 은 일련의 객체(object)를 반환합니다.
+The two methods used here, ``findAll()`` and ``first()``, are provided
+by the ``CodeIgniter\Model`` class. They already know the table to use based on the ``$table``
+property we set in ``NewsModel`` class, earlier. They are helper methods
+that use the Query Builder to run their commands on the current table, and
+returning an array of results in the format of your choice. In this example,
+``findAll()`` returns an array of array.
 
-뉴스 표시
-***********
+Display the News
+****************
 
-쿼리가 작성되었으므로 모델은 뉴스 항목을 사용자에게 표시할 뷰와 연결되어야 합니다.
-이는 앞서 만든 ``Pages`` 컨트롤러에서 할 수 있지만, 명확한 연결을 위해 새로운 ``News`` 컨트롤러를 정의합니다. 
-**app/Controllers/News.php**\ 로 새 컨트롤러를 생성하십시오.
+Now that the queries are written, the model should be tied to the views
+that are going to display the news items to the user. This could be done
+in our ``Pages`` controller created earlier, but for the sake of clarity,
+a new ``News`` controller is defined.
+
+Create News Controller
+======================
+
+Create the new controller at **app/Controllers/News.php**.
 
 .. literalinclude:: news_section/003.php
 
-코드를 보면 앞에서 만든 파일과 약간의 유사성을 볼 수 있습니다.
-먼저 CodeIgniter 코어 클래스인 ``Controller``\ 를 확장하는 ``BaseController``\ 를 확장하여 몇 가지 헬퍼 메소드를 제공하고, ``Request``\ 와 ``Response``\ 객체와 ``Logger`` 클래스 액세스 하여 디스크에 정보를 저장할 수  있도록 합니다. 
+Looking at the code, you may see some similarity with the files we
+created earlier. First, it extends ``BaseController`` that extends a core CodeIgniter class, ``Controller``,
+which provides a couple of helper methods, and makes sure that you have
+access to the current ``Request`` and ``Response`` objects, as well as the
+``Logger`` class, for saving information to disk.
 
-다음으로 두 가지 메소드가 있는데, 모든 뉴스 항목을 보는 메소드와 특정 뉴스 항목을 보는 메소드입니다.
+Next, there are two methods, one to view all news items, and one for a specific
+news item.
 
-다음으로 헬퍼 함수인 :php:func:`model()` 함수를 사용하여 **NewsModel** 인스턴스를 생성합니다.
-자세한 내용은 :doc:`../general/common_functions`\ 에서 확인할 수 있습니다.
-``$model = new NewsModel();``\ 로 직접 객체를 작성할 수 있습니다.
+Next, the :php:func:`model()` function is used to create the ``NewsModel`` instance.
+This is a helper function. You can read more about it in :doc:`../general/common_functions`.
+You could also write ``$model = new NewsModel();``, if you don't use it.
 
-두 번째 메소드에서 ``$slug`` 변수가 모델의 메소드로 전달되는 것을 볼 수 있습니다. 모델은 이 슬러그를 사용하여 반환할 뉴스 항목을 식별합니다.
+You can see that the ``$slug`` variable is passed to the model's
+method in the second method. The model is using this slug to identify the
+news item to be returned.
 
-이제 데이터는 모델을 통해 컨트롤러에 검색되지만, 아직 아무것도 표시되지 않습니다.
-다음으로 해야할 일은 이 데이터를 뷰에 전달하는 것입니다. 
-``index()`` 메소드를 다음과 같이 수정합니다.
+Complete News::index() Method
+=============================
+
+Now the data is retrieved by the controller through our model, but
+nothing is displayed yet. The next thing to do is, passing this data to
+the views. Modify the ``index()`` method to look like this:
 
 .. literalinclude:: news_section/004.php
 
-위의 코드는 모델로부터 모든 뉴스를 가져와 변수에 할당합니다.
-title의 값은 ``$data['title']`` 요소에 할당되며 모든 데이터는 뷰로 전달됩니다.
-뉴스 항목을 렌더링하려면 뷰를 작성해야합니다.
-**app/Views/news/index.php**\ 를 생성하고 다음 코드를 추가합니다.
+The code above gets all news records from the model and assigns it to a
+variable. The value for the title is also assigned to the ``$data['title']``
+element and all data is passed to the views. You now need to create a
+view to render the news items.
+
+Create news/index View File
+===========================
+
+Create **app/Views/news/index.php** and add the next piece of code.
 
 .. literalinclude:: news_section/005.php
 
-.. note:: XSS 공격을 방지하기 위해 다시 :php:func:`esc()`\ 를 사용하고 있습니다.
-    하지만 이번에는 "url"\ 을 두 번째 매개 변수로 전달했습니다. 
-    출력이 사용되는 상황에 따라 공격 패턴이 다르기 때문입니다.
+.. note:: We are again using using :php:func:`esc()` to help prevent XSS attacks.
+    But this time we also passed "url" as a second parameter. That's because
+    attack patterns are different depending on the context in which the output
+    is used.
 
-여기서, 각 뉴스 항목은 루프를 이용하여 사용자에게 표시됩니다.
-우리는 템플릿에 HTML과 PHP를 섞어 사용한 것을 볼 수 있습니다.
-템플릿 언어를 사용하고 싶다면 CodeIgniter의 :doc:`View Parser </outgoing/view_parser>` 
-또는 타사의 파서를 사용하십시오.
+Here, each news item is looped and displayed to the user. You can see we
+wrote our template in PHP mixed with HTML. If you prefer to use a template
+language, you can use CodeIgniter's :doc:`View
+Parser </outgoing/view_parser>` or a third party parser.
 
-뉴스 개요(overview) 페이지는 현재 완료되었지만, 개별 뉴스 항목을 표시할 페이지는 여전히 없습니다.
-앞서 만든 모델은 이 기능을 쉽게 사용할 수 있도록 만들어졌습니다.
-컨트롤러에 일부 코드를 추가하고 새로운 뷰를 작성하면 됩니다.
-``News`` 컨트롤러로 돌아가서 다음과 같이 ``view()`` 메소드를 업데이트하십시오.
+Complete News::show() Method
+============================
+
+The news overview page is now done, but a page to display individual
+news items is still absent. The model created earlier is made in such
+a way that it can easily be used for this functionality. You only need to
+add some code to the controller and create a new view. Go back to the
+``News`` controller and update the ``show()`` method with the following:
 
 .. literalinclude:: news_section/006.php
 
-``PageNotFoundException`` 클래스를 가져오기 위해 ``use CodeIgniter\Exceptions\PageNotFoundException;``\ 를 추가하는 것을 잊지 마세요.
+Don't forget to add ``use CodeIgniter\Exceptions\PageNotFoundException;`` to import
+the ``PageNotFoundException`` class.
 
-매개 변수없이 ``getNews()`` 메소드를 호출하는 대신 ``$slug`` 변수가 전달되므로 특정 뉴스 항목을 반환합니다.
-이제 남은 것은 뷰를 만드는 일입니다. **app/Views/news/view.php** 파일에 다음 코드를 추가하세요.
+Instead of calling the ``getNews()`` method without a parameter, the
+``$slug`` variable is passed, so it will return the specific news item.
+
+Create news/view View File
+==========================
+
+The only thing left to do is create the corresponding view at
+**app/Views/news/view.php**. Put the following code in this file.
 
 .. literalinclude:: news_section/007.php
 
-.. note:: XSS 공격을 방지하기 위해 다시 ``esc()``\ 를 사용하고 있습니다.
-    하지만 이번에는 "url"\ 을 두 번째 매개 변수로 전달했습니다. 
-    출력이 사용되는 상황에 따라 공격 패턴이 다르기 때문입니다.
-    자세한 내용은 :doc:`여기 </general/common_functions>`\ 를 참조하십시오.
+Adding Routing Rules
+********************
 
-라우팅
-*******
-
-라우팅 파일(**app/Config/Routes.php**)을 다음과 같이 수정합니다.
-
-이를 통해 요청이 ``Pages`` 컨트롤러로 직접 이동하지 않고 ``News`` 컨트롤러에 도달할 수 있습니다.
-첫 번째 줄은 슬러그가 있는 URI를 ``News`` 컨트롤러의 ``view()`` 메서드로 라우팅합니다.
+Modify your **app/Config/Routes.php** file, so it looks as follows:
 
 .. literalinclude:: news_section/008.php
 
-브라우저를 "news" 페이지(예: ``localhost:8080/news``)로 지정하면 뉴스 항목 목록이 표시되며, 각 항목에는 기사 하나만 표시할 수 있는 링크가 제공됩니다.
+This makes sure the requests reach the ``News`` controller instead of
+going directly to the ``Pages`` controller. The second ``$routes->get()`` line
+routes URI's with a slug to the ``show()`` method in the ``News`` controller.
+
+Point your browser to your "news" page, i.e., **localhost:8080/news**,
+you should see a list of the news items, each of which has a link
+to display just the one article.
 
 .. image:: ../images/tutorial2.png
     :align: center

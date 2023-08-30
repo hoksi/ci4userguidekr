@@ -1,64 +1,102 @@
-#####################
-HTML Table 클래스
-#####################
+################
+HTML Table Class
+################
 
-테이블 클래스는 배열 또는 데이터베이스 결과 세트에서 HTML 테이블을 자동 생성할 수있는 메소드를 제공합니다.
+The Table Class provides methods that enable you to auto-generate HTML
+tables from arrays or database result sets.
 
 .. contents::
     :local:
     :depth: 2
 
 *********************
-Table 클래스 사용
+Using the Table Class
 *********************
 
-클래스 초기화
+Initializing the Class
 ======================
 
-Table 클래스는 서비스로 제공되지 않으며 "일반적인 방법으로" 인스턴스화해야 합니다.
+The Table class is not provided as a service, and should be instantiated
+"normally", for instance:
 
 .. literalinclude:: table/001.php
 
 Examples
 ========
 
-다음은 다차원 배열에서 테이블을 만드는 방법을 보여주는 예입니다.
-첫 번째 배열 인덱스는 테이블 제목이 됩니다(또는 아래 함수 참조에 설명된 ``setHeading()`` 메소드를 사용하여 자신의 제목을 설정할 수 있습니다).
+Here is an example showing how you can create a table from a
+multi-dimensional array. Note that the first array index will become the
+table heading (or you can set your own headings using the ``setHeading()``
+method described in the function reference below).
 
 .. literalinclude:: table/002.php
 
-다음은 데이터베이스 쿼리 결과에서 생성된 테이블의 예입니다.
-테이블 클래스는 테이블 이름을 기반으로 자동으로 제목을 생성합니다(또는 아래 함수 참조에 설명된 ``setHeading()`` 메소드를 사용하여 자신의 제목을 설정할 수 있습니다).
+Here is an example of a table created from a database query result. The
+table class will automatically generate the headings based on the table
+names (or you can set your own headings using the ``setHeading()``
+method described in the class reference below).
 
 .. literalinclude:: table/003.php
 
-다음은 이산 매개 변수를 사용하여 테이블을 작성하는 예입니다.
+Here is an example showing how you might create a table using discrete
+parameters:
 
 .. literalinclude:: table/004.php
 
-개별 매개 변수대신 배열이 사용하는 동일한 예가 있습니다.
+Here is the same example, except instead of individual parameters,
+arrays are used:
 
 .. literalinclude:: table/005.php
 
-테이블 모양 변경
+Changing the Look of Your Table
 ===============================
 
-테이블 클래스를 사용하면 레이아웃 디자인을 지정할 수있는 테이블 템플릿을 설정할 수 있습니다.
-템플릿 프로토 타입은 다음과 같습니다.
+The Table Class permits you to set a table template with which you can
+specify the design of your layout. Here is the template prototype:
 
 .. literalinclude:: table/006.php
 
-.. note:: 템플릿에는 두 개의 "행" 블록 세트가 있습니다. 이를 통해 데이터를 나타내는 행별 배경색 또는 디자인 요소를 번갈아 나오도록 만들수 있습니다.
+.. note:: You'll notice there are two sets of "row" blocks in the
+    template. These permit you to create alternating row colors or design
+    elements that alternate with each iteration of the row data.
 
-완전한 템플릿을 제출할 필요는 없습니다.
-레이아웃의 일부만 변경해야하는 경우 해당 요소만 제출하면 됩니다.
-이 예에서는 테이블 열기 태그만 변경됩니다.
+You are NOT required to submit a complete template. If you only need to
+change parts of the layout you can simply submit those elements. In this
+example, only the table opening tag is being changed:
 
 .. literalinclude:: table/007.php
-	
-템플릿 설정 배열을 Table 클래스 생성자에 전달하여 기본값을 설정할 수도 있습니다.
+
+You can also set defaults for these by passing an array of template settings
+to the Table constructor:
 
 .. literalinclude:: table/008.php
+
+.. _table-sync-rows-with-headings:
+
+Synchronizing Rows with Headings
+================================
+
+.. versionadded:: 4.4.0
+
+The ``setSyncRowsWithHeading(true)`` method enables that each data value
+is placed in the same column as defined in ``setHeading()`` if an
+associative array was used as parameter. This is especially useful
+when dealing with data loaded via REST API where the order is not to
+your liking, or if the API returned too much data.
+
+If a data row contains a key that is not present in the heading, its value is
+filtered. Conversely, if a data row does not have a key listed in the heading,
+an empty cell will be placed in its place.
+
+.. literalinclude:: table/019.php
+
+.. important:: You must call ``setSyncRowsWithHeading(true)`` and
+    ``setHeading([...])`` before adding any rows via ``addRow([...])`` where
+    the rearrangement of columns takes place.
+
+Using an array as input to ``generate()`` produces the same result:
+
+.. literalinclude:: table/020.php
 
 
 ***************
@@ -69,113 +107,121 @@ Class Reference
 
 .. php:class:: Table
 
-	.. attribute:: $function = null
+    .. attribute:: $function = null
 
-		모든 셀 데이터에 PHP 함수 또는 유효한 함수 배열 객체를 지정할 수 있습니다.
+        Allows you to specify a native PHP function or a valid function array object to be applied to all cell data.
 
-		.. literalinclude:: table/009.php
+        .. literalinclude:: table/009.php
 
-		위의 예제에서 모든 셀 데이터는 PHP의 :php:func:`htmlspecialchars()` 함수를 통해 실행됩니다.
-		
-		::
+        In the above example, all cell data would be run through PHP's :php:func:`htmlspecialchars()` function, resulting in::
 
-			<td>Fred</td><td>&lt;strong&gt;Blue&lt;/strong&gt;</td><td>Small</td>
+            <td>Fred</td><td>&lt;strong&gt;Blue&lt;/strong&gt;</td><td>Small</td>
 
-	.. php:method:: generate([$tableData = null])
+    .. php:method:: generate([$tableData = null])
 
-		:param	mixed	$tableData: 테이블 행을 채울 데이터
-		:returns:	HTML table
-		:rtype:	string
+        :param    mixed    $tableData: Data to populate the table rows with
+        :returns:    HTML table
+        :rtype:    string
 
-		생성 된 테이블이 포함된 문자열을 리턴합니다. 배열 또는 데이터베이스 결과 객체일 수 있는 선택적 매개 변수를 승인합니다.
+        Returns a string containing the generated table. Accepts an optional parameter which can be an array or a database result object.
 
-	.. php:method:: setCaption($caption)
+    .. php:method:: setCaption($caption)
 
-		:param	string	$caption: 테이블 캡션
-		:returns:	메소드 체이닝을 위한 Table 객체
-		:rtype:	Table
+        :param    string    $caption: Table caption
+        :returns:    Table instance (method chaining)
+        :rtype:    Table
 
-		테이블에 캡션을 추가합니다.
+        Permits you to add a caption to the table.
 
-		.. literalinclude:: table/010.php
+        .. literalinclude:: table/010.php
 
-	.. php:method:: setHeading([$args = [] [, ...]])
+    .. php:method:: setHeading([$args = [] [, ...]])
 
-		:param	mixed	$args: 테이블 열 제목 배열 또는 문자열
-		:returns:	메소드 체이닝을 위한 Table 객체
-		:rtype:	Table
+        :param    mixed    $args: An array or multiple strings containing the table column titles
+        :returns:    Table instance (method chaining)
+        :rtype:    Table
 
-		배열 또는 이산 매개 변수를 통하여 테이블 제목을 설정합니다. 
-		
-		.. literalinclude:: table/011.php
+        Permits you to set the table heading. You can submit an array or discrete params:
 
-	.. php:method:: setFooting([$args = [] [, ...]])
+        .. literalinclude:: table/011.php
 
-		:param	mixed	$args: 테이블 푸터(footer) 배열 또는 문자열
-		:returns:	메소드 체이닝을 위한 Table 객체
-		:rtype:	Table
+    .. php:method:: setFooting([$args = [] [, ...]])
 
-		배열 또는 이산 매개 변수를 통하여 테이블 푸터(footer)를 설정합니다. 
-		
-		.. literalinclude:: table/012.php
+        :param    mixed    $args: An array or multiple strings containing the table footing values
+        :returns:    Table instance (method chaining)
+        :rtype:    Table
 
-	.. php:method:: addRow([$args = [][, ...]])
+        Permits you to set the table footing. You can submit an array or discrete params:
 
-		:param	mixed	$args: 행에 출력될 배열 또는 문자열
-		:returns:	메소드 체이닝을 위한 Table 객체
-		:rtype:	Table
+        .. literalinclude:: table/012.php
 
-		배열 또는 이산 매개 변수를 통하여 테이블 행(row)를 설정합니다. 
-		
-		.. literalinclude:: table/013.php
+    .. php:method:: addRow([$args = [] [, ...]])
 
-		개별 셀의 태그 속성을 설정하려면 해당 셀에 대해 연관 배열을 사용할 수 있습니다.
-		연관 키 **data**\ 는 셀의 데이터를 정의합니다. 
-		key => val 쌍은 HTML 태그 key='val' 속성(attribute)으로 추가됩니다.
-		
-		.. literalinclude:: table/014.php
+        :param    mixed    $args: An array or multiple strings containing the row values
+        :returns:    Table instance (method chaining)
+        :rtype:    Table
 
-	.. php:method:: makeColumns([$array = [] [, $columnLimit = 0]])
+        Permits you to add a row to your table. You can submit an array or discrete params:
 
-		:param	array	$array: 여러 행의 데이터를 포함하는 배열
-		:param	int	$columnLimit: 테이블의 열 수
-		:returns:	HTML 테이블 열
-		:rtype:	array
+        .. literalinclude:: table/013.php
 
-		이 방법은 1차원 배열을 사용하여 원하는 열과 동일한 깊이를 가진 다차원 배열을 만듭니다.
-		이를 이용하여 고정된 열 수를 가진 테이블에 많은 요소가 있는 단일 배열을 표시 할 수 있습니다. 다음 예를 고려하십시오.
+        If you would like to set an individual cell's tag attributes, you can use an associative array for that cell.
+        The associative key **data** defines the cell's data. Any other key => val pairs are added as key='val' attributes to the tag:
 
-		.. literalinclude:: table/015.php
+        .. literalinclude:: table/014.php
 
-	.. php:method:: setTemplate($template)
+    .. php:method:: makeColumns([$array = [] [, $columnLimit = 0]])
 
-		:param	array	$template: 템플릿 값을 포함하는 연관 배열
-		:returns:	성공하면 true, 실패하면 false
-		:rtype:	bool
+        :param    array    $array: An array containing multiple rows' data
+        :param    int    $columnLimit: Count of columns in the table
+        :returns:    An array of HTML table columns
+        :rtype:    array
 
-		전체 또는 부분 템플릿을 설정합니다.
+        This method takes a one-dimensional array as input and creates a multi-dimensional array with a depth equal to the number of columns desired.
+        This allows a single array with many elements to be displayed in a table that has a fixed column count. Consider this example:
 
-		.. literalinclude:: table/016.php
+        .. literalinclude:: table/015.php
 
-	.. php:method:: setEmpty($value)
+    .. php:method:: setTemplate($template)
 
-		:param	mixed	$value: 빈 셀에 넣을 값
-		:returns:	메소드 체이닝을 위한 Table 객체
-		:rtype:	Table
+        :param    array    $template: An associative array containing template values
+        :returns:    true on success, false on failure
+        :rtype:    bool
 
-		비어있는 테이블 셀에서 사용할 기본값을 설정합니다.
-		다음 예는 빈칸(&nbsp;)을 설정합니다
-		
-		.. literalinclude:: table/017.php
+        Permits you to set your template. You can submit a full or partial template.
 
-	.. php:method:: clear()
+        .. literalinclude:: table/016.php
 
-		:returns:	메소드 체이닝을 위한 Table 객체
-		:rtype:	Table
+    .. php:method:: setEmpty($value)
 
-		테이블 제목, 행 데이터 및 캡션을 지웁니다.
-		데이터가 다른 여러 테이블을 표시할 때 ,사용한 이전 테이블 정보를 삭제합니다.
+        :param    mixed    $value: Value to put in empty cells
+        :returns:    Table instance (method chaining)
+        :rtype:    Table
 
-		Example
+        Lets you set a default value for use in any table cells that are empty.
+        You might, for example, set a non-breaking space:
 
-		.. literalinclude:: table/018.php
+        .. literalinclude:: table/017.php
+
+    .. php:method:: clear()
+
+        :returns:    Table instance (method chaining)
+        :rtype:    Table
+
+        Lets you clear the table heading, row data and caption. If
+        you need to show multiple tables with different data you
+        should to call this method after each table has been
+        generated to clear the previous table information.
+
+        Example
+
+        .. literalinclude:: table/018.php
+    
+    .. php:method:: setSyncRowsWithHeading(bool $orderByKey)
+
+        :returns:   Table instance (method chaining)
+        :rtype:     Table
+
+        Enables each row data key to be ordered by heading keys. This gives
+        more control of data being displaced in the correct column. Make
+        sure to set this value before calling the first ``addRow()`` method.

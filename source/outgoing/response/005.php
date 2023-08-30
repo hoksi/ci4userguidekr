@@ -1,4 +1,4 @@
 <?php
 
-$this->response->setHeader('Location', 'http://example.com')
-    ->setHeader('WWW-Authenticate', 'Negotiate');
+$this->response->setHeader('Cache-Control', 'no-cache')
+    ->appendHeader('Cache-Control', 'must-revalidate');

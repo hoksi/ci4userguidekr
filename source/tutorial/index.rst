@@ -1,138 +1,154 @@
-########
-Tutorial
-########
+############################
+Build Your First Application
+############################
 
 .. contents::
     :local:
     :depth: 2
 
-이 튜토리얼은 CodeIgniter4 프레임워크와 MVC 아키텍처의 기본 원칙을 소개하고,
-기본적인 CodeIgniter 어플리케이션이 단계별로 구성되는 방법을 보여줍니다.
+Overview
+********
 
+This tutorial is intended to introduce you to the CodeIgniter4 framework
+and the basic principles of MVC architecture. It will show you how a
+basic CodeIgniter application is constructed in a step-by-step fashion.
 
-PHP에 익숙하지 않다면 계속하기 전에 `W3Schools PHP Tutorial <https://www.w3schools.com/php/default.asp>`_\ 을 확인하는 것이 좋습니다.
+If you are not familiar with PHP, we recommend that you check out
+the `W3Schools PHP Tutorial <https://www.w3schools.com/php/default.asp>`_ before continuing.
 
-이 튜토리얼에서는 **basic news application**\ 을 만듭니다.
-정적 페이지를 로드할 수 있는 코드를 작성을 시작하여 데이터베이스에서 뉴스 항목을
-읽는 뉴스 섹션을 만들고, 마지막으로, 데이터베이스에 뉴스 항목을 만들기 위해 폼(form)을 추가합니다.
+In this tutorial, you will be creating a **basic news application**. You
+will begin by writing the code that can load static pages. Next, you
+will create a news section that reads news items from a database.
+Finally, you'll add a form to create news items in the database.
 
-본 튜토리얼은 주로 다음을 학습하는데 초점을 맞춥니다.:
+This tutorial will primarily focus on:
 
--  Model-View-Controller 기본
--  기본 Routing
--  폼 검증(form validation)
--  CodeIgniter의 모델를 사용하여 기본 데이터베이스 쿼리 수행
+-  Model-View-Controller basics
+-  Routing basics
+-  Form validation
+-  Performing basic database queries using CodeIgniter's Model
 
-전체 튜토리얼은 몇 페이지에 걸쳐 분할되며, CodeIgniter 프레임워크의 기능중 작은 부분을 설명합니다.
-다음 페이지를 살펴보십시오.:
+The entire tutorial is split up over several pages, each explaining a
+small part of the functionality of the CodeIgniter framework. You'll go
+through the following pages:
 
--  Introduction, 이 페이지에서는 예상한 사항에 대한 개요를 제공하고, 기본 어플리케이션을 다운로드하여 실행합니다.
--  :doc:`Static pages <static_pages>`, 컨트롤러, 뷰, 라우팅의 기본 사항을 학습합니다.
--  :doc:`News section <news_section>`, 모델을 사용하고 몇 가지 기본 데이터베이스 작업을 수행합니다.
--  :doc:`Create news items <create_news_items>`, 보다 고급적인 데이터베이스 작업과 폼 검증(form validation)을 도입합니다.
--  :doc:`Conclusion <conclusion>`, 더 많은 자료와 다른 자원(resource)에 대한 힌트를 제공합니다.
+-  Introduction, this page, which gives you an overview of what to
+   expect and gets your default application downloaded and running.
+-  :doc:`Static pages <static_pages>`, which will teach you the basics
+   of controllers, views and routing.
+-  :doc:`News section <news_section>`, where you'll start using models
+   and will be doing some basic database operations.
+-  :doc:`Create news items <create_news_items>`, which will introduce
+   more advanced database operations and form validation.
+-  :doc:`Conclusion <conclusion>`, which will give you some pointers on
+   further reading and other resources.
 
-CodeIgniter 프레임워크의 탐색을 즐기세요.
+Enjoy your exploration of the CodeIgniter framework.
 
 .. toctree::
-	:hidden:
-	:titlesonly:
+    :hidden:
+    :titlesonly:
 
-	static_pages
-	news_section
-	create_news_items
-	conclusion
+    static_pages
+    news_section
+    create_news_items
+    conclusion
 
-시작 및 실행
-************
+Getting Up and Running
+**********************
 
-CodeIgniter 설치
-================
+Installing CodeIgniter
+======================
 
-사이트에서 수동으로 릴리스를 다운로드할 수 있지만, 이 튜토리얼은 Composer를 통해 AppStarter 패키지를 설치하는 방법을 사용합니다.
-명령줄에서 다음을 입력합니다.
+You can download a release manually from the site, but for this tutorial we will
+use the recommended way and install the AppStarter package through Composer.
+From your command line type the following:
 
-::
+.. code-block:: console
 
-    > composer create-project codeigniter4/appstarter ci-news
+    composer create-project codeigniter4/appstarter ci-news
 
-``vendor`` 폴더에 CodeIgniter가 설치되고 어플리케이션 코드가 포함된 ``ci-news`` 라는 새 폴더가 생성됩니다.
+This creates a new folder, **ci-news**, which contains your application code, with
+CodeIgniter installed in the vendor folder.
 
 .. _setting-development-mode:
 
-Development Mode 설정
-=====================
+Setting Development Mode
+========================
 
-기본적으로 CodeIgniter는 ``production`` 모드에서 시작됩니다.
-이 모드는 라이브 설정이 잘못되었을 때 사이트를 좀 더 안전하게 유지하기 위한 안전 모드입니다.
-먼저 그것을 수정해봅시다. "env" 파일을 ".env"로 복사한 후 에디터로 여세요.
+By default, CodeIgniter starts up in production mode. This is a safety feature
+to keep your site a bit more secure in case settings are messed up once it is live.
+So first let's fix that. Copy or rename the **env** file to **.env**. Open it up.
 
-이 파일에는 서버별 설정이 포함되어 있습니다. git과 같은 버전 관리 시스템에 이 중요한 정보를 커밋(commit)하지 마세요.
-여기에는 일반적으로 가장 많이 사용되는 항목중 일부가 포함되어 있지만, 모두 주석 처리되어 있습니다.
-``production`` 모드 변경을 위해 ``CI_ENVIRONMENT``\ 가 있는 라인의 주석 처리를 제거하고 ``development``\ 로 변경합니다.
-
-::
+This file contains server-specific settings. This means you never will need to
+commit any sensitive information to your version control system. It includes
+some of the most common ones you want to enter already, though they are all commented
+out. So uncomment the line with ``CI_ENVIRONMENT`` on it, and change ``production`` to
+``development``::
 
     CI_ENVIRONMENT = development
 
-Development Server 실행
-=======================
+Running Development Server
+==========================
 
-이제 브라우저에서 어플리케이션을 볼 차례입니다.
-Apache, Nginx 등과 같은 웹 서버를 통해 서비스를 제공할 수 있지만, CodeIgniter에는 PHP의 내장 서버를 활용하여 개발 컴퓨터에서 빠르게 실행되도록 하는 간단한 명령이 포함되어 있습니다.
-프로젝트 루트의 명령줄에 다음을 입력합니다.
+With that out of the way it's time to view your application in a browser. You can
+serve it through any server of your choice, Apache, Nginx, etc, but CodeIgniter
+comes with a simple command that takes advantage of PHP's built-in server to get
+you up and running fast on your development machines. Type the following on the
+command line from the root of your project:
 
-::
+.. code-block:: console
 
-    > php spark serve
+    php spark serve
 
-
-시작 페이지
+The Welcome Page
 ****************
 
-이제 브라우저에 다음 URL을 입력하여 시작 화면이 표시되도록 하십시오.
-
-::
+Now point your browser to the correct URL you will be greeted by a welcome screen.
+Try it now by heading to the following URL::
 
     http://localhost:8080
 
-다음 페이지가 여러분을 반길겁니다.
+and you should be greeted by the following page:
 
 .. image:: ../images/welcome.png
 
-이제 어플리케이션을 변경하고 작동할 수 있습니다.
+This means that your application works and you can start making changes to it.
 
-디버깅
+Debugging
 *********
 
 Debug Toolbar
 =============
 
-개발 모드에 진입하면 애플리케이션 오른쪽 하단에 CodeIgniter 불꽃이 표시됩니다. 그것을 클릭하면 디버그 툴바가 표시됩니다.
+Now that you're in development mode, you'll see the CodeIgniter flame on the right bottom of your application. Click it and you'll see the debug toolbar.
 
-이 툴바는 개발 중에 참조할 수 있는 여러 가지 유용한 항목이 포함되어 있습니다.
-운영(production) 환경에서는 표시되지 않습니다.
-아래쪽에 있는 탭을 클릭하면 추가 정보가 표시됩니다.
-툴바의 오른쪽에있는 X를 클릭하면 CodeIgniter 불꽃이 있는 작은 사각형으로 최소화됩니다.
-불꽃을 클릭하면 툴바가 다시 표시됩니다.
+This toolbar contains a number of helpful items that you can reference during development.
+This will never show in production environments. Clicking any of the tabs along the bottom
+brings up additional information. Clicking the X on the right of the toolbar minimizes it
+to a small square with the CodeIgniter flame on it. If you click that the toolbar
+will show again.
 
 .. image:: ../images/debugbar.png
 
 Error Pages
 ===========
 
-이 외에도 CodeIgniter에는 프로그램에서 예외 또는 기타 오류가 발생할 때 유용한 오류 페이지가 있습니다.
-**app/Controllers/Home.php**\ 를 열어 일부 라인을 변경하여 오류를 생성하십시오.(세미콜론이나 중괄호를 제거하면 효과가 있습니다!).
-
-다음과 같은 화면이 나타납니다.
+In addition to this, CodeIgniter has some helpful error pages when you hit exceptions or
+other errors in your program. Open up **app/Controllers/Home.php** and change some line
+to generate an error (removing a semi-colon or brace should do the trick!). You will be
+greeted by a screen looking something like this:
 
 .. image:: ../images/error.png
 
-여기에 주목해야 할 몇 가지가 있습니다.
+There are a couple of things to note here:
 
-1. 맨 위에 있는 빨간 머리글 위로 마우스를 가져 가면 DuckDuckGo.com에서 예외를 검색하여 새 탭에 보여주는 **search** 링크가 나타납니다.
-2. Backtrace의 임의의 행에서 **arguments** 링크를 클릭하면 해당 함수 호출에 전달된 인수 목록을 볼 수 있습니다.
+1. Hovering over the red header at the top reveals a **search** link that will open up
+   DuckDuckGo.com in a new tab and searching for the exception.
+2. Clicking the **arguments** link on any line in the Backtrace will expand a list of
+   the arguments that were passed into that function call.
 
-다른 모든 것은 볼 때 명확해야 합니다.
+Everything else should be clear when you see it.
 
-이제 시작하는 방법과 약간의 디버그 방법을 알았으므로 작은 뉴스 어플리케이션을 빌드해 보겠습니다.
+Now that we know how to get started and how to debug a little, let's get started building this
+small news application.

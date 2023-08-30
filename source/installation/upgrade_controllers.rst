@@ -1,51 +1,55 @@
-컨트롤러 업그레이드
+Upgrade Controllers
 ###################
 
 .. contents::
     :local:
     :depth: 2
 
-관련 문서
+Documentations
 ==============
 
-- `CodeIgniter 3.X 컨트롤러 설명서 <http://codeigniter.com/userguide3/general/controllers.html>`_
-- `CodeIgniter 4.X 컨트롤러 설명서 </incoming/controllers.html>`_
+- `Controller Documentation CodeIgniter 3.X <http://codeigniter.com/userguide3/general/controllers.html>`_
+- :doc:`Controller Documentation CodeIgniter 4.X </incoming/controllers>`
 
-무엇이 바뀌었습니까?
+What has been changed
 =====================
 
-- CodeIgniter4에 네임스페이스가 추가되었으므로 컨트롤러를 지원 네임스페이스로 변경해야 합니다.
-- CI4 Controller의 생성자는 코어 클래스를 속성에 자동으로 로드하지 않습니다.
-- CI4의 Controller에는 특별한 생성자인 :ref:`initController() <controller-constructor>`\ 가 있습니다.
-- CI4는 작업에 사용할 :doc:`Request </incoming/incomingrequest>`\ 와 :doc:`Responses </outgoing/response>` 객체를 제공합니다 - CI3 방식보다 더 강력합니다.
-- 기본 컨트롤러를 원하는 경우 (CI3의 ``MY_Controller``\ 와 같은), **app/Controllers/BaseController.php**\ 를 사용하세요."
+- Since namespaces have been added to CodeIgniter 4, the controllers must be changed to support namespaces.
+- The constructor of CI4 Controller does not automatically load core classes into the properties.
+- CI4's Controller has a special constructor :ref:`initController() <controller-constructor>`.
+- CI4 provides :doc:`Request </incoming/incomingrequest>` and :doc:`Responses </outgoing/response>`
+  objects for you to work with - more powerful than the CI3-way.
+- If you want a base controller (``MY_Controller`` in CI3), use **app/Controllers/BaseController.php**.
 
+Upgrade Guide
+=============
 
-업그레이드 가이드
-=================
+1. First, move all controller files to the folder **app/Controllers**.
+2. Add this line just after the opening php tag: ``namespace App\Controllers;``
+3. Replace ``extends CI_Controller`` with ``extends BaseController``.
+4. Remove the line ``defined('BASEPATH') OR exit('No direct script access allowed');`` if it exists.
 
-1. 먼저 모든 컨트롤러 파일을 **app/Controllers** 폴더로 이동합니다.
-2. <?php 태그 바로 뒤에 ``namespace App\Controllers;``\ 를 추가합니다.
-3. ``extends CI_Controller``\ 를 ``extends BaseController``\ 로 바꿉니다.
-4. ``defined('BASEPATH') OR exit('No direct script access allowed');`` 라인이 있으면 제거합니다.
+| If you use sub-directories in your controller structure, you have to change the namespace according to that.
+| For example, you have a version 3 controller located in **application/controllers/users/auth/Register.php**,
+    the namespace has to be ``namespace App\Controllers\Users\Auth;`` and the controller path in the version 4
+    should look like this: **app/Controllers/Users/Auth/Register.php**. Make sure to have the first letters of
+    the sub-directories as capitalized.
+| After that you have to insert a ``use`` statement below the namespace definition in order to extend the ``BaseController``:
+    ``use App\Controllers\BaseController;``
 
-| 컨트롤러 구조에 하위 디렉터리를 사용한다면 네임스페이스를 변경해야 합니다.
-| 예를 들어 **application/controllers/users/auth/Register.php**\ 에 버전 3의 컨트롤러가 있다면 네임스페이스는 ``namespace App\Controllers\Users\Auth;``\ 이고 버전 4의 컨트롤러 경로는 **app/Controllers/Users/Auth/Register.php**\ 와 같이 변경됩니다. 하위 디렉토리의 첫 글자가 대문자로 되어 있는지 확인하십시오.
-| ``BaseController``\ 를 확장하려면 네임스페이스 정의 아래에 ``use``\ 문을 삽입해야 합니다 : ``use App\Controllers\BaseController;``
-
-코드 예
+Code Example
 ============
 
 CodeIgniter Version 3.x
 ------------------------
 
-Path: **application/controllers**
+Path: **application/controllers**:
 
 .. literalinclude:: upgrade_controllers/ci3sample/001.php
 
 CodeIgniter Version 4.x
 -----------------------
 
-Path: **app/Controllers**
+Path: **app/Controllers**:
 
 .. literalinclude:: upgrade_controllers/001.php

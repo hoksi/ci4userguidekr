@@ -1,6 +1,23 @@
 <?php
 
-$default = [
+namespace Config;
+
+use CodeIgniter\Database\Config;
+
+/**
+ * Database Configuration
+ */
+class Database extends Config
+{
     // ...
-    'port' => 5432,
-];
+
+    public function __construct()
+    {
+        // ...
+
+        $array = json_decode($this->default['encrypt'], true);
+        if (is_array($array)) {
+            $this->default['encrypt'] = $array;
+        }
+    }
+}

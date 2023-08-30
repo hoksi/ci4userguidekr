@@ -1,78 +1,79 @@
-##################
-데이터베이스 명령
-##################
+#################
+Database Commands
+#################
 
-CodeIgniter는 데이터베이스 관리를 위한 몇 가지 간단한 명령을 제공합니다.
+CodeIgniter provides some simple commands for database management.
 
 .. contents::
     :local:
     :depth: 2
 
 *************************
-테이블 정보 표시
+Showing Table Information
 *************************
 
-데이터베이스의 테이블 나열
+List the Tables in Your Database
 ================================
 
 db:table --show
 ---------------
 
-터미널에서 데이터베이스의 모든 테이블을 나열하려면 ``db:table --show`` 명령을 사용할 수 있습니다.
+To list all the tables in your database straight from your favorite terminal,
+you can use the ``db:table --show`` command:
 
-::
+.. code-block:: console
 
-    > php spark db:table --show
+    php spark db:table --show
 
-이 명령을 사용할 때 테이블이 존재한다고 가정합니다.
-그렇지 않으면 CodeIgniter는 데이터베이스에 테이블이 없다고 투덜될 것입니다.
+When using this command it is assumed that a table exists.
+Otherwise, CodeIgniter will complain that the database has no tables.
 
-일부 레코드 검색
+Retrieve Some Records
 =====================
 
 db:table
 --------
 
-다음 명령은 ``my_table``\ 이라는 테이블이 있으면 테이블의 필드 이름과 레코드를 볼 수 있습니다.
+When you have a table named ``my_table``, you can see the field names and the records of a table:
 
-::
+.. code-block:: console
 
-    > php spark db:table my_table
+    .. code-block:: consolephp spark db:table my_table
 
-테이블 ``my_table``\ 이 데이터베이스에 없으면 CodeIgniter는 선택할 수 있는 테이블 목록을 표시합니다.
+If the table ``my_table`` is not in the database, CodeIgniter displays a list of available tables to select.
 
-테이블 이름 없이 다음 명령을 사용할 수도 있습니다.
+You can also use the following command without the table name:
 
-::
+.. code-block:: console
 
-    > php spark db:table
+    php spark db:table
 
-이 경우 테이블 이름을 묻습니다.
+In this case, the table name will be asked.
 
-당신은 또한 몇 가지 옵션을 전달할 수 있습니다
+You can also pass a few options:
 
-::
+.. code-block:: console
 
-    > php spark db:table my_table --limit-rows 50 --limit-field-value 20 --desc
+    php spark db:table my_table --limit-rows 50 --limit-field-value 20 --desc
 
-``--limit-rows 50`` 옵션은 행 수를 50행으로 제한합니다.
+The option ``--limit-rows 50`` limits the number of rows to 50 rows.
 
-``--limit-field-value 20`` 옵션은 터미널에서 테이블 출력의 혼동을 방지하기 위해 필드 값의 길이를 20자로 제한합니다.
+The option  ``--limit-field-value 20`` limits the length of the field values to 20 characters, to prevent confusion of the table output in the terminal.
 
-``--desc`` 옵션은 정렬 방향을 "DESC"로 설정합니다.
+The option ``--desc`` sets the sort direction to "DESC".
 
-필드 메타데이터 검색
+Retrieve Field Metadata
 =======================
 
 db:table --metadata
 -------------------
 
-``my_table``\ 이라는 이름의 테이블이 있는 경우 ``--metadata`` 옵션을 사용하여 열 유형, 테이블의 최대 길이와 같은 메타데이터를 볼 수 있습니다.
+When you have a table named ``my_table``, you can see metadata like the column type, max length of the table with the ``--metadata`` option:
 
-::
+.. code-block:: console
 
-    > php spark db:table my_table --metadata
+    php spark db:table my_table --metadata
 
-이 명령을 사용할 때 테이블이 존재한다고 가정합니다.
-그렇지 않으면 CodeIgniter는 선택할 테이블 목록을 표시합니다.
-또한 이 명령은 테입명을 생략하고 ``db:table --metadata``\ 로 사용할 수 있습니다.
+When using this command it is assumed that the table exists.
+Otherwise, CodeIgniter will show a table list to select.
+Also, you can use this command as ``db:table --metadata``.

@@ -1,22 +1,23 @@
 ###############
-뷰 데코레이터
+View Decorators
 ###############
 
-뷰 데코레이터를 사용하면 애플리케이션이 렌더링중 HTML 출력을 수정할 수 있습니다.
-데코레이팅은 캐시되기 직전에 발생하며 뷰에 사용자 정의 기능을 적용할 수 있습니다.
+View Decorators allow your application to modify the HTML output during the rendering process. This happens just
+prior to being cached, and allows you to apply custom functionality to your views.
 
 *******************
-데코레이터 만들기
+Creating Decorators
 *******************
 
-자신의 뷰 데코레이터를 만들려면 ``CodeIgniter\View\ViewDecoratorInterface``\ 를 구현(implement)하는 새 클래스를 만들어야 합니다.
-이렇게 하려면 생성된 HTML 문자열을 가져와서 수정을 수행하고 결과 HTML을 반환하는 단일 메서드가 필요합니다.
+Creating your own view decorators requires creating a new class that implements ``CodeIgniter\View\ViewDecoratorInterface``.
+This requires a single method that takes the generated HTML string, performs any modifications on it, and returns
+the resulting HTML.
 
 .. literalinclude:: view_decorators/001.php
 
-클래스가 생성되면 ``app/Config/View.php``\ 에 등록해야 합니다.
+Once created, the class must be registered in ``app/Config/View.php``:
 
 .. literalinclude:: view_decorators/002.php
 
-이제 렌더링되거나 구문 분석되는 모든 뷰에 대해 데코레이터가 호출됩니다.
-데코레이터는 구성(config) 설정에 지정된 순서대로 호출됩니다.
+Now that it's registered the decorator will be called for every view that is rendered or parsed.
+Decorators are called in the order specified in this configuration setting.

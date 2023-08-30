@@ -1,21 +1,21 @@
-########################
-지역화(Localization)
-########################
+############
+Localization
+############
 
 .. contents::
     :local:
-    :depth: 2
+    :depth: 3
 
 ********************
-지역화 작업
+Working with Locales
 ********************
 
-CodeIgniter는 어플리케이션을 다른 언어로 지역화하는데 도움이 되는 몇 가지 도구를 제공합니다.
-어플리케이션의 전체 지역화는 복잡한 주제이지만 어플리케이션에서 지원되는 언어로 문자열을 바꾸는 것은 간단합니다.
+CodeIgniter provides several tools to help you localize your application for different languages. While full
+localization of an application is a complex subject, it's simple to swap out strings in your application
+with different supported languages.
 
-언어 문자열은 지원되는 각 언어의 하위 디렉토리와 함께 **app/Language** 디렉토리에 저장됩니다.
-
-::
+Language strings are stored in the **app/Language** directory, with a sub-directory for each
+supported language::
 
     app/
         Language/
@@ -24,193 +24,233 @@ CodeIgniter는 어플리케이션을 다른 언어로 지역화하는데 도움�
             fr/
                 App.php
 
-.. important:: 로케일 감지는 ``IncomingRequest`` 클래스를 사용하는 웹 기반 요청에만 작동합니다. 커맨드 라인 요청에는 이러한 기능이 없습니다.
+.. important:: Locale detection only works for web-based requests that use the IncomingRequest class.
+    Command-line requests will not have these features.
 
-지역화 구성
+Configuring the Locale
 ======================
 
-모든 사이트에는 기본 language/locale이 있으며, **app/Config/App.php**\ 에서 설정할 수 있습니다.
+.. _setting-the-default-locale:
+
+Setting the Default Locale
+--------------------------
+
+Every site will have a default language/locale they operate in. This can be set in **app/Config/App.php**:
 
 .. literalinclude:: localization/001.php
 
-값은 어플리케이션이 텍스트 문자열 및 기타 형식을 관리하는데 사용하는 모든 문자열입니다.
-`BCP 47 <http://www.rfc-editor.org/rfc/bcp/bcp47.txt>`_ 언어 코드를 사용하는 것이 좋습니다.
-이를 따르면 "미국 영어"의 경우는 ``en-US``, "French/France"의 경우는 ``fr-FR``\ 과 같은 언어 코드가 생성됩니다.
-이에 대한 더 읽기 쉬운 소개는 `W3C 사이트  <https://www.w3.org/International/articles/language-tags/>`_\ 에서 찾을 수 있습니다.
+The value can be any string that your application uses to manage text strings and other formats. It is
+recommended that a `BCP 47 <http://www.rfc-editor.org/rfc/bcp/bcp47.txt>`_ language code is used. This results in
+language codes like en-US for American English, or fr-FR, for French/France. A more readable introduction
+to this can be found on the `W3C's site <https://www.w3.org/International/articles/language-tags/>`_.
 
-시스템은 정확하게 일치하는 것을 찾을 수 없는 경우 더 일반적인 언어 코드로 대체될 만큼 똑똑합니다.
-로케일 코드가 ``en-US``\ 로 설정되어 있고 ``en``\ 에 언어 파일만 설정되어 있으면, 더 구체적인 ``en-US``\ 에 대해 아무것도 없기 때문에 이 파일이 사용됩니다.
-그러나 **app/Language/en-US** 디렉토리에 해당하는 언어 디렉토리가 존재하면 먼저 사용됩니다.
+The system is smart enough to fall back to more generic language codes if an exact match
+cannot be found. If the locale code was set to ``en-US`` and we only have language files set up for ``en``
+then those will be used since nothing exists for the more specific ``en-US``. If, however, a language
+directory existed at the **app/Language/en-US** directory then that would be used first.
 
-로케일 감지
+Locale Detection
 ================
 
-요청중에 올바른 로케일을 감지하기 위해 지원되는 두 가지 방법이 있습니다.
-첫 번째는 :doc:`컨텐츠 협상 </incoming/content_negotiation>`\ 을 자동으로 수행하여 올바른 로케일을 결정하는 "set and forget" 방법입니다.
-두 번째 방법을 사용하면 경로에서 로케일을 설정하는데 사용할 세그먼트를 지정할 수 있습니다.
+There are two methods supported to detect the correct locale during the request. The first is a "set and forget"
+method that will automatically perform :doc:`content negotiation </incoming/content_negotiation>` for you to
+determine the correct locale to use. The second method allows you to specify a segment in your routes that
+will be used to set the locale.
 
-로케일을 직접 설정해야 하는 경우 ``IncomingRequest::setLocale(string $locale)``\ 을 사용할 수 있습니다.
+Should you ever need to set the locale directly, see `Setting the Current Locale`_.
 
-컨텐츠 협상
+Since v4.4.0, ``IncomingRequest::setValidLocales()`` has been added to set
+(and reset) valid locales that are set from ``Config\App::$supportedLocales`` setting.
+
+Content Negotiation
 -------------------
 
-**app/Config/App.php**\ 에 두 개의 설정을 추가로 설정하여 컨텐츠 협상이 자동으로 수행되도록 할 수 있습니다.
-첫 번째 값은 Request 클래스에 로케일을 협상하고 싶다고 알려주므로 간단히 true로 설정하십시오.
+You can set up content negotiation to happen automatically by setting two additional settings in **app/Config/App.php**.
+The first value tells the Request class that we do want to negotiate a locale, so simply set it to true:
 
 .. literalinclude:: localization/002.php
 
-이 기능이 활성화되면 시스템은 ``$supportLocales``\ 에 정의한 로케일 배열을 기반으로 올바른 언어를 자동으로 협상합니다.
-지원하는 언어와 요청한 언어가 일치하지 않으면 ``$supportedLocales``\ 의 첫 번째 항목이 사용됩니다.
-다음 예에서 일치하는 항목이 없으면 ``en`` 로케일이 사용됩니다.
+Once this is enabled, the system will automatically negotiate the correct language based upon an array
+of locales that you have defined in ``$supportLocales``. If no match is found between the languages
+that you support, and the requested language, the first item in ``$supportedLocales`` will be used. In
+the following example, the ``en`` locale would be used if no match is found:
 
 .. literalinclude:: localization/003.php
 
 .. _localization-in-routes:
 
-경로(route)에 배치
------------------------
+In Routes
+---------
 
-두 번째 방법은 사용자 지정 자리 표시자를 사용하여 원하는 로케일을 감지하고 요청에 설정합니다.
-자리 표시자 ``{locale}``\ 은 경로에 세그먼트로 배치할 수 있습니다.
-존재하는 경우 일치하는 세그먼트의 내용이 로케일이 됩니다.
+The second method uses a custom placeholder to detect the desired locale and set it on the Request. The
+placeholder ``{locale}`` can be placed as a segment in your route. If present, the contents of the matching
+segment will be your locale:
 
 .. literalinclude:: localization/004.php
 
-이 예에서 사용자가 **http://example.com/fr/books**\ 를 방문할 때 유효한 로케일로 구성된 경우 로케일이 ``fr``\ 로 설정됩니다.
+In this example, if the user tried to visit **http://example.com/fr/books**, then the locale would be
+set to ``fr``, assuming it was configured as a valid locale.
 
-만약 값이 **app/Config/App.php** 파일의 ``$supportedLocales``\ 에서 정의된 유효한 로케일과 일치하지 않는 경우, 기본 로케일이 대신 사용됩니다.
-그러나 App 구성 파일에서 정의된 지원되는 로케일만 사용하도록 설정하지 않은 한, 지원되는 로케일 외의 값을 사용할 수 있습니다
+If the value doesn't match a valid locale as defined in ``$supportedLocales`` in **app/Config/App.php**, the default
+locale will be used in it's place, unless you set to use only the supported locales defined in the App configuration
+file:
 
 .. literalinclude:: localization/018.php
 
-.. note:: v4.3.0부터 ``useSupportedLocalesOnly()`` 메소드를 사용할 수 있습니다.
+.. note:: The ``useSupportedLocalesOnly()`` method can be used since v4.3.0.
 
-현재 로케일 검색
+Setting the Current Locale
+==========================
+
+If you want to set the locale directly, you may use
+``IncomingRequest::setLocale(string $locale)``.
+You must set supported locales in **app/Config/App.php**:
+
+.. literalinclude:: localization/003.php
+
+.. note:: Any attempt to set a locale not included in this array will result in
+    the :ref:`default locale <setting-the-default-locale>` being set.
+
+Retrieving the Current Locale
 =============================
 
-현재 로케일은 ``getLocale()`` 메소드를 통해 ``IncomingRequest`` 오브젝트에서 검색할 수 있습니다.
-컨트롤러가 ``CodeIgniter\Controller``\ 를 확장하는 경우 ``$this->request``\ 를 통해 사용할 수 있습니다
+The current locale can always be retrieved from the IncomingRequest object, through the ``getLocale()`` method.
+If your controller is extending ``CodeIgniter\Controller``, this will be available through ``$this->request``:
 
 .. literalinclude:: localization/005.php
 
-또는 :doc:`서비스 클래스 </concepts/services>`\ 를 사용하여 현재 요청을 검색할 수 있습니다.
+Alternatively, you can use the :doc:`Services class </concepts/services>` to retrieve the current request:
 
 .. literalinclude:: localization/006.php
 
 *********************
-언어 지역화
+Language Localization
 *********************
 
-언어 파일 만들기
+Creating Language Files
 =======================
 
-.. note:: 언어 파일에는 네임스페이스가 없습니다.
+.. note:: The Language Files do not have namespaces.
 
-언어에는 필요한 특정 명명 규칙이 없습니다.
-파일의 내용 유형을 설명하기 위해 파일 이름을 논리적으로 지정해야 합니다.
-예를 들어, 오류 메시지가 포함된 파일을 작성하려고 한다고 가정합니다.
-**Errors.php**\ 라는 이름으로 간단히 지정할 수 있습니다.
+Languages do not have any specific naming convention that are required. The file should be named logically to
+describe the type of content it holds. For example, let's say you want to create a file containing error messages.
+You might name it simply: **Errors.php**.
 
-파일 내에서 배열을 반환합니다. 배열의 각 요소에는 언어 키와 반환 할 문자열이 있습니다.
+Within the file, you would return an array, where each element in the array has a language key and can have string to return:
 
 .. literalinclude:: localization/007.php
 
-또한 중첩된 정의(define)를 지원합니다.
+It also support nested definition:
 
 .. literalinclude:: localization/008.php
 
 .. literalinclude:: localization/009.php
 
-기본 사용법
-==============
+Basic Usage
+===========
 
-:php:func:`lang()` 헬퍼 함수를 사용하면 파일 이름과 언어 키를 마침표(.)로 구분된 첫 번째 매개 변수로 전달하여 모든 언어 파일에서 텍스트를 검색할 수 있습니다.
-예를 들어 **Errors.php** 언어 파일에서 ``errorEmailMissing`` 문자열을 로드하려면 다음과 같이합니다.
+You can use the :php:func:`lang()` helper function to retrieve text from any of the language files, by passing the
+filename and the language key as the first parameter, separated by a period (.). For example, to load the
+``errorEmailMissing`` string from the **Errors.php** language file, you would do the following:
 
 .. literalinclude:: localization/010.php
 
-중첩하여 정의한 경우 다음과 같이합니다.
+For nested definition, you would do the following:
 
 .. literalinclude:: localization/011.php
 
-요청된 언어 키가 현재 로케일의 파일에 없으면 문자열이 변경되지 않고 키가 다시 전달됩니다.
-이 예에서 정의된 키가 없으면 'Errors.errorEmailMissing'\ 이나 'Errors.nested.error.message'\ 을 반환합니다.
+If the requested language key doesn't exist in the file for the current locale, the string will be passed
+back, unchanged. In this example, it would return 'Errors.errorEmailMissing' or 'Errors.nested.error.message' if it didn't exist.
 
-매개 변수 교체
+Replacing Parameters
 --------------------
 
-.. note:: 다음 함수들이 모두 작동하기 위해서는 시스템에 `intl <https://www.php.net/manual/en/book.intl.php>`_ 확장을 로드해야 합니다.
-    확장이로드되지 않으면 교체가 시도되지 않습니다.
-    `Sitepoint <https://www.sitepoint.com/localization-demystified-understanding-php-intl/>`_\ 에서 자세한 개요를 확인할 수 있습니다.
+.. note:: The following functions all require the `intl <https://www.php.net/manual/en/book.intl.php>`_ extension to
+    be loaded on your system in order to work. If the extension is not loaded, no replacement will be attempted.
+    A great overview can be found over at `Sitepoint <https://www.sitepoint.com/localization-demystified-understanding-php-intl/>`_.
 
-``lang()`` 함수의 두 번째 매개 변수로 언어 문자열의 자리 표시자를 바꾸는 값 배열을 전달할 수 있습니다.
-이것은 매우 간단한 숫자 변환과 서식을 허용합니다.
+You can pass an array of values to replace placeholders in the language string as the second parameter to the
+``lang()`` function. This allows for very simple number translations and formatting:
 
 .. literalinclude:: localization/012.php
 
-자리 표시자의 첫 번째 항목이 숫자인 경우 배열의 항목 색인에 해당합니다.
+The first item in the placeholder corresponds to the index of the item in the array, if it's numerical:
 
 .. literalinclude:: localization/013.php
 
-원하는 경우 이름이 지정된 키를 사용하여 작업을 쉽게할 수 있습니다.
+You can also use named keys to make it easier to keep things straight, if you'd like:
 
 .. literalinclude:: localization/014.php
 
-분명히, 당신은 단순히 숫자 교체 이상을 할 수 있습니다.
-기본 라이브러리에 대한 `공식 ICU 문서 <https://unicode-org.github.io/icu-docs/apidoc/released/icu4c/classMessageFormat.html#details>`_\ 에 따르면 다음 유형의 데이터를 대체할 수 있습니다:
+Obviously, you can do more than just number replacement. According to the
+`official ICU docs <https://unicode-org.github.io/icu-docs/apidoc/released/icu4c/classMessageFormat.html#details>`_ for the underlying
+library, the following types of data can be replaced:
 
 * numbers - integer, currency, percent
 * dates - short, medium, long, full
 * time - short, medium, long, full
-* spellout - spells out numbers (예 : 34 becomes thirty-four)
+* spellout - spells out numbers (i.e., 34 becomes thirty-four)
 * ordinal
 * duration
 
-다음은 몇 가지 예입니다
+Here are a few examples:
 
 .. literalinclude:: localization/015.php
 
-조건부 교체, 복수화 등의 기능에 대한 더 나은 아이디어를 얻으려면 ``MessageFormatter`` 클래스와 기본 ICU 형식을 읽어야합니다.
-이전에 제공된 두 링크 모두 사용 가능한 옵션에 대한 훌륭한 아이디어를 제공합니다.
+You should be sure to read up on the MessageFormatter class and the underlying ICU formatting to get a better
+idea on what capabilities it has, like performing the conditional replacement, pluralization, and more. Both of the links provided
+earlier will give you an excellent idea as to the options available.
 
-로케일 지정
+Specifying Locale
 -----------------
 
-매개 변수를 대체할 때 사용할 다른 로케일을 지정하기 위해 로케일을 ``lang()`` 함수의 세 번째 매개 변수로 전달할 수 있습니다.
+To specify a different locale to be used when replacing parameters, you can pass the locale in as the
+third parameter to the ``lang()`` function.
 
 .. literalinclude:: localization/016.php
 
-중첩 배열
+Nested Arrays
 -------------
 
-언어 파일에 중첩 배열을 사용하여 목록 등을 쉽게 사용할 수 있습니다.
+Language files also allow nested arrays to make working with lists, etc... easier.
 
 .. literalinclude:: localization/017.php
 
-언어 대체
+Language Fallback
 =================
 
-특정 로케일에 대한 메시지 세트 (예 : **Language/en/app.php**)가 있는 경우 해당 로케일의 언어 변형 (예 : **Language/en-US/app.php**)을 각각 고유 폴더에 추가할 수 있습니다.
+If you have a set of messages for a given locale, for instance
+**Language/en/app.php**, you can add language variants for that locale,
+each in its own folder, for instance **Language/en-US/app.php**.
 
-해당 로케일 변형에 대해 다르게 지역화된 메시지에만 값을 제공하면됩니다.
-누락 된 메시지 정의는 기본 로케일 설정에서 자동으로 가져옵니다.
+You only need to provide values for those messages that would be
+localized differently for that locale variant. Any missing message
+definitions will be automatically pulled from the main locale settings.
 
-새 메시지가 프레임워크에 추가되어 아직 로케일에 맞게 번역할 기회가 없는 경우 지역화가 영어로 다시 떨어질 수 있습니다.
+It gets better - the localization can fall all the way back to English,
+in case new messages are added to the framework and you haven't had
+a chance to translate them yet for your locale.
 
-따라서 로케일 ``fr-CA``\ 를 사용하는 경우 지역화된 메시지는 먼저 **Language/fr/CA**\ 에서 찾은 다음 **Language/fr**\ 을 거쳐 **Language/en**\ 에서 찾습니다.
+So, if you are using the locale ``fr-CA``, then a localized
+message will first be sought in the **Language/fr-CA** directory, then in
+the **Language/fr** directory, and finally in the **Language/en** directory.
 
-메시지 번역
+Message Translations
 ====================
 
-`own repository <https://github.com/codeigniter4/translations>`_\ 에 "공식" 번역 세트가 있습니다.
+We have an "official" set of translations in their
+`own repository <https://github.com/codeigniter4/translations>`_.
 
-해당 리포지토리를 다운로드하고 **app**\ 의 **Language** 폴더에 복사합니다.
-``App`` 네임스페이스가  **app** 폴더에 매핑되므로 통합된 번역이 자동으로 선택됩니다.
+You could download that repository, and copy its **Language** folder
+into your **app** folder. The incorporated translations will be automatically
+picked up because the ``App`` namespace is mapped to your **app** folder.
 
-이 보다 더 나은 방법은 프로젝트 내에서 다음 명령어를 실행하는 것입니다.
+Alternately, a better practice would be to run the following command inside your
+project:
 
-::
+.. code-block:: console
 
-    > composer require codeigniter4/translations
+    composer require codeigniter4/translations
 
-번역된 메시지들은 매핑된 번역 폴더에 자동으로 수집됩니다.
+The translated messages will be automatically picked
+up because the translations folders get mapped appropriately.

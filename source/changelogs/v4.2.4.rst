@@ -9,4 +9,4 @@ Release Date: August 13, 2022
     :local:
     :depth: 2
 
-**다운로드 오류를 수정하기 위한 핫픽스 릴리스; 다른 내용은 변경되지 않습니다.**
+**Hotfix release to fix download errors; no other content changes.**

@@ -12,6 +12,8 @@ Release Date: November 5, 2022
 Bugs Fixed
 **********
 
-- 세션의 잘못된 PHPDoc유형 수정.
+- Fixed incorrect PHPDoc types in Session.
 
-수정된 전체 버그 목록은 `CHANGELOG.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/CHANGELOG.md>`_\ 를 참조하세요.
+See the repo's
+`CHANGELOG_4.2.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/changelogs/CHANGELOG_4.2.md>`_
+for a complete list of bugs fixed.

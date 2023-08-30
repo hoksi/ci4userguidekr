@@ -8,27 +8,27 @@ Upgrade Sessions
 Documentations
 ==============
 
-- `CodeIgniter 3.X Session Library 문서 <http://codeigniter.com/userguide3/libraries/sessions.html>`_
-- :doc:`CodeIgniter 4.X Session Library 문서 </libraries/sessions>`
+- `Session Library Documentation CodeIgniter 3.X <http://codeigniter.com/userguide3/libraries/sessions.html>`_
+- :doc:`Session Library Documentation CodeIgniter 4.X </libraries/sessions>`
 
-변경된 사항
+What has been changed
 =====================
-- 메소드명, 라이브러리 로드와 같은 작은 부분만 변경되었습니다.
+- Only small things like the method names and the loading of the library have changed.
 
 Upgrade Guide
 =============
-1. 세션 라이브러리를 사용할 때마다 ``$this->load->library('session');``\ 를 ``$session = session();``\ 으로 바꿉니다.
-2. ``$this->session``\ 으로 시작하는 모든 부분을 다음과 같이 ``$session``\ 의 새 메소드 이름으로 바꿉니다.
+1. Wherever you use the Session Library replace ``$this->load->library('session');`` with ``$session = session();``.
+2. From that on you have to replace every line starting with ``$this->session`` with ``$session`` followed by the new method name.
 
-    - 세션 데이터에 액세스하는 CI3 구문 ``$this->session->name`` 대신 ``$session->item`` 또는 ``$session->get('item')`` 구문을 사용합니다.
-    - 데이터를 설정하려면 ``$this->session->set_userdata($array);`` 대신 ``$session->set($array);``\ 를 사용합니다.
-    - 데이터를 제거하려면 ``$session->remove('some_name');`` 대신 ``unset($_SESSION['some_name']);`` 또는 ``$session->remove('some_name');``\ 를 사용합니다.
-    - 세션 데이터를 다음 요청에만 사용할 수 있는 flashdata로 표시하려면 ``$this->session->mark_as_flash('item');`` 대신 ``$session->markAsFlashdata('item');``\ 를 사용합니다.
+    - To access session data use the syntax ``$session->item`` or ``$session->get('item')`` instead of the CI3 syntax ``$this->session->name``.
+    - To set data use ``$session->set($array);`` instead of ``$this->session->set_userdata($array);``.
+    - To remove data use ``unset($_SESSION['some_name']);`` or ``$session->remove('some_name');`` instead of ``$this->session->unset_userdata('some_name');``.
+    - To mark session data as flashdata, which will only be available for the next request, use ``$session->markAsFlashdata('item');`` instead of ``$this->session->mark_as_flash('item');```
 
 Code Example
 ============
 
-CodeIgniter Version 3.11
+CodeIgniter Version 3.x
 ------------------------
 
 .. literalinclude:: upgrade_sessions/ci3sample/001.php

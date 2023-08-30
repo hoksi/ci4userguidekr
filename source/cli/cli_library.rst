@@ -1,92 +1,112 @@
-##################
-CLI 라이브러리
-##################
+###########
+CLI Library
+###########
 
-CodeIgniter의 CLI 라이브러리를 사용하면 다음을 포함하여 대화식 커맨드 라인 스크립트를 간단하게 만들 수 있습니다.
+CodeIgniter's CLI library makes creating interactive command-line scripts simple, including:
 
-* 사용자에게 더 많은 정보를 요구
-* 터미널에 멀티 컬러 텍스트 쓰기
-* 경고음 (좋아요!)
-* 긴 작업 중에 진행률 표시 줄 표시
-* 긴 텍스트 줄을 창에 맞게 줄 바꿈하십시오.
+* Prompting the user for more information
+* Writing multi-colored text the terminal
+* Beeping (be nice!)
+* Showing progress bars during long tasks
+* Wrapping long text lines to fit the window.
 
 .. contents::
     :local:
     :depth: 2
 
-클래스 초기화
+Initializing the Class
 **********************
 
-모든 메소드가 정적이므로 CLI 라이브러리의 인스턴스를 작성할 필요가 없습니다.
-대신, 컨트롤러는 클래스 위의 ``use``\ 문을 통해 컨트롤러를 찾을 수 있어야 합니다.
+You do not need to create an instance of the CLI library, since all of it's methods are static. Instead, you simply
+need to ensure your controller can locate it via a ``use`` statement above your class:
 
 .. literalinclude:: cli_library/001.php
 
-파일이 처음 로드될 때 클래스가 자동으로 초기화됩니다.
+The class is automatically initialized when the file is loaded the first time.
 
-사용자로부터 입력 받기
+Getting Input from the User
 ***************************
 
-사용자에게 추가 정보를 요청해야 하는 경우가 있습니다.
-선택적 커맨드 라인 인수를 입력 받거나, 기존 파일을 덮어 쓰기 전에 확인이 필요한 경우등등..
-이런 경우 ``prompt()`` 또는 ``promptByKey()`` 메소드를 사용하여 처리합니다.
+Sometimes you need to ask the user for more information. They might not have provided optional command-line
+arguments, or the script may have encountered an existing file and needs confirmation before overwriting. This is
+handled with the ``prompt()`` or ``promptByKey()`` method.
 
-질문을 첫 번째 매개 변수로 전달하여 질문을 제공 할 수 있습니다.
+.. note:: Since v4.3.0, you can write tests for these methods with ``PhpStreamWrapper``.
+    See :ref:`testing-cli-input`.
+
+prompt()
+========
+
+You can provide a question by passing it in as the first parameter:
 
 .. literalinclude:: cli_library/002.php
 
-두 번째 매개 변수에서 기본값을 전달하여 사용자가 Enter 키를 누르는 경우 사용할 기본(default) 답변을 제공할 수 있습니다
+You can provide a default answer that will be used if the user just hits enter by passing the default in the
+second parameter:
 
 .. literalinclude:: cli_library/003.php
 
-두 번째 매개 변수로 허용된 답변 배열을 전달하여 허용되는 답변을 제한할 수 있습니다.
+You can restrict the acceptable answers by passing in an array of allowed answers as the second parameter:
 
 .. literalinclude:: cli_library/004.php
 
-마지막으로, :ref:`검증 규칙 <validation>`\ 을 세 번째 매개 변수로 답변 입력에 전달할 수 있습니다.
+Finally, you can pass :ref:`validation <validation>` rules to the answer input as the third parameter:
 
 .. literalinclude:: cli_library/005.php
 
-검증 규칙은 어레이 구문으로도 작성할 수 있습니다.
+Validation rules can also be written in the array syntax:
 
 .. literalinclude:: cli_library/006.php
 
-**promptByKey()**
+promptByKey()
+=============
 
-프롬프트에 대한 미리 정의된 답변(옵션)을 설명해야 하거나 너무 복잡하여 값을 통해 선택할 수 없는 경우
- ``promptByKey()``\ 를 사용하면 값이 아닌 키로 옵션을 선택할 수 있습니다.
+Predefined answers (options) for prompt sometimes need to be described or are too complex to select via their value.
+``promptByKey()`` allows the user to select an option by its key instead of its value:
 
 .. literalinclude:: cli_library/007.php
 
-명명된 키도 가능합니다.
+Named keys are also possible:
 
 .. literalinclude:: cli_library/008.php
 
-마지막으로 :ref:`validation <validation>` 규칙을 세 번째 매개 변수로 전달하면, 허용되는 답변은 전달된 옵션에 의해 검증됩니다.
+Finally, you can pass :ref:`validation <validation>` rules to the answer input as the third parameter, the acceptable answers are automatically restricted to the passed options.
 
+.. _prompt-by-multiple-keys:
 
-피드백 제공
+promptByMultipleKeys()
+======================
+
+.. versionadded:: 4.3.0
+
+This method is the same as ``promptByKey()``, but it supports multiple value.
+
+.. literalinclude:: cli_library/023.php
+
+.. important:: The method ``promptByMultipleKeys()``, unlike ``promptByKey()``, does not support named keys or validation.
+
+Providing Feedback
 ******************
 
 write()
-========
+=======
 
-사용자에게 피드백을 제공하기 위해 몇 가지 방법이 제공됩니다.
-이는 단일 상태 업데이트나 사용자의 터미널 창으로 래핑되는 복잡한 정보 테이블처럼 간단할 수 있습니다.
-이것의 핵심에는 문자열을 첫 번째 매개 변수로 출력하는 ``write()`` 메소드입니다
+Several methods are provided for you to provide feedback to your users. This can be as simple as a single status update
+or a complex table of information that wraps to the user's terminal window. At the core of this is the ``write()``
+method which takes the string to output as the first parameter:
 
 .. literalinclude:: cli_library/009.php
 
-두 번째 매개 변수로 색상 이름을 전달하여 텍스트 색상을 변경할 수 있습니다
+You can change the color of the text by passing in a color name as the second parameter:
 
 .. literalinclude:: cli_library/010.php
 
-상태별로 메시지를 구분하거나 다른 색상을 사용하여 '헤더'를 만드는 데 사용할 수 있습니다.
-세 번째 매개 변수로 색 이름을 전달하여 배경색을 설정할 수 있습니다
+This could be used to differentiate messages by status, or create 'headers' by using a different color. You can
+even set background colors by passing the color name in as the third parameter:
 
 .. literalinclude:: cli_library/011.php
 
-다음과 같은 전경색(foreground color)을 사용할 수 있습니다:
+The following foreground colors are available:
 
 * black
 * dark_gray
@@ -106,7 +126,7 @@ write()
 * light_gray
 * white
 
-배경색(background color)으로 다음 색상을 사용할 수 있습니다:
+And a smaller number are available as background colors:
 
 * black
 * blue
@@ -118,60 +138,64 @@ write()
 * magenta
 
 print()
-========
+=======
 
-전후에 개행을 강요하지 않는다는 점을 제외하면 ``write()`` 메소드와 동일합니다.
-대신 커서가 현재 어디에 있든지 화면에 인쇄합니다.
-이를 통해 다른 호출에서 동일한 라인에 여러 항목을 인쇄할 수 있습니다.
-이것은 상태를 보여주고 무언가를 한 다음 같은 줄에 "완료"를 인쇄할 때 특히 유용합니다.
+Print functions identically to the ``write()`` method, except that it does not force a newline either before or after.
+Instead it prints it to the screen wherever the cursor is currently. This allows you to print multiple items all on
+the same line, from different calls. This is especially helpful when you want to show a status, do something, then
+print "Done" on the same line:
 
 .. literalinclude:: cli_library/012.php
 
 .. _cli-library-color:
 
 color()
-========
+=======
 
-``write()`` 명령은 터미널에 한 줄을 쓰고 EOL 문자로 끝나는 반면, 인쇄 후 EOL을 강제하지 않는다는 점을 제외하고 ``color()``메소드를 사용하여 동일한 문자열을 만들 수 있습니다 . 
-이를 통해 동일한 행에 여러 출력을 만들 수 있습니다. 
-또는 더 일반적으로 ``write()`` 메소드 내부에서 다른 색상의 문자열을 만들 수 있습니다
+While the ``write()`` command will write a single line to the terminal, ending it with a EOL character, you can
+use the ``color()`` method to make a string fragment that can be used in the same way, except that it will not force
+an EOL after printing. This allows you to create multiple outputs on the same row. Or, more commonly, you can use
+it inside of a ``write()`` method to create a string of a different color inside:
 
 .. literalinclude:: cli_library/013.php
 
-이 예제는 창에 ``fileA``\ 가 노란색으로 표시되고 탭(tab) 다음에 흰색 텍스트로 ``/path/to/file``\ 이 표시됩니다.
+This example would write a single line to the window, with ``fileA`` in yellow, followed by a tab, and then
+``/path/to/file`` in white text.
 
 error()
-========
+=======
 
-오류를 출력할 때는 ``error()`` 메소드를 사용합니다.
-``write()``, ``color()``\ 와 같이 STDOUT 아닌 STDERR에 밝은 빨간색 텍스트를 출력합니다.
-스크립트가 오류를 감시하고, 모든 정보를 조사할 필요 없이 실제 오류 메시지만 조사할 때 유용합니다.
-사용 방법은 ``write()`` 메소드와 같습니다.
+If you need to output errors, you should use the appropriately named ``error()`` method. This writes light-red text
+to STDERR, instead of STDOUT, like ``write()`` and ``color()`` do. This can be useful if you have scripts watching
+for errors so they don't have to sift through all of the information, only the actual error messages. You use it
+exactly as you would the ``write()`` method:
 
 .. literalinclude:: cli_library/014.php
 
 wrap()
-========
+======
 
-이 명령은 문자열을 가져 와서 현재 줄에 인쇄를 시작한 다음 줄을 설정한 길이로 줄 바꿈합니다.
-이것은 현재 창에서 줄 바꿈하고 화면을 벗어나지 않을 설명이 있는 옵션 목록을 표시할 때 유용합니다.
+This command will take a string, start printing it on the current line, and wrap it to a set length on new lines.
+This might be useful when displaying a list of options with descriptions that you want to wrap in the current
+window and not go off screen:
 
 .. literalinclude:: cli_library/015.php
 
-기본적으로 문자열은 터미널 너비로 줄 바꿈됩니다.
-Windows는 현재 창 크기를 결정하는 방법을 제공하지 않으므로 기본값은 80 자입니다.
-폭을 더 짧은 것으로 제한하려면 창에 꼭 맞는 최대 길이를 두 번째 매개 변수로 전달하십시오.
-이렇게 하면 최대 길이에 가장 가까운 단어에서 문자열이 끊어 지므로 단어가 깨지지 않습니다.
+By default, the string will wrap at the terminal width. Windows currently doesn't provide a way to determine
+the window size, so we default to 80 characters. If you want to restrict the width to something shorter that
+you can be pretty sure fits within the window, pass the maximum line-length as the second parameter. This
+will break the string at the nearest word barrier so that words are not broken.
 
 .. literalinclude:: cli_library/016.php
 
-제목, 파일 또는 작업의 왼쪽에 열이 있고 오른쪽에 설명이 있는 텍스트 열이 필요하다는 것을 알 수 있습니다.
-기본적으로 이것은 창의 왼쪽 가장자리로 다시 줄 바꿈되어 열에 정렬할 수 없습니다.
-이 경우 첫 줄 다음에 모든 줄을 채우도록 여러 공간을 전달하여 왼쪽에 선명한 열 가장자리를 갖도록 할 수 있습니다
+You may find that you want a column on the left of titles, files, or tasks, while you want a column of text
+on the right with their descriptions. By default, this will wrap back to the left edge of the window, which
+doesn't allow things to line up in columns. In cases like this, you can pass in a number of spaces to pad
+every line after the first line, so that you will have a crisp column edge on the left:
 
 .. literalinclude:: cli_library/017.php
 
-이런 식으로 만들어집니다:
+Would create something like this:
 
 .. code-block:: none
 
@@ -183,40 +207,41 @@ Windows는 현재 창 크기를 결정하는 방법을 제공하지 않으므로
                text ever since the
 
 newLine()
-==========
+=========
 
-``newLine()`` 메소드는 빈 줄을 표시합니다. 매개 변수를 사용하지 않습니다
+The ``newLine()`` method displays a blank line to the user. It does not take any parameters:
 
 .. literalinclude:: cli_library/018.php
 
 clearScreen()
 =============
 
-``clearScreen()`` 메소드를 사용하여 현재 터미널 창을 지울 수 있습니다.
-대부분의 Windows 버전에서는 Windows에서 이 기능을 지원하지 않으므로 40 개의 빈 줄만 삽입합니다.
-Windows 10 bash 통합은 이것을 변경해야 합니다
+You can clear the current terminal window with the ``clearScreen()`` method. In most versions of Windows, this will
+simply insert 40 blank lines since Windows doesn't support this feature. Windows 10 bash integration should change
+this:
 
 .. literalinclude:: cli_library/019.php
 
 showProgress()
-===============
+==============
 
-진행 상황에 따라 상태를 계속 업데이트하는 작업 시간이 긴 실행 작업이있는 경우 다음과 같은 ``showProgress()`` 메소드를 사용할 수 있습니다:
+If you have a long-running task that you would like to keep the user updated with the progress, you can use the
+``showProgress()`` method which displays something like the following:
 
 .. code-block:: none
 
     [####......] 40% Complete
 
-이 블록은 매우 멋진 효과를 위해 애니메이션 처리됩니다.
+This block is animated in place for a very nice effect.
 
-이를 사용하려면 현재 단계에서 첫 번째 매개 변수로, 총 단계 수를 두 번째 매개 변수로 전달하십시오.
-완료율과 디스플레이 길이는 해당 숫자를 기준으로 결정됩니다. 
-완료되면 ``false``\ 를 첫 번째 매개 변수로 전달하면 진행률 표시 줄이 제거됩니다.
+To use it, pass in the current step as the first parameter, and the total number of steps as the second parameter.
+The percent complete and the length of the display will be determined based on that number. When you are done,
+pass ``false`` as the first parameter and the progress bar will be removed.
 
 .. literalinclude:: cli_library/020.php
 
 table()
-========
+=======
 
 .. literalinclude:: cli_library/021.php
 
@@ -230,8 +255,9 @@ table()
     +----+--------------------------+---------------------+--------+
 
 wait()
-=======
+======
 
-선택적으로 대기 메시지를 표시하고 특정 시간(초)동안 키 누름을 기다립니다.
+Waits a certain number of seconds, optionally showing a wait message and
+waiting for a key press.
 
 .. literalinclude:: cli_library/022.php

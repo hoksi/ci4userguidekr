@@ -9,27 +9,14 @@ Release Date: August 6, 2022
     :local:
     :depth: 2
 
-BREAKING
-********
-
-none.
-
 Enhancements
 ************
 
-- ``Security::generateHash()``\ 는 공개로 전환되었으며 ``Config\Security::$regenerate``\ 가 false인 경우 CSRF 토큰을 수동으로 재생성할 때 사용할 수 있습니다.
-
-Changes
-*******
-
-none.
-
-Deprecations
-************
-
-none.
+- Now ``Security::generateHash()`` is public, and can be used to regenerate CSRF token manually when ``Config\Security::$regenerate`` is false.
 
 Bugs Fixed
 **********
 
-수정된 전체 버그 목록은 `CHANGELOG.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/CHANGELOG.md>`_\ 를 참조하세요.
+See the repo's
+`CHANGELOG_4.2.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/changelogs/CHANGELOG_4.2.md>`_
+for a complete list of bugs fixed.

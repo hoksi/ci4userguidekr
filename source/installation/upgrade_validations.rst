@@ -8,32 +8,34 @@ Upgrade Validations
 Documentations of Library
 =========================
 
-- `CodeIgniter 3.X Form Validation 문서 <http://codeigniter.com/userguide3/libraries/form_validation.html>`_
-- :doc:`CodeIgniter 4.X Validation 문서 </libraries/validation>`
+- `Form Validation Documentation CodeIgniter 3.X <http://codeigniter.com/userguide3/libraries/form_validation.html>`_
+- :doc:`Validation Documentation CodeIgniter 4.X </libraries/validation>`
 
-
-변경된 사항
+What has been changed
 =====================
-- 유효성 검사 오류 표시를 변경하려면 CI4 :ref:`유효성 검사 뷰(view) 템플릿 <validation-customizing-error-display>`\ 을 설정해야 합니다.
-- CI4 유효성 검사에는 CI3의 콜백이나 호출 가능이 없습니다.
-- CI4 유효성 검사 형식 규칙은 빈 문자열을 허용하지 않습니다.
-- CI4 유효성 검사는 데이터를 변경하지 않습니다.
-- v4.3.0부터 :php:func:`validation_errors()`\ 가 도입되었지만, CI3와 API가 다릅니다.
+- If you want to change validation error display, you have to set CI4 :ref:`validation View templates <validation-customizing-error-display>`.
+- CI4 validation has no Callbacks nor Callable in CI3.
+  Use :ref:`Rule Classes <validation-using-rule-classes>` or
+  :ref:`Closure Rule <validation-using-closure-rule>`
+  instead.
+- CI4 validation format rules do not permit empty string.
+- CI4 validation never changes your data.
+- Since v4.3.0, :php:func:`validation_errors()` has been introduced, but the API is different from CI3's.
 
 Upgrade Guide
 =============
-1. 폼을 포함된 뷰의 다음 항목을 변경합니다.
+1. Within the view which contains the form you have to change:
 
-    - ``<?php echo validation_errors(); ?>`` 대신 ``<?= validation_list_errors() ?>``
+    - ``<?php echo validation_errors(); ?>`` to ``<?= validation_list_errors() ?>``
 
-2. 컨트롤러의 다음 항목을 변경합니다.
+2. Within the controller you have to change the following:
 
-    - ``$this->load->helper(array('form', 'url'));`` 대신 ``helper(['form', 'url']);``
-    - ``$this->load->library('form_validation');`` 삭제
-    - ``if ($this->form_validation->run() == FALSE)`` 대신 ``if (! $this->validate([]))``
-    - ``$this->load->view('myform');`` 대신 ``return view('myform', ['validation' => $this->validator,]);``
+    - ``$this->load->helper(array('form', 'url'));`` to ``helper(['form', 'url']);``
+    - remove the line ``$this->load->library('form_validation');``
+    - ``if ($this->form_validation->run() == FALSE)`` to ``if (! $this->validate([]))``
+    - ``$this->load->view('myform');`` to ``return view('myform', ['validation' => $this->validator,]);``
 
-3. 컨트롤러에서 유효성 검사 규칙을 배열로 설정하여 변경합니다.
+3. You have to change the validation rules. The new syntax is to set the rules as array in the controller:
 
    .. literalinclude:: upgrade_validations/001.php
 
@@ -42,9 +44,7 @@ Code Example
 
 CodeIgniter Version 3.x
 ------------------------
-Path: **application/views**
-
-::
+Path: **application/views**::
 
     <html>
     <head>
@@ -75,15 +75,13 @@ Path: **application/views**
     </body>
     </html>
 
-Path: **application/controllers/**
+Path: **application/controllers**:
 
 .. literalinclude:: upgrade_validations/ci3sample/002.php
 
 CodeIgniter Version 4.x
 -----------------------
-Path: **app/Views**
-
-::
+Path: **app/Views**::
 
     <html>
     <head>
@@ -114,6 +112,6 @@ Path: **app/Views**
     </body>
     </html>
 
-Path: **app/Controllers/**
+Path: **app/Controllers**:
 
 .. literalinclude:: upgrade_validations/002.php

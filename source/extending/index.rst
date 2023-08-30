@@ -1,8 +1,8 @@
-############################
-CodeIgniter 확장(Extending)
-############################
+#####################
+Extending CodeIgniter
+#####################
 
-CodeIgniter4는 쉽게 확장하거나 구축할 수 있도록 설계되었습니다.
+CodeIgniter 4 has been designed to be easy to extend or build upon.
 
 .. toctree::
     :titlesonly:
@@ -12,4 +12,5 @@ CodeIgniter4는 쉽게 확장하거나 구축할 수 있도록 설계되었습�
     events
     basecontroller
     authentication
+    composer_packages
     contributing

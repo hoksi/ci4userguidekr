@@ -1,168 +1,194 @@
 #########################
-CodeIgniter 모델 사용
+Using CodeIgniter's Model
 #########################
 
 .. contents::
     :local:
-    :depth: 2
+    :depth: 3
 
-모델
+Models
 ******
 
-CodeIgniter의 모델은 데이터베이스에서 **단일 테이블** 작업을 보다 편리하게 만들기 위해 일반적으로 사용하는 편리한 기능과 추가 기능을 제공합니다.
+The CodeIgniter's Model provides convenience features and additional functionality
+that people commonly use to make working with a **single table** in your database more convenient.
 
-레코드 찾기, 레코드 업데이트, 레코드 삭제 등을 포함하여 데이터베이스 테이블과 상호 작용하는 데 필요한 많은 표준 방법에 대한 도우미 메서드와 함께 기본 제공됩니다.
+It comes out of the box with helper
+methods for much of the standard ways you would need to interact with a database table, including finding records,
+updating records, deleting records, and more.
 
 .. _accessing-models:
 
-모델에 액세스하기
-******************
+Accessing Models
+****************
 
-모델은 일반적으로 **app/Models** 디렉토리에 저장되며, ``namespace App\Models``\ 와 같이 디렉토리의 위치와 일치하는 네임스페이스를 가집니다.
+Models are typically stored in the **app/Models** directory. They should have a namespace that matches their
+location within the directory, like ``namespace App\Models``.
 
-새 인스턴스를 만들거나 :php:func:`model()` 헬퍼 함수를 사용하여 클래스 내 모델에 액세스할 수 있습니다.
+You can access models within your classes by creating a new instance or using the :php:func:`model()` helper function.
 
 .. literalinclude:: model/001.php
 
-``model()`` 함수는 내부적으로 ``Factories::models()`` 함수를 사용합니다.
-첫 번째 매개변수에 대한 자세한 내용은 :ref:`factories-example`\ 를 참조하세요.
+The ``model()`` uses ``Factories::models()`` internally.
+See :ref:`factories-loading-class` for details on the first parameter.
 
-CodeIgniter 모델
+CodeIgniter's Model
 *******************
 
-CodeIgniter는 다음과 같은 몇 가지 유용한 기능을 제공하는 모델 클래스를 제공합니다:
+CodeIgniter does provide a model class that provides a few nice features, including:
 
-- 자동 데이터베이스 연결
-- 기본적인 CRUD 메소드
-- 모델내 검증(validation)
-- :ref:`자동 페이지네이션(pagination) <paginating-with-models>`
-- 등등...
+- automatic database connection
+- basic CRUD methods
+- in-model validation
+- :ref:`automatic pagination <paginating-with-models>`
+- and more
 
-이 클래스는 자체 모델을 구축할 수있는 견고한 기반을 제공하므로 어플리케이션의 모델 계층을 신속하게 구축할 수 있습니다.
+This class provides a solid base from which to build your own models, allowing you to
+rapidly build out your application's model layer.
 
-모델 만들기
-*************
+Creating Your Model
+*******************
 
-CodeIgniter의 모델을 활용하려면 ``CodeIgniter\Model``\ 을 확장하는 새로운 모델 클래스를 만들면됩니다.
+To take advantage of CodeIgniter's model, you would simply create a new model class
+that extends ``CodeIgniter\Model``:
 
 .. literalinclude:: model/002.php
 
-이렇게 작성된 클래스는 데이터베이스 연결, 쿼리 빌더 등 여러 가지 편리한 추가 메소드를 제공합니다.
+This empty class provides convenient access to the database connection, the Query Builder,
+and a number of additional convenience methods.
 
 initialize()
 ============
 
-모델에 추가 설정이 필요한 경우 모델의 생성자 직후에 실행되는 ``initialize()`` 메소드를 확장할 수 있습니다.
-이렇게 하면 생성자 매개 변수를 반복하지 않고 추가 단계를 수행할 수 있습니다(예: 다른 모델 확장).
+Should you need additional setup in your model you may extend the ``initialize()`` method
+which will be run immediately after the Model's constructor. This allows you to perform
+extra steps without repeating the constructor parameters, for example extending other models:
 
 .. literalinclude:: model/003.php
 
+Connecting to the Database
+==========================
 
-데이터베이스 연결
-===================
-
-클래스가 처음 인스턴스화될 때 데이터베이스 연결 인스턴스가 생성자에 전달되지 않으면 구성에서 설정한대로 기본 데이터베이스 그룹에 자동으로 연결됩니다.
-``$DBGroup`` 속성을 클래스에 추가하여 모델별로 사용되는 그룹을 수정할 수 있습니다.
-이는 모델 내에서 ``$this->db``\ 에 대한 참조가 적절한 DB에 연결되도록 합니다.
+When the class is first instantiated, if no database connection instance is passed to the constructor,
+it will automatically connect to the default database group, as set in the configuration. You can
+modify which group is used on a per-model basis by adding the ``$DBGroup`` property to your class.
+This ensures that within the model any references to ``$this->db`` are made through the appropriate
+connection.
 
 .. literalinclude:: model/004.php
 
-"group_name"을 데이터베이스 구성 파일에 정의된 데이터베이스 그룹 이름으로 바꾸십시오.
+You would replace "group_name" with the name of a defined database group from the database
+configuration file.
 
-모델 설정
-===========
+Configuring Your Model
+======================
 
-모델 클래스에는 클래스의 메소드가 원활하게 작동하도록 설정할 수 있는 몇 가지 설정 옵션이 있습니다.
-처음 두 개는 모든 CRUD 메소드에서 사용할 테이블과 필요한 레코드를 찾는 방법을 결정하는데 사용됩니다.
+The model class has some configuration options that can be set to allow the class' methods
+to work seamlessly for you. The first two are used by all of the CRUD methods to determine
+what table to use and how we can find the required records:
 
 .. literalinclude:: model/005.php
 
 $table
 ------
 
-모델을 통하여 조작하고자 하는 데이터베이스 테이블을 지정합니다.
-이것은 내장 CRUD 메소드에만 적용되며 모델을 통한 쿼리에서 이 테이블만 사용하도록 제한하지 않습니다.
+Specifies the database table that this model primarily works with. This only applies to the
+built-in CRUD methods. You are not restricted to using only this table in your own
+queries.
 
 $primaryKey
 -----------
 
-테이블에서 레코드를 고유하게 식별하는 열(column)의 이름입니다.
-반드시 데이터베이스에 지정된 기본(primary) 키와 일치 할 필요는 없으며, ``find()``\ 와 같은 메소드에서 지정된 값과 일치하는 열을 찾을때 사용합니다.
+This is the name of the column that uniquely identifies the records in this table. This
+does not necessarily have to match the primary key that is specified in the database, but
+is used with methods like ``find()`` to know what column to match the specified value to.
 
-.. note:: 모든 기능이 예상대로 작동하려면 모든 모델에 기본 키가 지정되어 있어야 합니다.
+.. note:: All Models must have a primaryKey specified to allow all of the features to work
+    as expected.
 
 $useAutoIncrement
 -----------------
 
-테이블이 자동 증가(auto-increment) 기능을 사용할지 여부를 ``$primaryKey``\ 에 지정합니다.
-``false``\ 로 설정하면 테이블의 모든 레코드에 대해 기본 키 값을 제공해야 합니다.
-이 기능은 1:1 관계를 구현하거나 모델에 UUID를 사용하려는 경우에 유용합니다.
-기본 값은 ``true``\ 입니다.
+Specifies if the table uses an auto-increment feature for ``$primaryKey``. If set to ``false``
+then you are responsible for providing primary key value for every record in the table. This
+feature may be handy when we want to implement 1:1 relation or use UUIDs for our model. The
+default value is ``true``.
 
-.. note:: 만약 ``$AutoIncrement``\ 를 ``false``\ 로 설정했다면, 반드시 데이터베이스의 기본 키를 ``unique``\ 로 설정해야 모델의 모든 기능이 이전과 동일하게 작동합니다.
+.. note:: If you set ``$useAutoIncrement`` to ``false``, then make sure to set your primary
+    key in the database to ``unique``. This way you will make sure that all of Model's features
+    will still work the same as before.
 
 $returnType
 -----------
 
-모델의 CRUD 메소드는 Result 객체 대신 결과 데이터를 자동으로 반환합니다.
-이 설정을 통해 반환되는 데이터 유형을 정의할 수 있습니다.
-유효한 값은 **array** (기본 값), **object** 또는 Result 오브젝트의 ``getCustomResultObject()`` 메소드와 함께 사용할 수 있는 **정규화된 클래스명**\ 입니다.
-클래스의 특수 ``::class`` 상수를 사용하면 대부분의 IDE에서 이름을 자동 완성하고 리팩토링과 같은 기능을 통해 코드를 더 잘 이해할 수 있습니다.
+The Model's CRUD methods will take a step of work away from you and automatically return
+the resulting data, instead of the Result object. This setting allows you to define
+the type of data that is returned. Valid values are '**array**' (the default), '**object**', or the **fully
+qualified name of a class** that can be used with the Result object's ``getCustomResultObject()``
+method. Using the special ``::class`` constant of the class will allow most IDEs to
+auto-complete the name and allow functions like refactoring to better understand your code.
 
 .. _model-use-soft-deletes:
 
 $useSoftDeletes
 ---------------
 
-``true``\ 이면 ``delete()`` 메소드 호출은 실제로 행을 삭제하는 대신 데이터베이스의 ``deleted_at`` 필드를 설정합니다.
-이를 통해 데이터가 다른 곳에서 참조될 때 데이터를 보존하거나 복원할 수있는 개체의 "휴지통"\ 을 유지하거나 단순히 보안 추적의 일부로 보존할 수 있습니다.
-``true``\ 인 경우, **find*()** 메소드를 호출하기 전에 ``withDeleted()`` 메소드를 호출하지 않으면 **find*()** 메소드는 삭제되지 않은 행만 리턴합니다.
+If true, then any ``delete()`` method calls will set ``deleted_at`` in the database, instead of
+actually deleting the row. This can preserve data when it might be referenced elsewhere, or
+can maintain a "recycle bin" of objects that can be restored, or even simply preserve it as
+part of a security trail. If true, the **find*()** methods will only return non-deleted rows, unless
+the ``withDeleted()`` method is called prior to calling the **find*()** method.
 
-모델의 ``$dateFormat`` 설정에 따라 데이터베이스에 타입이 DATETIME 또는 INTEGER인 ``deleted_at`` 필드가 필요합니다.
-기본 필드 이름은 ``deleted_at``\ 이지만 이 이름은 ``$deletedField`` 속성을 사용하여 원하는 이름으로 수정할 수 있습니다.
+This requires either a DATETIME or INTEGER field in the database as per the model's
+``$dateFormat`` setting. The default field name is ``deleted_at`` however this name can be
+configured to any name of your choice by using ``$deletedField`` property.
+
+.. important:: The ``deleted_at`` field must be nullable.
 
 $allowedFields
 --------------
 
-이 배열은 ``save()``, ``insert()``, ``update()`` 메소드를 통하여 설정할 수 있는 필드 이름입니다.
-여기에 명시되지 않은 필드명은 삭제됩니다. 
-이렇게 하면 양식(Form)에서 입력된 모든 데이터를 모델에 모두 입력되는 것을 방지하여 대량 할당 취약점이 발생하지 않도록 보호할 수 있습니다.
+This array should be updated with the field names that can be set during ``save()``, ``insert()``, or
+``update()`` methods. Any field names other than these will be discarded. This helps to protect
+against just taking input from a form and throwing it all at the model, resulting in
+potential mass assignment vulnerabilities.
 
-.. note:: ``$primaryKey`` 필드는 허용된 필드(allowed field)가 되어서는 안 됩니다.
+.. note:: The ``$primaryKey`` field should never be an allowed field.
 
 Dates
 -----
 
 $useTimestamps
---------------
+^^^^^^^^^^^^^^
 
-이 값은 현재 날짜가 모든 INSERT 및 UPDATE에 자동으로 추가되는지 여부를 결정합니다.
-``true``\ 이면 ``$dateFormat``\ 에 지정된 형식으로 현재 시간을 설정합니다.
-이를 위해서 테이블에 적절한 데이터 유형의 **created_at**, **updated_at**, **deleted_at**\ 이라는 컬럼(column)이 있어야 합니다.
+This boolean value determines whether the current date is automatically added to all inserts
+and updates. If true, will set the current time in the format specified by ``$dateFormat``. This
+requires that the table have columns named **created_at**, **updated_at** and **deleted_at** in the appropriate
+data type.
 
 $dateFormat
 ^^^^^^^^^^^
 
-이 값은 ``$useTimestamps``, ``$useSoftDeletes``\ 와 함께 작동하여 데이터베이스에 삽입되는 날짜 값의 유형입니다.
-기본적으로 이것은 DATETIME 값을 생성하지만 유효한 옵션은 ``'datetime'``, ``'date'``, ``'int'``\ (PHP 타임스탬프) 입니다.
-잘못되거나 없는 유형의 **dateFormat**\ 과 함께 **useSoftDeletes**, **useTimestamps**\ 를 사용하면 예외가 발생합니다.
+This value works with ``$useTimestamps`` and ``$useSoftDeletes`` to ensure that the correct type of
+date value gets inserted into the database. By default, this creates DATETIME values, but
+valid options are: ``'datetime'``, ``'date'``, or ``'int'`` (a PHP timestamp). Using **useSoftDeletes** or
+**useTimestamps** with an invalid or missing **dateFormat** will cause an exception.
 
 $createdField
 ^^^^^^^^^^^^^
 
-데이터 레코드 작성 타임스탬프를 유지하기 위해 사용하는 데이터베이스 필드를 지정합니다.
-업데이트가 되지않도록 하려면 비워 두십시오. (``$useTimestamps``\ 가 활성화된 경우에도)
+Specifies which database field to use for data record create timestamp.
+Leave it empty to avoid updating it (even if ``$useTimestamps`` is enabled).
 
 $updatedField
 ^^^^^^^^^^^^^
 
-데이터 레코드 업데이트 타임스탬프를 유지하기 위해 사용할 데이터베이스 필드를 지정합니다.
-업데이트가 되지않도록 하려면 비워 두십시오 (``$useTimestamps``\ 가 활성화된 경우에도)
+Specifies which database field should use for keep data record update timestamp.
+Leave it empty to avoid update it (even ``$useTimestamps`` is enabled).
 
 $deletedField
 ^^^^^^^^^^^^^
 
-소프트 삭제를 위해 사용할 데이터베이스 필드를 지정합니다. :ref:`model-use-soft-deletes` 참조.
+Specifies which database field to use for soft deletions. See :ref:`model-use-soft-deletes`.
 
 Validation
 ----------
@@ -170,37 +196,38 @@ Validation
 $validationRules
 ^^^^^^^^^^^^^^^^
 
-:ref:`validation-array`\ 에 설명 된대로 유효성 검사 규칙 배열을 포함하거나 동일한 섹션에 설명 된대로 유효성 검사 그룹의 이름을 포함하는 문자열을 포함합니다.
-아래에 자세히 설명되어 있습니다.
+Contains either an array of validation rules as described in :ref:`validation-array`
+or a string containing the name of a validation group, as described in the same section.
+Described in more detail below.
 
 $validationMessages
 ^^^^^^^^^^^^^^^^^^^
 
-:ref:`validation-custom-errors`\ 에 설명 된 바와 같이, 유효성 검증 중에 사용해야하는 사용자 정의 오류 메시지 배열을 포함합니다.
-아래에 자세히 설명되어 있습니다.
+Contains an array of custom error messages that should be used during validation, as
+described in :ref:`validation-custom-errors`. Described in more detail below.
 
 $skipValidation
 ^^^^^^^^^^^^^^^
 
-모든 **inserts**\ 와 **updates**\ 의 유효성 검사를 하지 않을지 여부입니다.
-기본값은 ``false``\ 이며 데이터의 유효성 검사를 항상 시도합니다.
-
-이 속성은 주로 ``skipValidation()`` 메소드에 의해 사용되지만, 모델이 유효성을 검사하지 않도록 ``true``\ 로 변경될 수 있습니다.
+Whether validation should be skipped during all **inserts** and **updates**. The default
+value is ``false``, meaning that data will always attempt to be validated. This is
+primarily used by the ``skipValidation()`` method, but may be changed to ``true`` so
+this model will never validate.
 
 .. _clean-validation-rules:
 
 $cleanValidationRules
 ^^^^^^^^^^^^^^^^^^^^^
 
-전달된 데이터에 존재하지 않는 유효성 검사 규칙을 제거해야 하는지 여부입니다.
-**업데이트**\ 에서 사용됩니다.
-기본값은 ``true``\ 입니다. 
-전달된 데이터에 없는 필드에 대한 유효성 검사 규칙이 유효성 검사 전에 (일시적으로) 제거됩니다.
-이는 일부 필드만 업데이트할 때 유효성 검사 오류를 방지하기 위한 것입니다.
+Whether validation rules should be removed that do not exist in the passed data.
+This is used in **updates**.
+The default value is ``true``, meaning that validation rules for the fields
+that are not present in the passed data will be (temporarily) removed before the validation.
+This is to avoid validation errors when updating only some fields.
 
-``cleanRules()`` 메소드로 값을 변경할 수도 있습니다.
+You can also change the value by the ``cleanRules()`` method.
 
-.. note:: v4.2.7 이전 버전은 버그로 인해 ``$cleanValidationRules``\ 가 작동하지 않았습니다.
+.. note:: Prior to v4.2.7, ``$cleanValidationRules`` did not work due to a bug.
 
 Callbacks
 ---------
@@ -208,7 +235,7 @@ Callbacks
 $allowCallbacks
 ^^^^^^^^^^^^^^^
 
-아래에 정의된 콜백을 사용할지 여부를 결정합니다.
+Whether the callbacks defined below should be used.
 
 $beforeInsert
 ^^^^^^^^^^^^^
@@ -235,95 +262,98 @@ $beforeDelete
 $afterDelete
 ^^^^^^^^^^^^
 
-이 속성들은 콜백 메소드를 지정할 때 사용되며, 콜백은 속성 이름이 뜻하는 시점에 호출됩니다.
+These arrays allow you to specify callback methods that will be run on the data at the
+time specified in the property name.
 
-
-
-
-데이터 작업
+Working with Data
 *****************
 
-데이터 찾기
+Finding Data
 ============
 
-``find()``, ``insert()``, ``update()``, ``delete()`` 등을 포함하여 테이블에서 기본 CRUD 작업을 수행하기 위한 여러 함수가 제공됩니다.
+Several functions are provided for doing basic CRUD work on your tables, including ``find()``,
+``insert()``, ``update()``, ``delete()`` and more.
 
 find()
 ------
 
-첫 번째 매개 변수로 전달된 값과 기본 키가 일치하는 단일 행(row)을 리턴합니다.
+Returns a single row where the primary key matches the value passed in as the first parameter:
+
+.. literalinclude:: model/006.php
+
+The value is returned in the format specified in ``$returnType``.
+
+You can specify more than one row to return by passing an array of primaryKey values instead
+of just one:
 
 .. literalinclude:: model/007.php
 
-값은 ``$returnType``\ 에 지정된 형식으로 반환됩니다.
-
-하나의 키 대신 primaryKey 배열을 전달하여 둘 이상의 행을 반환하도록 지정할 수 있습니다.
-
-.. literalinclude:: model/007.php
-
-.. note:: 전달된 매개변수가 없으면 ``find()``\ 는 해당 모델의 테이블에 있는 모든 행을 반환하며, ``findAll()``\ 과 같은 기능을 수행하게 됩니다.
+.. note:: If no parameters are passed in, ``find()`` will return all rows in that model's table,
+    effectively acting like ``findAll()``, though less explicit.
 
 findColumn()
 ------------
 
-null 또는 인덱스화된 열(column)의 값 배열을 반환합니다.
- 
+Returns null or an indexed array of column values:
+
 .. literalinclude:: model/008.php
 
-``$column_name``\ 은 단일 열의 이름이어야 합니다. 그렇지 않으면 ``DataException``\ 이 발생합니다.
+``$column_name`` should be a name of single column else you will get the ``DataException``.
 
 findAll()
 ---------
 
-모든 결과를 반환
+Returns all results:
 
 .. literalinclude:: model/009.php
 
-이 메소드를 호출하기 전에 필요에 따라 쿼리 빌더의 메소드를 추가하여 수정할 수 있습니다.
+This query may be modified by interjecting Query Builder commands as needed prior to calling this method:
 
 .. literalinclude:: model/010.php
 
-limit 및 offset 값을 각각 첫 번째와 두 번째 매개 변수로 전달할 수 있습니다.
+You can pass in a limit and offset values as the first and second
+parameters, respectively:
 
 .. literalinclude:: model/011.php
 
 first()
 -------
 
-결과 집합의 첫 번째 행을 반환합니다.
-쿼리 빌더와 함께 사용하는 것이 가장 좋습니다.
+Returns the first row in the result set. This is best used in combination with the query builder.
 
 .. literalinclude:: model/012.php
 
 withDeleted()
 -------------
 
-``$useSoftDeletes``\ 가 ``true``\ 이면 **find*()** 메소드는 ``deleted_at IS NOT null``\ 인 행을 반환하지 않습니다.
-이를 일시적으로 무시하려면 **find*()** 메소드를 호출하기 전에 ``withDeleted()`` 메소드를 사용합니다.
+If ``$useSoftDeletes`` is true, then the **find*()** methods will not return any rows where ``deleted_at IS NOT NULL``.
+To temporarily override this, you can use the ``withDeleted()`` method prior to calling the **find*()** method.
 
 .. literalinclude:: model/013.php
 
 onlyDeleted()
 -------------
 
-withDeleted()는 삭제된 행과 삭제되지 않은 행을 모두 리턴하지만, 이 메소드는 find* 메소드를 수정하여 소프트 삭제된 행만 리턴합니다.
+Whereas ``withDeleted()`` will return both deleted and not-deleted rows, this method modifies
+the next **find*()** methods to return only soft deleted rows:
 
 .. literalinclude:: model/014.php
 
-데이터 저장
-============
+Saving Data
+===========
 
 insert()
 --------
 
-첫 번째 매개변수는 데이터베이스에 새 데이터 행을 생성하기 위한 데이터의 연관 배열입니다.
-객체가 배열 대신 전달되면 배열로 변환을 시도합니다.
+The first parameter is an associative array of data to create a new row of data in the database.
+If an object is passed instead of an array, it will attempt to convert it to an array.
 
-배열의 키는 ``$table``\ 의 열 이름과 일치해야 하지만 배열의 값은 해당 키에 대해 저장할 값입니다.
+The array's keys must match the name of the columns in the ``$table``, while the array's values are the values to save for that key.
 
-선택적 두 번째 매개변수는 부울 유형이며, false로 설정되면 쿼리의 성공 또는 실패를 나타내는 부울 값을 반환합니다.
+The optional second parameter is of type boolean, and if it is set to false, the method will return a boolean value,
+which indicates the success or failure of the query.
 
-``getInsertID()`` 메소드를 사용하여 마지막으로 삽입된 행의 기본 키를 검색할 수 있습니다.
+You can retrieve the last inserted row's primary key using the ``getInsertID()`` method.
 
 .. literalinclude:: model/015.php
 
@@ -334,30 +364,33 @@ allowEmptyInserts()
 
 .. versionadded:: 4.3.0
 
-기본적으로 모델은 데이터가 비어 있을 때 예외를 발생시킵니다.
-그러나 ``allowEmptyInserts()`` 메소드를 호출하면 검사가 수행되지 않아 비어 있는 데이터를 삽입할 수 있습니다. 
+You can use ``allowEmptyInserts()`` method to insert empty data. The Model throws an exception when you try to insert empty data by default. But if you call this method, the check will no longer be performed.
 
 .. literalinclude:: model/056.php
 
-다시 검사를 활성화하려면 ``allowEmptyInserts(false)``\ 를 호출하면 됩니다.
+You can enable the check again by calling ``allowEmptyInserts(false)``.
 
 update()
 --------
 
-데이터베이스의 기존 레코드를 업데이트합니다. 첫 번째 매개 변수는 업데이트할 레코드의 ``$primaryKey``\ 입니다.
-두 번째 매개 변수는 이 메소드에 전달될 데이터의 연관 배열입니다.
-배열의 키는 ``$table``\ 의 열(column) 이름과 일치해야 하며 배열의 값은 해당 키에 저장할 값입니다.
+Updates an existing record in the database. The first parameter is the ``$primaryKey`` of the record to update.
+An associative array of data is passed into this method as the second parameter. The array's keys must match the name
+of the columns in a ``$table``, while the array's values are the values to save for that key:
 
 .. literalinclude:: model/016.php
 
-.. important:: v4.3.0 이후부터 이 메소드가 WHERE절 없이 SQL 문을 생성하는 경우 ``DatabaseException`` 예외가 발생합니다.
-    이전 버전에서는 ``$primaryKey``\ 가 지정되지 않고 WHERE절 없이 SQL 문이 생성된 경우에도 쿼리가 실행되어 테이블의 모든 레코드가 업데이트되었습니다.
+.. important:: Since v4.3.0, this method raises a ``DatabaseException``
+    if it generates an SQL statement without a WHERE clause.
+    In previous versions, if it is called without ``$primaryKey`` specified and
+    an SQL statement was generated without a WHERE clause, the query would still
+    execute and all records in the table would be updated.
 
-기본(primary) 키 배열을 첫 번째 매개 변수로 전달하여 한 번의 호출로 여러 레코드를 업데이트할 수 있습니다.
+Multiple records may be updated with a single call by passing an array of primary keys as the first parameter:
 
 .. literalinclude:: model/017.php
 
-유효성 검사, 이벤트 등의 추가 이점을 갖는 쿼리 빌더의 업데이트 명령을 수행하려면, 매개 변수를 비운채 사용하십시오.
+When you need a more flexible solution, you can leave the parameters empty and it functions like the Query Builder's
+update command, with the added benefit of validation, events, etc:
 
 .. literalinclude:: model/018.php
 
@@ -366,79 +399,96 @@ update()
 save()
 ------
 
-``$primaryKey`` 값과 일치하는 배열 키가 존재하는지의 여부에 따라 레코드 INSERT 또는 UPDATE를 자동으로 처리하는 ``insert()``\ 와 ``update()`` 메서드를 둘러싼 래퍼입니다.
+This is a wrapper around the ``insert()`` and ``update()`` methods that handle inserting or updating the record
+automatically, based on whether it finds an array key matching the **primary key** value:
 
 .. literalinclude:: model/019.php
 
-save 메소드는 단순하지 않은 오브젝트를 인식하고 공용 및 보호된 값을 배열로 가져 와서 적절한 insert 또는 update 메소드로 전달하여 사용자 정의 클래스 결과 오브젝트에 대한 작업을 훨씬 간단하게 만들수 있습니다. 
-이를 통해 매우 깨끗한 방식으로 Entity 클래스를 사용할 수 있습니다.
-엔터티 클래스는 사용자, 블로그 게시물, 작업 등과 같은 개체 유형의 단일 인스턴스를 나타내는 간단한 클래스입니다.
-이 클래스는 특정 방식으로 요소를 형식화하는 등 오브젝트 자체를 둘러싼 비즈니스 로직을 유지 보수합니다.
-데이터베이스에 저장되는 방법에 대해 전혀 알지 못합니다.
-간단하게는 다음과 같이 보일 수 있습니다.
+The save method also can make working with custom class result objects much simpler by recognizing a non-simple
+object and grabbing its public and protected values into an array, which is then passed to the appropriate
+insert or update method. This allows you to work with Entity classes in a very clean way. Entity classes are
+simple classes that represent a single instance of an object type, like a user, a blog post, job, etc. This
+class is responsible for maintaining the business logic surrounding the object itself, like formatting
+elements in a certain way, etc. They shouldn't have any idea about how they are saved to the database. At their
+simplest, they might look like this:
 
 .. literalinclude:: model/020.php
 
-이 작업을 수행하는 간단한 모델은 다음과 같습니다.
+A very simple model to work with this might look like:
 
 .. literalinclude:: model/021.php
 
-다음 모델은 ``jobs`` 테이블의 데이터로 작동하며 모든 결과를 ``App\Entities\Job`` 인스턴스로 반환합니다.
-해당 레코드를 데이터베이스에 유지해야 하는 경우 사용자 정의 메소드를 작성하거나 모델의 ``save()`` 메소드를 사용하여 클래스를 검사하고 public과 private 특성을 가져 와서 데이터베이스에 저장해야 합니다.
+This model works with data from the ``jobs`` table, and returns all results as an instance of ``App\Entities\Job``.
+When you need to persist that record to the database, you will need to either write custom methods, or use the
+model's ``save()`` method to inspect the class, grab any public and private properties, and save them to the database:
 
 .. literalinclude:: model/022.php
 
-.. note:: 엔터티를 많이 사용하는 경우를 위해 CodeIgniter는 엔터티 개발을 보다 간단하게 해주는 몇 가지 편리한 기능을 제공하는 내장된 Entity 클래스를 제공합니다.
+.. note:: If you find yourself working with Entities a lot, CodeIgniter provides a built-in :doc:`Entity class </models/entities>`
+    that provides several handy features that make developing Entities simpler.
 
-데이타 삭제
+Deleting Data
 =============
 
 delete()
 --------
 
-첫 번째 매개 변수로 제공된 기본 키 값을 사용하여 모델 테이블에서 일치하는 레코드를 삭제합니다.
+Takes a primary key value as the first parameter and deletes the matching record from the model's table:
 
 .. literalinclude:: model/023.php
 
-모델의 ``$useSoftDeletes`` 값이 true인 경우 ``deleted_at``\ 를 현재 날짜 및 시간으로 설정하여 행을 업데이트합니다.
-두 번째 매개 변수를 true로 설정하여 영구적으로 삭제할 수 있습니다.
+If the model's ``$useSoftDeletes`` value is true, this will update the row to set ``deleted_at`` to the current
+date and time. You can force a permanent delete by setting the second parameter as true.
 
-첫 번째 매개 변수로 기본 키 배열을 전달하여 한 번에 여러 레코드를 삭제할 수 있습니다
+An array of primary keys can be passed in as the first parameter to delete multiple records at once:
 
 .. literalinclude:: model/024.php
 
-매개 변수가 전달되지 않으면 쿼리 빌더의 delete 메소드처럼 작동하며 where 메소드 호출이 필요합니다.
+If no parameters are passed in, will act like the Query Builder's delete method, requiring a where call
+previously:
 
 .. literalinclude:: model/025.php
 
 purgeDeleted()
 --------------
 
-'deleted_at IS NOT null'\ 이 있는 모든 행을 데이터베이스 테이블에서 영구적으로 제거합니다.
+Cleans out the database table by permanently removing all rows that have 'deleted_at IS NOT NULL'.
 
 .. literalinclude:: model/026.php
 
-모델 내 검증
-=============
+.. _in-model-validation:
 
-데이터 검증
+In-Model Validation
+===================
+
+Validating Data
 ---------------
 
-많은 사람들에게 모델의 데이터 유효성 검사는 코드를 복제하지 않고 데이터를 단일 표준으로 유지하는데 선호되는 방법입니다.
-Model 클래스는 ``insert()``, ``update()``, ``save()`` 메소드를 사용하여 데이터베이스에 저장하기 전에 모든 데이터를 자동으로 검증하는 방법을 제공합니다.
+For many people, validating data in the model is the preferred way to ensure the data is kept to a single
+standard, without duplicating code. The Model class provides a way to automatically have all data validated
+prior to saving to the database with the ``insert()``, ``update()``, or ``save()`` methods.
 
-.. important:: 데이터를 업데이트할 때 기본적으로 모델 클래스의 유효성 검사는 제공된 필드의 유효성만 검사합니다. 이는 일부 필드만 업데이트할 때 유효성 검사 오류를 방지하기 위한 것입니다.
+.. important:: When you update data, by default, the validation in the model class only
+    validates provided fields. This is to avoid validation errors when updating only some fields.
 
-    그러나 이것은 업데이트할 때 ``required*`` 규칙이 예상대로 작동하지 않음을 의미합니다.
-    필수 필드를 확인하고 싶다면 구성별로 동작을 변경할 수 있습니다.
-    자세한 내용은 ref:`clean-validation-rules`\ 를 참조하세요.
+    But this means ``required*`` rules do not work as expected when updating.
+    If you want to check required fields, you can change the behavior by configuration.
+    See :ref:`clean-validation-rules` for details.
 
-첫 번째 단계는 적용 할 필드와 규칙으로 ``$validationRules`` 클래스 속성을 채우는 것입니다.
-사용하려는 사용자 지정 오류 메시지가 있으면 ``$validationMessages`` 배열에 넣으십시오.
+Setting Validation Rules
+------------------------
+
+The first step is to fill out the ``$validationRules`` class property with the fields and rules that should
+be applied. If you have custom error message that you want to use, place them in the ``$validationMessages`` array:
 
 .. literalinclude:: model/027.php
 
-기능별로 유효성 검사 규칙을 필드로 설정하는 다른 방법
+If you'd rather organize your rules and error messages within the Validation configuration file, you can do that
+and simply set ``$validationRules`` to the name of the validation rule group you created:
+
+.. literalinclude:: model/034.php
+
+The other way to set the validation rules to fields by functions,
 
 .. php:namespace:: CodeIgniter
 
@@ -449,285 +499,317 @@ Model 클래스는 ``insert()``, ``update()``, ``save()`` 메소드를 사용하
     :param  string  $field:
     :param  array   $fieldRules:
 
-    이 함수는 필드 유효성 검사 규칙을 설정합니다.
+    This function will set the field validation rules.
 
-    사용예
-    
+    Usage example:
+
     .. literalinclude:: model/028.php
 
 .. php:method:: setValidationRules($validationRules)
 
     :param  array   $validationRules:
 
-    이 함수는 유효성 검사 규칙을 설정합니다.
+    This function will set the validation rules.
 
-    사용예
-    
+    Usage example:
+
     .. literalinclude:: model/029.php
 
-기능별로 유효성 검사 메시지를 필드로 설정하는 다른 방법은,
+The other way to set the validation message to fields by functions,
 
 .. php:method:: setValidationMessage($field, $fieldMessages)
 
-    :param    string    $field
-    :param    array    $fieldMessages
+    :param  string  $field:
+    :param  array   $fieldMessages:
 
-    이 함수는 오류 메시지를 설정합니다.
+    This function will set the field wise error messages.
+
+    Usage example:
 
     .. literalinclude:: model/030.php
 
 .. php:method:: setValidationMessages($fieldMessages)
 
-    :param    array    $fieldMessages
+    :param  array   $fieldMessages:
 
-    이 함수는 필드 메시지를 설정합니다.
+    This function will set the field messages.
+
+    Usage example:
 
     .. literalinclude:: model/031.php
 
-이제 ``insert()``, ``update()``, ``save()`` 메소드를 호출할 때마다 데이터의 유효성이 검사됩니다.
-실패하면 모델은 **false**\ 를 반환합니다. ``errors()`` 메소드를 사용하여 유효성 검사 오류를 검색할 수 있습니다
+Getting Validation Result
+-------------------------
+
+Now, whenever you call the ``insert()``, ``update()``, or ``save()`` methods, the data will be validated. If it fails,
+the model will return boolean **false**.
+
+.. _model-getting-validation-errors:
+
+Getting Validation Errors
+-------------------------
+
+You can use the ``errors()`` method to retrieve the validation errors:
 
 .. literalinclude:: model/032.php
 
-위와 같이 하면 필드 이름과 관련 오류가 있는 배열을 반환하는데, 양식(form) 맨 위에 모든 오류를 표시하거나 개별적으로 표시하는 데 사용할 수 있습니다.
+This returns an array with the field names and their associated errors that can be used to either show all of the
+errors at the top of the form, or to display them individually:
 
 .. literalinclude:: model/033.php
 
-유효성 검사 구성 파일 내에서 규칙 및 오류 메시지를 구성하려는 경우 이를 수행하고 ``$validationRules``\ 를 만든 유효성 검사 규칙 그룹의 이름으로 설정하면 됩니다.
-
-.. literalinclude:: model/034.php
-
-유효성 검사 규칙 검색
+Retrieving Validation Rules
 ---------------------------
 
-``validationRules`` 속성에 액세스하여 모델의 유효성 검사 규칙을 검색할 수 있습니다.
+You can retrieve a model's validation rules by accessing its ``validationRules``
+property:
 
 .. literalinclude:: model/035.php
 
-옵션을 사용하여 접근자 메서드를 직접 호출하여 해당 규칙의 하위 집합만 검색 할 수도 있습니다.
+You can also retrieve just a subset of those rules by calling the accessor
+method directly, with options:
 
 .. literalinclude:: model/036.php
 
-``$options`` 매개 변수는 하나의 요소를 가진 연관 배열이며, 키는 ``'except'`` 또는 ``'only'``\ 이며, 값은 해당 필드 이름의 배열입니다.
+The ``$options`` parameter is an associative array with one element,
+whose key is either ``'except'`` or ``'only'``, and which has as its
+value an array of fieldnames of interest:
 
 .. literalinclude:: model/037.php
 
-유효성 검사 자리 표시자
-------------------------
+Validation Placeholders
+-----------------------
 
-이 모델은 전달된 데이터를 기반으로 규칙의 일부를 바꾸는 간단한 방법을 제공합니다.
-이것은 명확하지 않은 것처럼 들리지만 특히 ``is_unique`` 유효성 검사 규칙을 사용하면 편리합니다.
-자리 표시자는 단순히 중괄호로 묶인 ``$data``\ 로 전달된 필드(또는 배열 키)의 이름이며, 일치하는 필드의 **값**\ 으로 대체됩니다. 
-다음 예를 확인하세요.
+The model provides a simple method to replace parts of your rules based on data that's being passed into it. This
+sounds fairly obscure but can be especially handy with the ``is_unique`` validation rule. Placeholders are simply
+the name of the field (or array key) that was passed in as ``$data`` surrounded by curly brackets. It will be
+replaced by the **value** of the matched incoming field. An example should clarify this:
 
 .. literalinclude:: model/038.php
 
+.. note:: Since v4.3.5, you must set the validation rules for the placeholder
+    field (``id``).
 
-이 규칙 집합에서 전자 메일 주소는 자리 표시자의 값과 일치하는 ID를 가진 행을 제외하고 데이터베이스에서 고유(unique)해야 합니다.
-POST 데이터가 다음과 같다고 가정합니다.
+In this set of rules, it states that the email address should be unique in the database, except for the row
+that has an id matching the placeholder's value. Assuming that the form POST data had the following:
 
 .. literalinclude:: model/039.php
 
-``{id}`` 자리 표시자는 숫자 **4**\ 로 대체되어 이 규칙이 수정됩니다.
+then the ``{id}`` placeholder would be replaced with the number **4**, giving this revised rule:
 
 .. literalinclude:: model/040.php
 
-따라서 이메일이 고유하다는 것을 확인할 때 ``id=4``\ 인 데이터베이스의 행은 무시됩니다.
+So it will ignore the row in the database that has ``id=4`` when it verifies the email is unique.
 
-전달된 동적 키가 양식(form) 데이터와 충돌하지 않도록 주의한다면 런타임에 더 많은 동적 규칙을 작성하는 데 사용할 수 있습니다.
+.. note:: Since v4.3.5, if the placeholder (``id``) value does not pass the
+    validation, the placeholder would not be replaced.
 
-필드 보호
+This can also be used to create more dynamic rules at runtime, as long as you take care that any dynamic
+keys passed in don't conflict with your form data.
+
+Protecting Fields
 =================
 
-대량 할당 공격으로 부터 보호하려면 Model 클래스의 ``$allowedFields`` 클래스 속성에 INSERT 및 UPDATE중 변경 가능한 모든 필드 이름을 명시해야 합니다.
-제공된 모든 데이터중 명시되지 않은 데이터는 데이터베이스에 도달하기 전에 제거됩니다.
-타임스탬프 또는 기본 키가 변경되지 않도록 하는 데 유용합니다.
+To help protect against Mass Assignment Attacks, the Model class **requires** that you list all of the field names
+that can be changed during inserts and updates in the ``$allowedFields`` class property. Any data provided
+in addition to these will be removed prior to hitting the database. This is great for ensuring that timestamps,
+or primary keys do not get changed.
 
 .. literalinclude:: model/041.php
 
-테스트, 마이그레이션 또는 시드 중 보호된 요소를 변경하기를 원할 때가 있습니다.
-이럴 때 보호 기능을 켜거나 끌 수 있습니다
+Occasionally, you will find times where you need to be able to change these elements. This is often during
+testing, migrations, or seeds. In these cases, you can turn the protection on or off:
 
 .. literalinclude:: model/042.php
 
-런타임 리턴 유형 변경
+Runtime Return Type Changes
 ===========================
 
-**find*()** 메소드를 클래스 ``$returnType`` 속성으로 사용하여 데이터가 리턴되는 형식을 지정할 수 있습니다.
-그러나 지정한 형식과 다른 형식으로 데이터를 다시 원할 수도 있습니다.
-모델은 이를 수행할 수 있는 메소드를 제공합니다.
+You can specify the format that data should be returned as when using the **find*()** methods as the class property,
+``$returnType``. There may be times that you would like the data back in a different format, though. The Model
+provides methods that allow you to do just that.
 
-.. note:: 이 메소드는 다음 **find*()** 메소드 호출에 대한 리턴 유형만 변경합니다. 그 후에는 기본값으로 재설정됩니다.
+.. note:: These methods only change the return type for the next **find*()** method call. After that,
+    it is reset to its default value.
 
 asArray()
 ---------
 
-**find*()** 메소드의 데이터를 연관 배열로 리턴합니다.
+Returns data from the next **find*()** method as associative arrays:
 
 .. literalinclude:: model/047.php
 
 asObject()
 ----------
 
-**find*()** 메소드의 데이터를 표준 객체 또는 사용자 정의 클래스 인스턴스로 반환합니다.
+Returns data from the next **find*()** method as standard objects or custom class instances:
 
 .. literalinclude:: model/048.php
 
-많은 양의 데이터 처리
+Processing Large Amounts of Data
 ================================
 
-많은 양의 데이터를 처리해야 할 때 메모리가 부족해질 위험이 있습니다.
-이를 방지하기 위해 chunk() 메소드를 사용하여 작업을 수행하면 작은 크기의 데이터 청크를 얻을 수 있습니다.
-첫 번째 매개 변수는 단일 청크의 크기입니다.
-두 번째 매개 변수는 각 청크 데이터 행에 대해 호출될 클로저(Closure)입니다.
+Sometimes, you need to process large amounts of data and would run the risk of running out of memory.
+To make this simpler, you may use the chunk() method to get smaller chunks of data that you can then
+do your work on. The first parameter is the number of rows to retrieve in a single chunk. The second
+parameter is a Closure that will be called for each row of data.
 
-이 방법은 크론 작업, 데이터 내보내기(export) 또는 기타 대규모 작업에 적합합니다.
+This is best used during cronjobs, data exports, or other large tasks.
 
 .. literalinclude:: model/049.php
 
 .. _model-events-callbacks:
 
-쿼리 빌더 사용
+Working with Query Builder
 **************************
 
-모델 테이블에 대한 쿼리 빌더 가져오기
+Getting Query Builder for the Model's Table
 ===========================================
 
-CodeIgniter Model은 해당 모델의 데이터베이스 연결을 위해 쿼리 빌더의 인스턴스 하나를 가지고 있습니다.
-필요할 때 언제든지 쿼리 빌더의 **공유** 인스턴스에 접근할 수 있습니다.
+CodeIgniter Model has one instance of the Query Builder for that model's database connection.
+You can get access to the **shared** instance of the Query Builder any time you need it:
 
 .. literalinclude:: model/043.php
 
-이 빌더는 모델의 ``$table``\ 로 설정되어 있습니다.
+This builder is already set up with the model's ``$table``.
 
-.. note:: 쿼리 빌더 인스턴스를 얻으면 doc:`Query Builder <../database/query_builder>`\ 의 메소드를 호출할 수 있습니다.
-    그러나 쿼리 빌더는 Model이 아니므로 Model의 메소드를 호출할 수 없습니다.
+.. note:: Once you get the Query Builder instance, you can call methods of the
+    :doc:`Query Builder <../database/query_builder>`.
+    However, since Query Builder is not a Model, you cannot call methods of the Model.
 
-다른 테이블에 대한 쿼리 빌더 가져오기
+Getting Query Builder for Another Table
 =======================================
 
-다른 테이블에 액세스해야 하는 경우 쿼리 빌더의 다른 인스턴스를 가져올 수 있습니다.
-테이블 이름을 매개변수로 전달하지만 이것이 공유 인스턴스를 **반환하지 않는다**\ 는 점에 유의하세요.
+If you need access to another table, you can get another instance of the Query Builder.
+Pass the table name in as a parameter, but be aware that this will **not** return
+a shared instance:
 
 .. literalinclude:: model/044.php
 
-쿼리 빌더와 모델의 메소드 혼합
+Mixing Methods of Query Builder and Model
 =========================================
 
-쿼리 빌더 메소드와 Model의 CRUD 메소드를 체인 콜(chained call) 통하여 매우 우아하게 사용할 수 있습니다.
+You can also use Query Builder methods and the Model's CRUD methods in the same chained call, allowing for
+very elegant use:
 
 .. literalinclude:: model/045.php
 
-이 경우, 모델이 가지고 있는 쿼리 빌더의 공유 인스턴스에서 작동합니다.
+In this case, it operates on the shared instance of the Query Builder held by the model.
 
-.. important:: 모델은 쿼리 빌더에 완벽한 인터페이스를 제공하지 않습니다.
-    Model과 쿼리 빌더는 서로 다른 목적을 가진 별개의 클래스입니다.
-    같은 데이터를 반환할 것이라고 기대해서는 안 됩니다.
+.. important:: The Model does not provide a perfect interface to the Query Builder.
+    The Model and the Query Builder are separate classes with different purposes.
+    They should not be expected to return the same data.
 
-쿼리 빌더가 결과를 반환하면 그대로 반환됩니다.
-이 경우, 결과는 모델의 메소드에서 반환된 것과 다를 수 있으며 예상한 결과가 아닐 수 있습니다. 모델의 이벤트가 트리거되지 않습니다.
+If the Query Builder returns a result, it is returned as is.
+In that case, the result may be different from the one returned by the model's method
+and may not be what was expected. The model's events are not triggered.
 
-예기치 않은 작동을 방지하려면 메소드 체인 끝에 결과를 반환하는 쿼리 빌더 메소드를 사용하지 말고, 모델의 메소드를 지정하세요.
+To prevent unexpected behavior, do not use Query Builder methods that return results
+and specify the model's method at the end of the method chaining.
 
-.. note:: 모델의 데이터베이스 연결도 자연스럽게 접근할 수 있습니다.
+.. note:: You can also access the model's database connection seamlessly:
 
     .. literalinclude:: model/046.php
 
-
-모델 이벤트
+Model Events
 ************
 
-모델 실행시 호출 가능한 콜백 메소드를 지정할 수 있는 몇 가지 이벤트 포인트가 있습니다.
-이를 이용하여 데이터를 정규화하거나, 암호를 해시하고 관련 엔터티를 저장하는 작업등을 수행할 수 있습니다.
-모델 실행의 다음 이벤트 포인트 ``$beforeInsert``, ``$afterInsert``,
+There are several points within the model's execution that you can specify multiple callback methods to run.
+These methods can be used to normalize data, hash passwords, save related entities, and much more. The following
+points in the model's execution can be affected, each through a class property: ``$beforeInsert``, ``$afterInsert``,
 ``$beforeInsertBatch``, ``$afterInsertBatch``, ``$beforeUpdate``, ``$afterUpdate``, ``$beforeUpdateBatch``,
-``$afterUpdateBatch``, ``$afterFind``, and ``$afterDelete``\ 는 각 클래스 속성을 통해 영향을 받을 수 있습니다.
+``$afterUpdateBatch``, ``$afterFind``, and ``$afterDelete``.
 
-.. note:: v4.3.0 이후부터 ``$beforeInsertBatch``, ``$afterInsertBatch``, ``$beforeUpdateBatch``, ``$afterUpdateBatch``\ 를 사용할 수 있습니다.
+.. note:: ``$beforeInsertBatch``, ``$afterInsertBatch``, ``$beforeUpdateBatch`` and
+    ``$afterUpdateBatch`` can be used since v4.3.0.
 
-콜백 정의
-============
+Defining Callbacks
+==================
 
-사용할 모델에 먼저 새 클래스 메소드를 작성하고 콜백을 지정하십시오.
-이 클래스는 ``$data`` 배열을 매개 변수로 받습니다.
-``$data`` 배열에 전달되는 내용은 이벤트마다 다르지만, 원래 메소드에 전달된 기본 데이터를 **data**\ 라는 키에 전달합니다.
-insert* 또는 update* 메소드의 경우 데이터베이스에 삽입되는 키/값 쌍이 됩니다.
-기본 배열에는 메소드에 전달된 다른 값도 포함됩니다.
-다른 콜백이 정보를 전달받을 수 있도록 호출된 콜백 메소드는 $data 배열을 리턴해야 합니다.
+You specify the callbacks by first creating a new class method in your model to use. This class will always
+receive a ``$data`` array as its only parameter. The exact contents of the ``$data`` array will vary between events, but
+will always contain a key named **data** that contains the primary data passed to the original method. In the case
+of the insert* or update* methods, that will be the key/value pairs that are being inserted into the database. The
+main array will also contain the other values passed to the method, and be detailed later. The callback method
+must return the original $data array so other callbacks have the full information.
 
 .. literalinclude:: model/050.php
 
-콜백 지정
-============
+Specifying Callbacks To Run
+===========================
 
-적절한 클래스 속성(``$beforeInsert``, ``$afterUpdate`` 등)에 메소드 이름을 추가하여 콜백이 호출되는 시기를 지정합니다.
-단일 이벤트에 여러 개의 콜백을 추가할 수 있으며 지정된 순서대로 처리됩니다.
-여러 이벤트에서 동일한 콜백을 사용할 수도 있습니다
+You specify when to run the callbacks by adding the method name to the appropriate class property (``$beforeInsert``, ``$afterUpdate``,
+etc). Multiple callbacks can be added to a single event and they will be processed one after the other. You can
+use the same callback in multiple events:
 
 .. literalinclude:: model/051.php
 
-또한 각 모델은 ``$allowCallbacks`` 속성을 설정하여 클래스 전체에 콜백을 허용(기본값)하거나 거부할 수 있습니다.
+Additionally, each model may allow (default) or deny callbacks class-wide by setting its ``$allowCallbacks`` property:
 
 .. literalinclude:: model/052.php
 
-``allowCallbacks()`` 메서드를 사용하여 단일 모델에 대해 이 설정을 일시적으로 변경할 수 있습니다.
+You may also change this setting temporarily for a single model call using the ``allowCallbacks()`` method:
 
 .. literalinclude:: model/053.php
 
-이벤트 매개 변수
-=================
+Event Parameters
+================
 
-각 콜백에 전달되는 데이터는 약간씩 다릅니다.
-다음은 각 이벤트의 ``$data`` 매개 변수에 전달되는 세부 정보입니다.
+Since the exact data passed to each callback varies a bit, here are the details on what is in the ``$data`` parameter
+passed to each event:
 
 ================= =========================================================================================================
-Event            $data contents
+Event             $data contents
 ================= =========================================================================================================
-beforeInsert      **data** = Insert되는 키/값 쌍 객체, 엔터티 클래스가 insert 메소드로 전달되면 먼저 배열로 변환됩니다.
-afterInsert       **id** = 새 행의 기본 키, 실패 시 0
-                  **data** = Insert될 원래의 키/값 쌍
-                  **result** = 쿼리 빌더 insert() 메소드 호출 결과
-beforeInsertBatch **data** = 삽입되는 값들의 연관 배열.  insertBatch 메소드에 객체나 Entity 클래스가 전달되면 
-                  먼저 배열로 변환됩니다.
-afterInsertBatch  **data** = 삽입되는 값들의 연관 배열.
-                  **result** = Query Builder를 통해 사용된 insertbatch() 메소드의 결과.
-beforeUpdate      **id** = Update할 행의 기본(primary) 키 배열
-                  **data** = Update되는 키/값 쌍, update 메소드에 객체나 Entity 클래스가 전달되면 먼저 배열로 변환됩니다.
-afterUpdate       **id** = Update할 행의 기본(primary) 키 배열
-                  **data** = Update되는 키/값 쌍
-                  **result** = 쿼리 빌더 update() 메소드 호출 결과
-beforeUpdateBatch **data** = 업데이트되는 값들의 연관 배열, updateBatch 메소드에 객체나 Entity 클래스가 전달되면
-                  먼저 배열로 변환됩니다.
-afterUpdateBatch  **data** = 업데이트되는 키/값 쌍.
-                  **result** =  Query Builder를 통해 사용된 updateBatch() 메소드의 결과
-beforeFind        호출 **method** 이름, **singleton** 요청 여부와 추가 필드
-- first()         추가 필드 없음
-- find()          **id** = 검색되는 행의 기본 키
-- findAll()       **limit** = 찾을 행 수
-                  **offset** = 검색하는 동안 건너뛸 행 수
-afterFind         **beforeFind**\ 와 동일하지만 데이터의 결과 행을 포함하거나 결과가 없으면 null 입니다.
-beforeDelete      delete* 메소드에 따라 다릅니다. 다음을 참조하십시오.
-- delete()        **id** = 삭제되는 행의 기본 키
-                  **purge** = 소프트 삭제(soft-delete) 행을 강제로 삭제할지 여부(boolean)
-afterDelete       **id** = 삭제되는 행의 기본 키
-                  **purge** = 소프트 삭제(soft-delete) 행을 강제로 삭제할지 여부(boolean)
-                  **result** = 쿼리 빌더 delete() 메소드 호출 결과
-                  **data** = 사용안함
+beforeInsert      **data** = the key/value pairs that are being inserted. If an object or Entity class is passed to the
+                  insert method, it is first converted to an array.
+afterInsert       **id** = the primary key of the new row, or 0 on failure.
+                  **data** = the key/value pairs being inserted.
+                  **result** = the results of the insert() method used through the Query Builder.
+beforeInsertBatch **data** = associative array of values that are being inserted. If an object or Entity class is passed to the
+                  insertBatch method, it is first converted to an array.
+afterInsertBatch  **data** = the associative array of values being inserted.
+                  **result** = the results of the insertbatch() method used through the Query Builder.
+beforeUpdate      **id** = the array of primary keys of the rows being updated.
+                  **data** = the key/value pairs that are being updated. If an object or Entity class is passed to the
+                  update method, it is first converted to an array.
+afterUpdate       **id** = the array of primary keys of the rows being updated.
+                  **data** = the key/value pairs being updated.
+                  **result** = the results of the update() method used through the Query Builder.
+beforeUpdateBatch **data** = associative array of values that are being updated. If an object or Entity class is passed to the
+                  updateBatch method, it is first converted to an array.
+afterUpdateBatch  **data** = the key/value pairs being updated.
+                  **result** = the results of the updateBatch() method used through the Query Builder.
+beforeFind        The name of the calling **method**, whether a **singleton** was requested, and these additional fields:
+- first()         No additional fields
+- find()          **id** = the primary key of the row being searched for.
+- findAll()       **limit** = the number of rows to find.
+                  **offset** = the number of rows to skip during the search.
+afterFind         Same as **beforeFind** but including the resulting row(s) of data, or null if no result found.
+beforeDelete      Varies by delete* method. See the following:
+- delete()        **id** = primary key of row being deleted.
+                  **purge** = boolean whether soft-delete rows should be hard deleted.
+afterDelete       **id** = primary key of row being deleted.
+                  **purge** = boolean whether soft-delete rows should be hard deleted.
+                  **result** = the result of the delete() call on the Query Builder.
+                  **data** = unused.
 ================= =========================================================================================================
 
 Modifying Find* Data
 ====================
 
-``beforeFind``\ 와 ``afterFind`` 메소드는 모델의 정상적인 응답을 대체하기 위해 수정된 데이터 셑을 반환할 수 있습니다.
-``afterFind``\ 의 경우 반환 배열에서 ``data``\ 에 대한 변경 내용은 호출 컨텍스트로 자동 전달됩니다.
-``beforeFind``\ 가 검색 워크플로우를 가로 채기전 또 다른 부울 값 ``returnData``\ 도 반환합니다.
+The ``beforeFind`` and ``afterFind`` methods can both return a modified set of data to override the normal response
+from the model. For ``afterFind`` any changes made to ``data`` in the return array will automatically be passed back
+to the calling context. In order for ``beforeFind`` to intercept the find workflow it must also return an additional
+boolean, ``returnData``:
 
 .. literalinclude:: model/054.php
 
-사용자 정의 모델 만들기
-************************
+Manual Model Creation
+*********************
 
-DB에 연결되어 있다면 어플리케이션에 대한 모델을 작성하기 위해 특수한 클래스를 확장하지 않아도 됩니다.
-DB연결을 통해 CodeIgniter의 모델이 제공하는 기능을 무시하고 사용자가 원하는 방법으로 모델을 만들 수 있습니다.
+You do not need to extend any special class to create a model for your application. All you need is to get an
+instance of the database connection and you're good to go. This allows you to bypass the features CodeIgniter's
+Model gives you out of the box, and create a fully custom experience.
 
 .. literalinclude:: model/055.php

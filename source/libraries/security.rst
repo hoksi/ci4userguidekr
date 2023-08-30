@@ -1,61 +1,63 @@
-##############
-보안
-##############
+########
+Security
+########
 
-보안 클래스에는 사이트 간 요청 위조 공격(Cross-Site Request Forgery attacks)으로부터 사이트를 보호하는 데 도움이 되는 방법이 포함되어 있습니다.
+The Security Class contains methods that help protect your site against Cross-Site Request Forgery attacks.
 
 .. contents::
     :local:
     :depth: 3
 
 *******************
-라이브러리 로드
+Loading the Library
 *******************
 
-라이브러리 로드를 하려는 이유가 CSRF 보호를 위한것이라면, 입력이 필터로 실행되고 수동으로 상호 작용을 하지 않으므로 로드할 필요는 없습니다.
+If your only interest in loading the library is to handle CSRF protection, then you will never need to load it,
+as it runs as a filter and has no manual interaction.
 
-경우에 따라 직접 액세스가 필요하다면 서비스를 통해 로드합니다.
+If you find a case where you do need direct access though, you may load it through the Services file:
 
 .. literalinclude:: security/001.php
 
 .. _cross-site-request-forgery:
 
 *********************************
-사이트 간 요청 위조 (CSRF)
+Cross-Site Request Forgery (CSRF)
 *********************************
 
-.. warning:: CSRF 보호는 **POST/PUT/PATCH/DELETE** 요청에 대해서만 사용할 수 있습니다.
-    다른 메서드에 대한 요청은 보호되지 않습니다.
+.. warning:: The CSRF Protection is only available for **POST/PUT/PATCH/DELETE** requests.
+    Requests for other methods are not protected.
 
-전제 조건
+Prerequisite
 ============
 
-CodeIgniter의 CSRF 보호를 사용할 때 여전히 다음과 같이 코딩해야 합니다.
-그렇지 않으면 CSRF 보호를 우회할 수 있습니다.
+When you use the CodeIgniter's CSRF protection, you still need to code as the following.
+Otherwise, the CSRF protection may be bypassed.
 
-자동 라우팅이 비활성화된 경우
-------------------------------
+When Auto-Routing is Disabled
+-----------------------------
 
-다음 중 하나를 수행합니다.
+Do one of the following:
 
-1. ``$routes->add()``\ 를 사용하지 말고 경로에 HTTP 동사를 사용하십시오.
-2. 처리하기 전에 컨트롤러 메소드에서 요청 메소드를 확인하십시오.
+1. Do not use ``$routes->add()``, and use HTTP verbs in routes.
+2. Check the request method in the controller method before processing.
 
-::
+E.g.::
 
     if (! $this->request->is('post')) {
         return $this->response->setStatusCode(405)->setBody('Method Not Allowed');
     }
 
-.. note:: :ref:`$this->request->is() <incomingrequest-is>` 메소드는 v4.3.0 이후 버전에서 사용할 수 있습니다. 
-    이전 버전에서는 ``if (strtolower($this->request->getMethod()) !== 'post')``\ 와 같이 사용해야합니다.
+.. note:: The :ref:`$this->request->is() <incomingrequest-is>` method can be used since v4.3.0.
+    In previous versions, you need to use
+    ``if (strtolower($this->request->getMethod()) !== 'post')``.
 
-자동 라우팅이 활성화된 경우
+When Auto-Routing is Enabled
 ----------------------------
 
-1. 처리하기 전에 컨트롤러 메소드에서 요청 메소드를 확인하십시오.
+1. Check the request method in the controller method before processing.
 
-::
+E.g.::
 
     if (! $this->request->is('post')) {
         return $this->response->setStatusCode(405)->setBody('Method Not Allowed');
@@ -69,139 +71,154 @@ Config for CSRF
 CSRF Protection Methods
 -----------------------
 
-코드이그나이터는 기본적으로 쿠키 기반 CSRF 보호를 사용합니다. 
-OWASP 교차사이트 요청서 위조방지 컨닝시트의 `Double Submit Cookie <https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie>`_\ .
+By default, the Cookie based CSRF Protection is used. It is
+`Double Submit Cookie <https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie>`_
+on OWASP Cross-Site Request Forgery Prevention Cheat Sheet.
 
-세션 기반 CSRF 보호를 사용할 수도 있습니다.
+You can also use Session based CSRF Protection. It is
 `Synchronizer Token Pattern <https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#synchronizer-token-pattern>`_.
 
-**app/Config/Security.php**\ 에서 다음 구성 매개 변수 값을 편집하여 세션 기반 CSRF 보호를 사용하도록 설정할 수 있습니다.
+You can set to use the Session based CSRF protection by editing the following config parameter value in
+**app/Config/Security.php**:
 
 .. literalinclude:: security/002.php
 
 Token Randomization
 -------------------
 
-`BREACH`_\ 와 같은 압축 부채널 공격(mitigate compression side-channel attacks)을 완화하고 공격자가 CSRF 토큰을 추측하지 못하도록 토큰 무작위화(기본값 해제)를 구성할 수 있습니다.
+To mitigate compression side-channel attacks like `BREACH`_, and prevent an attacker from guessing the CSRF tokens, you can configure token randomization (off by default).
 
-활성화하면 토큰에 무작위 마스크가 추가되어 스크램블에 사용됩니다.
+If you enable it, a random mask is added to the token and used to scramble it.
 
 .. _`BREACH`: https://en.wikipedia.org/wiki/BREACH
 
-다음과 같이 **app/Config/Security.php**\ 파일의 매개 변수 값을 편집하여 활성화할 수 있습니다.
+You can enable it by editing the following config parameter value in
+**app/Config/Security.php**:
 
 .. literalinclude:: security/003.php
 
-토큰 재생성
-===================
+Token Regeneration
+------------------
 
-토큰은 제출할 때마다 재생성되거나(기본값), CSRF 쿠키 존재하는 동안 동일하게 유지됩니다.
-토큰의 기본 재생성은 강력한 보안을 제공하지만, 다른 토큰이 뒤로/앞으로 탐색, 여러 탭/창, 비동기 작업 등으로 무효화됨에 따라 사용성 문제가 발생할 수 있습니다.
-다음과 같이 **app/Config/Security.php**\ 파일의 매개 변수를 편집하여 이 동작을 변경할 수 있습니다.
+Tokens may be either regenerated on every submission (default) or
+kept the same throughout the life of the CSRF cookie. The default
+regeneration of tokens provides stricter security, but may result
+in usability concerns as other tokens become invalid (back/forward
+navigation, multiple tabs/windows, asynchronous actions, etc). You
+may alter this behavior by editing the following config parameter value in
+**app/Config/Security.php**:
 
 .. literalinclude:: security/004.php
 
-.. note:: v4.2.3부터 ``Security::generateHash()`` 메소드를 사용하여 수동으로 CSRF 토큰을 재생성할 수 있습니다.
+.. note:: Since v4.2.3, you can regenerate CSRF token manually with the
+    ``Security::generateHash()`` method.
 
 .. _csrf-redirection-on-failure:
 
-실패 시 리디렉션
-======================
+Redirection on Failure
+----------------------
 
-v4.3.0부터, 요청이 CSRF 유효성 검사를 통과하지 못하면 기본적으로 SecurityException이 발생합니다.
+Since v4.3.0, when a request fails the CSRF validation check,
+it will throw a SecurityException by default,
 
-이전 페이지로 리디렉션하도록하려면, **app/Config/Security.php**\ 에서 다음 구성 매개변수 값을 변경하십시오.
+.. note:: In production environment, when you use HTML forms, it is recommended
+    to enable this redirection for a better user experience.
+
+If you want to make it redirect to the previous page,
+change the following config parameter value in
+**app/Config/Security.php**:
 
 .. literalinclude:: security/005.php
 
-리디렉션될 때, ``error`` 플래시 메시지가 설정되며, 다음 코드를 사용하여 뷰에서 사용자에게 표시할 수 있습니다.
-
-::
+When redirected, an ``error`` flash message is set and can be displayed to the end user with the following code in your view::
 
     <?= session()->getFlashdata('error') ?>
 
-이는 단순히 충돌하는 것보다 더 나은 사용자 경험을 제공합니다.
+This provides a nicer experience than simply crashing.
 
-리디렉션 값이 ``true``\ 인 경우에도 AJAX 호출은 리디렉션하지 않으며 SecurityException을 throw합니다.
+Even when the redirect value is ``true``, AJAX calls will not redirect, but will throw a SecurityException.
 
-CSRF 보호 활성화
+Enable CSRF Protection
 ======================
 
-**app/Config/Filters.php**\ 파일의 `csrf` 필터를 활성화하여 사이트 전체적으로 CSRF 보호(protection)를 활성화할 수 있습니다
+You can enable CSRF protection by altering your **app/Config/Filters.php**
+and enabling the `csrf` filter globally:
 
 .. literalinclude:: security/006.php
 
-URI를 화이트리스트에 추가하여 CSRF 보호에서 제외할 수 있습니다. (예 : 외부 POST 컨텐츠를 예상하는 API 엔드 포인트)
-사전 필터에 예외로 URI를 추가하여 제외시킵니다.
+Select URIs can be whitelisted from CSRF protection (for example API
+endpoints expecting externally POSTed content). You can add these URIs
+by adding them as exceptions in the filter:
 
 .. literalinclude:: security/007.php
 
-정규식도 지원합니다. (대/소문자 구분)
+Regular expressions are also supported (case-insensitive):
 
 .. literalinclude:: security/008.php
 
-
-특정 메소드에 대해서만 CSRF 필터를 활성화할 수 있습니다.
+It is also possible to enable the CSRF filter only for specific methods:
 
 .. literalinclude:: security/009.php
 
-.. Warning:: :ref:`auto-routing-legacy`\ 가 컨트롤러에 접근할 수 있는 모든 HTTP 메소드를 허용하기 때문에 ``$methods`` 필터를 사용할 경우, :ref:`Auto Routing (Legacy) <use-defined-routes-only>`\ 을 사용하지 않도록 설정해야 합니다.
-    활성화되어 있는 상태에서는 예상하지 못한 방법으로 컨트롤러에 액세스하여 필터를 우회할 수 있습니다.
+.. Warning:: If you use ``$methods`` filters, you should :ref:`disable Auto Routing (Legacy) <use-defined-routes-only>`
+    because :ref:`auto-routing-legacy` permits any HTTP method to access a controller.
+    Accessing the controller with a method you don't expect could bypass the filter.
 
 HTML Forms
 ==========
 
-:doc:`form helper <../helpers/form_helper>`\ 의 :func:`form_open()`\ 를 사용하면 자동으로 폼(form)에 숨겨진  추가합니다.
+If you use the :doc:`form helper <../helpers/form_helper>`, then
+:func:`form_open()` will automatically insert a hidden csrf field in
+your forms.
 
-.. note:: CSRF 필드의 자동 생성을 사용하려면 CSRF 필터를 폼 페이지로 설정해야 합니다.
-    대부분의 경우 ``GET`` 메소드를 사용하여 요청됩니다.
+.. note:: To use auto-generation of CSRF field, you need to turn CSRF filter on to the form page.
+    In most cases it is requested using the ``GET`` method.
 
-직접 폼에 csrf 필드를 추가하고 싶다면 ``csrf_token()`` 와 ``csrf_hash()`` 함수를 사용합니다
-
+If not, then you can use the always available ``csrf_token()``
+and ``csrf_hash()`` functions
 ::
 
-	<input type="hidden" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
+    <input type="hidden" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
 
-또한, ``csrf_field ()`` 메소드를 사용하면 숨겨진 입력 필드를 생성할 수 있습니다
+Additionally, you can use the ``csrf_field()`` method to generate this
+hidden input field for you::
 
-::
+    // Generates: <input type="hidden" name="{csrf_token}" value="{csrf_hash}" />
+    <?= csrf_field() ?>
 
-	// Generates: <input type="hidden" name="{csrf_token}" value="{csrf_hash}" />
-	<?= csrf_field() ?>
+When sending a JSON request the CSRF token can also be passed as one of the parameters.
+The next way to pass the CSRF token is a special Http header that's name is available by
+``csrf_header()`` function.
 
-JSON 요청을 보낼 때 CSRF 토큰을 매개 변수중 하나로 전달할 수 있습니다.
-CSRF 토큰을 전달하는 방법은 특수한 Http 헤더이며, ``csrf_header()`` 함수를 사용합니다.
+Additionally, you can use the ``csrf_meta()`` method to generate this handy
+meta tag for you::
 
-``csrf_meta()`` 메소드를 사용 하면 메타 태그를 편리하게 생성 할 수 있습니다
+    // Generates: <meta name="{csrf_header}" content="{csrf_hash}" />
+    <?= csrf_meta() ?>
 
-::
-
-	// Generates: <meta name="{csrf_header}" content="{csrf_hash}" />
-	<?= csrf_meta() ?>
-
-사용자 토큰 확인 순서
+The Order of Token Sent by Users
 ================================
 
-CSRF 토큰을 확인하는 순서는 다음과 같습니다.
+The order of checking the availability of the CSRF token is as follows:
 
 1. ``$_POST`` array
-2. Http header
-3. ``php://input`` (JSON 요청) - JSON을 디코딩한 다음 다시 인코딩해야 하기 때문에 이 방법이 가장 느립니다.
+2. HTTP header
+3. ``php://input`` (JSON request) - bear in mind that this approach is the slowest one since we have to decode JSON and then re-encode it
 
 *********************
-다른 유용한 메소드
+Other Helpful Methods
 *********************
 
-Security 클래스의 대부분의 메소드를 직접 사용할 필요는 없습니다.
-다음은 CSRF 보호와 관련이 없는 유용한 메소드입니다.
+You will never need to use most of the methods in the Security class directly. The following are methods that
+you might find helpful that are not related to the CSRF protection.
 
 sanitizeFilename()
 ==================
 
-디렉토리 탐색 시도 및 기타 보안 위협을 방지하기 위해 파일 이름을 삭제하려고 시도합니다. 
-이는 사용자 입력을 통해 제공된 파일에 특히 유용합니다. 
-첫 번째 매개 변수는 처리(sanitize) 경로입니다.
+Tries to sanitize filenames in order to prevent directory traversal attempts and other security threats, which is
+particularly useful for files that were supplied via user input. The first parameter is the path to sanitize.
 
-사용자 입력이 상대 경로를 포함하는 것이 허용되는 경우(예 : file/in/some/approved/folder.txt), 두 번째 선택적 매개 변수 ``$relative_path``\ 를 ``true``\ 로 설정합니다.
+If it is acceptable for the user input to include relative paths, e.g., **file/in/some/approved/folder.txt**, you can set
+the second optional parameter, ``$relativePath`` to ``true``.
 
 .. literalinclude:: security/010.php

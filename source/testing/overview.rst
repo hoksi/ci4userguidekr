@@ -1,99 +1,99 @@
 #######
-테스트
+Testing
 #######
 
-CodeIgniter는 프레임워크와 어플리케이션을 최대한 간단하게 테스트할 수 있도록 개발되었습니다.
-`PHPUnit <https://phpunit.de/>`__\ 에 대한 지원이 내장되어 있으며 프레임워크는 어플리케이션의 모든 측면을 가능한 한 쉽게 테스트할 수 있는 편리한 헬퍼 메소드를 제공합니다.
-
+CodeIgniter has been built to make testing both the framework and your application as simple as possible.
+Support for `PHPUnit <https://phpunit.de/>`__ is built in, and the framework provides a number of convenient
+helper methods to make testing every aspect of your application as painless as possible.
 
 .. contents::
     :local:
     :depth: 3
 
-***************
-시스템 설정
-***************
+*************
+System Set Up
+*************
 
-PHPUnit 설치
+Installing PHPUnit
 ==================
 
-CodeIgniter는 `PHPUnit <https://phpunit.de/>`__\ 을 모든 테스트의 기준으로 사용합니다.
-시스템에서 PHPUnit을 사용하기 위해 설치하는 두 가지 방법이 있습니다.
+CodeIgniter uses `PHPUnit <https://phpunit.de/>`__ as the basis for all of its testing. There are two ways to install
+PHPUnit to use within your system.
 
 Composer
 --------
 
-권장되는 방법은 `Composer <https://getcomposer.org/>`__\ 를 사용하여 프로젝트에 설치하는 것입니다.
-전역(global)으로 설치할 수는 있지만 시간이 지남에 따라 시스템의 다른 프로젝트와 호환성 문제가 발생할 수 있으므로 권장하지 않습니다.
+The recommended method is to install it in your project using `Composer <https://getcomposer.org/>`__. While it's possible
+to install it globally we do not recommend it, since it can cause compatibility issues with other projects on your
+system as time goes on.
 
-시스템에 Composer가 설치되어 있는지 확인 후 프로젝트 루트(어플리케이션 및 시스템 디렉토리를 포함하는 디렉토리)의 커맨드 라인에 다음을 입력하십시오.
+Ensure that you have Composer installed on your system. From the project root (the directory that contains the
+application and system directories) type the following from the command line:
 
-::
+.. code-block:: console
 
-    > composer require --dev phpunit/phpunit
+    composer require --dev phpunit/phpunit
 
-현재 PHP 버전에 맞는 버전이 설치됩니다. 
-완료되면 다음을 입력하여 이 프로젝트에 대한 모든 테스트를 실행할 수 있습니다
+This will install the correct version for your current PHP version. Once that is done, you can run all of the
+tests for this project by typing:
 
-::
+.. code-block:: console
 
-    > ./vendor/bin/phpunit
+    vendor/bin/phpunit
 
-Windows를 사용한다면 다음 명령을 사용하십시오.
+If you are using Windows, use the following command:
 
-::
+.. code-block:: console
 
-    > vendor\bin\phpunit
+    vendor\bin\phpunit
 
 Phar
 ----
 
-다른 방법은 `PHPUnit <https://phpunit.de/getting-started/phpunit-9.html>`__ 사이트에서 .phar 파일을 다운로드하는 것입니다.
-이것은 프로젝트 루트 내에 배치해야 하는 독립형 파일입니다.
-
+The other option is to download the .phar file from the `PHPUnit <https://phpunit.de/getting-started/phpunit-9.html>`__ site.
+This is a standalone file that should be placed within your project root.
 
 ************************
-어플리케이션 테스트
+Testing Your Application
 ************************
 
-PHPUnit 구성
+PHPUnit Configuration
 =====================
 
-프레임워크에는 프로젝트 루트에 ``phpunit.xml.dist`` 파일이 있습니다.
-이는 프레임워크 자체의 단위 테스트를 제어합니다. 
-만약 당신이 자신만의 ``phpunit.xml``\ 을 제공하면 이를 무시합니다.
+The framework has a ``phpunit.xml.dist`` file in the project root. This controls unit
+testing of the framework itself. If you provide your own ``phpunit.xml``, it will
+over-ride this.
 
-어플리케이션을 단위로 테스트하는 경우 ``phpunit.xml``\ 에서 ``system`` 폴더와 ``vendor`` 또는 ``ThirdParty`` 폴더를 제외해야합니다.
+Your ``phpunit.xml`` should exclude the ``system`` folder, as well as any ``vendor`` or
+``ThirdParty`` folders, if you are unit testing your application.
 
-
-Test 클래스
+The Test Class
 ==============
 
-제공된 추가 도구를 이용하려면 테스트가 ``CIUnitTestCase``\ 를 확장해야 합니다.
-모든 테스트는 기본적으로 **tests/app** 디렉토리에 있어야 합니다.
+In order to take advantage of the additional tools provided, your tests must extend ``CIUnitTestCase``. All tests
+are expected to be located in the **tests/app** directory by default.
 
-새 라이브러리 **Foo**\ 를 테스트하려면 **tests/app/Libraries/FooTest.php**\ 에 새 파일을 만듭니다.
+To test a new library, **Foo**, you would create a new file at **tests/app/Libraries/FooTest.php**:
 
 .. literalinclude:: overview/001.php
 
-모델 중 하나를 테스트하기 위해 **tests/app/Models/OneOfMyModelsTest.php**\ 에 다음과 같이 할 수 있습니다.
+To test one of your models, you might end up with something like this in **tests/app/Models/OneOfMyModelsTest.php**:
 
 .. literalinclude:: overview/002.php
 
-테스트 스타일/요건에 맞는 디렉토리 구조를 만들 수 있습니다. 
-테스트 클래스의 이름을 지정할 때 **app** 디렉토리는 ``App`` 네임스페이스의 루트이므로 사용하는 모든 클래스는``App``\ 에 대해 올바른 네임스페이스를 가져야합니다.
+You can create any directory structure that fits your testing style/needs. When namespacing the test classes,
+remember that the **app** directory is the root of the ``App`` namespace, so any classes you use must
+have the correct namespace relative to ``App``.
 
-.. note:: 네임스페이스는 테스트 클래스에 반드시 필요한 것은 아니지만 클래스 이름이 충돌하지 않도록 하는 데 도움이 됩니다.
+.. note:: Namespaces are not strictly required for test classes, but they are helpful to ensure no class names collide.
 
-데이터베이스 결과를 테스트할 때는 :doc:`DatabaseTestTrait <database>` 클래스를 사용해야 합니다.
+When testing database results, you must use the :doc:`DatabaseTestTrait <database>` in your class.
 
 Staging
 -------
 
-대부분의 테스트는 올바르게 실행하기 위해 약간의 준비가 필요합니다. 
-PHPUnit의 ``TestCase``\ 는 준비 및 정리를 돕는 4가지 방법을 제공합니다
-
-::
+Most tests require some preparation in order to run correctly. PHPUnit's ``TestCase`` provides four methods
+to help with staging and clean up::
 
     public static function setUpBeforeClass(): void
     public static function tearDownAfterClass(): void
@@ -101,8 +101,11 @@ PHPUnit의 ``TestCase``\ 는 준비 및 정리를 돕는 4가지 방법을 제�
     protected function setUp(): void
     protected function tearDown(): void
 
-정적 메소드 ``setUpBeforeClass()``\ 와 ``tearDownAfterClass()``\ 는 전체 테스트 케이스 전후에 실행되는 반면, 보호된 메소드 ``setUp()``\ 와 ``tearDown()``\ 은 각 테스트 사이에 실행됩니다. .
-이러한 특수 기능을 구현하는 경우 확장된 테스트 케이스가 스테이징을 방해하지 않도록 상위 기능도 함께 실행해야 합니다.
+The static methods ``setUpBeforeClass()`` and ``tearDownAfterClass()`` run before and after the entire test case, whereas the protected methods ``setUp()`` and ``tearDown()`` run
+between each test.
+
+If you implement any of these special functions make sure you run their
+parent as well so extended test cases do not interfere with staging:
 
 .. literalinclude:: overview/003.php
 
@@ -111,149 +114,154 @@ PHPUnit의 ``TestCase``\ 는 준비 및 정리를 돕는 4가지 방법을 제�
 Traits
 ------
 
-테스트를 강화하는 일반적인 방법은 특성(trait)을 사용하여 여러 테스트 사례에서 스테이징을 통합하는 것입니다.
-``CIUnitTestCase``\ 는 어떤 등급의 특성(trait)도 감지하고 특성(trait) 자체의 이름을 따서 실행할 스테이징 방법을 찾을 것입니다. (i.e. `setUp{NameOfTrait}()`\ 와 `tearDown{NameOfTrait}()`)
-예를 들어 일부 테스트 케이스에 인증을 추가해야 하는 경우 로그인된 사용자를 위조하는 설정 방법을 사용하여 인증 특성(trait)을 생성할 수 있습니다.
+A common way to enhance your tests is by using traits to consolidate staging across different
+test cases. ``CIUnitTestCase`` will detect any class traits and look for staging methods
+to run named for the trait itself (i.e. `setUp{NameOfTrait}()` and `tearDown{NameOfTrait}()`).
+
+For example, if you needed to add authentication to some
+of your test cases you could create an authentication trait with a set up method to fake a
+logged in user:
 
 .. literalinclude:: overview/006.php
 
-추가 어설션(Assertion)
---------------------------
+Additional Assertions
+---------------------
 
-``CIUnitTestCase``\ 는 유용한 추가 단위 테스트 어설션을 제공합니다.
+``CIUnitTestCase`` provides additional unit testing assertions that you might find useful.
 
 assertLogged($level, $expectedMessage)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-기대한 것이 로그에 올바르게 기록되었는지 확인하세요.
+Ensure that something you expected to be logged was actually logged:
 
 assertLogContains($level, $logMessage)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-로그에 메시지 부분을 포함하는 레코드가 있는지 확인하세요.
+Ensure that there's a record in the logs which contains a message part.
 
 .. literalinclude:: overview/007.php
 
 assertEventTriggered($eventName)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-실제로 트리거될 것으로 예상되는 이벤트
+Ensure that an event you expected to be triggered actually was:
 
 .. literalinclude:: overview/008.php
 
 assertHeaderEmitted($header, $ignoreCase = false)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-헤더 또는 쿠키가 실제로 방출되었는지 확인
+Ensure that a header or cookie was actually emitted:
 
 .. literalinclude:: overview/009.php
 
-.. note: 테스트 케이스는 `PHPunit에서 별도의 프로세스로 실행 <https://phpunit.readthedocs.io/en/9.5/annotations.html#runinseparateprocess>`_\ 되어야 합니다.
+.. note:: the test case with this should be `run as a separate process
+    in PHPunit <https://docs.phpunit.de/en/9.6/annotations.html#runinseparateprocess>`_.
 
 assertHeaderNotEmitted($header, $ignoreCase = false)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-헤더 또는 쿠키가 방출되지 않았는지 확인
+Ensure that a header or cookie was not emitted:
 
 .. literalinclude:: overview/010.php
 
-.. note: 테스트 케이스는 `PHPunit에서 별도의 프로세스로 실행 <https://phpunit.readthedocs.io/en/9.5/annotations.html#runinseparateprocess>`_\ 되어야 합니다.
+.. note:: the test case with this should be `run as a separate process
+    in PHPunit <https://docs.phpunit.de/en/9.6/annotations.html#runinseparateprocess>`_.
 
 assertCloseEnough($expected, $actual, $message = '', $tolerance = 1)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-확장된 실행 시간 테스트의 경우 예상 시간과 실제 시간의 절대 차이가 규정된 허용 오차 내에 있는지 테스트합니다.
+For extended execution time testing, tests that the absolute difference
+between expected and actual time is within the prescribed tolerance:
 
 .. literalinclude:: overview/011.php
 
-위의 테스트를 통해 실제 시간은 660 초 또는 661 초가 될 수 있습니다.
+The above test will allow the actual time to be either 660 or 661 seconds.
 
 assertCloseEnoughString($expected, $actual, $message = '', $tolerance = 1)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-확장된 실행 시간 테스트의 경우 문자열 형식의 예상 시간과 실제 시간의 절대 차이가 규정된 허용 오차내에 있는지 테스트합니다.
+For extended execution time testing, tests that the absolute difference
+between expected and actual time, formatted as strings, is within the prescribed tolerance:
 
 .. literalinclude:: overview/012.php
 
-위의 테스트를 통해 실제 시간은 660 초 또는 661 초가 될 수 있습니다.
+The above test will allow the actual time to be either 660 or 661 seconds.
 
-
-Protected/Private 속성에 액세스
+Accessing Protected/Private Properties
 --------------------------------------
 
-테스트할 때 다음 setter 및 getter 메소드를 사용하여 테스트중인 클래스의 Protected/Private 메소드 및 특성에 액세스할 수 있습니다.
+When testing, you can use the following setter and getter methods to access protected and private methods and
+properties in the classes that you are testing.
 
 getPrivateMethodInvoker($instance, $method)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-클래스 외부에서 private 메소드를 호출할 수 있습니다. 
-이렇게 하면 호출할 수있는 함수를 반환합니다.
-첫 번째 매개 변수는 테스트할 클래스의 인스턴스입니다. 
-두 번째 매개 변수는 호출하려는 메소드의 이름입니다.
+Enables you to call private methods from outside the class. This returns a function that can be called. The first
+parameter is an instance of the class to test. The second parameter is the name of the method you want to call.
 
 .. literalinclude:: overview/013.php
 
 getPrivateProperty($instance, $property)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-클래스의 인스턴스에서 private/protected 클래스 속성 값을 검색합니다.
-첫 번째 매개 변수는 테스트할 클래스의 인스턴스입니다.
-두 번째 매개 변수는 속성 이름입니다.
+Retrieves the value of a private/protected class property from an instance of a class. The first parameter is an
+instance of the class to test. The second parameter is the name of the property.
 
 .. literalinclude:: overview/014.php
 
 setPrivateProperty($instance, $property, $value)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-클래스 인스턴스 내에서 private/protected 속성에 값을 설정합니다.
-첫 번째 매개 변수는 테스트할 클래스의 인스턴스입니다.
-두 번째 매개 변수는 값을 설정할 속성의 이름입니다.
-세 번째 매개 변수는 설정할 값입니다.
+Set a protected value within a class instance. The first parameter is an instance of the class to test. The second
+parameter is the name of the property to set the value of. The third parameter is the value to set it to:
 
 .. literalinclude:: overview/015.php
 
-모의(Moking) 서비스
-=======================
+Mocking Services
+================
 
-**app/Config/Services.php**에 정의된 서비스 중 하나를 모의 실행하여 테스트를 문제의 코드로만 제한하고 서비스의 다양한 응답을 시뮬레이션해야 하는 경우가 종종 있습니다.
-이는 컨트롤러와 기타 통합 테스트를 테스트할 때 특히 그렇습니다.
-**Services** 클래스는 이를 단순화하는 다음 메소드를 제공합니다.
+You will often find that you need to mock one of the services defined in **app/Config/Services.php** to limit
+your tests to only the code in question, while simulating various responses from the services. This is especially
+true when testing controllers and other integration testing. The **Services** class provides the following methods
+to simplify this.
 
 Services::injectMock()
 ----------------------
 
-이 메소드를 사용하면 Services 클래스에서 리턴할 정확한 인스턴스를 정의할 수 있습니다.
-이를 사용하여 특정 방식으로 동작하도록 서비스의 속성을 설정하거나 서비스를 모의 클래스로 바꿀 수 있습니다.
+This method allows you to define the exact instance that will be returned by the Services class. You can use this to
+set properties of a service so that it behaves in a certain way, or replace a service with a mocked class.
 
 .. literalinclude:: overview/016.php
 
-첫 번째 매개 변수는 교체할 서비스입니다. 
-이름은 Services 클래스의 함수 이름과 정확히 일치해야합니다.
-두 번째 매개 변수는 이를 대체할 인스턴스입니다.
+The first parameter is the service that you are replacing. The name must match the function name in the Services
+class exactly. The second parameter is the instance to replace it with.
 
 Services::reset()
 -----------------
 
-서비스 클래스에서 모든 모의(mock) 클래스를 제거하여 원래 상태로 되돌립니다.
+Removes all mocked classes from the Services class, bringing it back to its original state.
 
-``CIUnitTestCase``\ 가 제공하는 ``$this->resetServices()`` 메소드를 사용할 수도 있습니다.
+You can also use the ``$this->resetServices()`` method that ``CIUnitTestCase`` provides.
 
 Services::resetSingle(string $name)
 -----------------------------------
 
-이름별로 단일 서비스에 대한 모의 및 공유 인스턴스를 제거합니다.
+Removes any mock and shared instances for a single service, by its name.
 
-.. note:: ``Cache``, ``Email``, ``Session`` 서비스는 침입 테스트 동작을 방지하기 위해 기본적으로 모의 처리됩니다. 이 모의 처리를 방지하려면 클래스 속성 ``$setUpMethods = ['mockEmail', 'mockSession'];``\ 에서 메소드 콜백을 제거합니다;``
+.. note:: The ``Cache``, ``Email`` and ``Session`` services are mocked by default to prevent intrusive testing behavior. To prevent these from mocking remove their method callback from the class property: ``$setUpMethods = ['mockEmail', 'mockSession'];``
 
-모의(Moking) Factory 인스턴스
-==============================
+Mocking Factory Instances
+=========================
 
-서비스와 마찬가지로 테스트 중에 ``Factory``\ 와 함께 사용될 미리 구성된 클래스 인스턴스를 제공해야 할 수도 있습니다.
-**Services**\ 와 같은 ``Factories::injectMock()`` 과 ``Factories::reset()`` 정적 메소드를 사용하지만 구성 요소 이름에 대해 선행 매개 변수를 추가로 사용합니다.
+Similar to Services, you may find yourself needing to supply a pre-configured class instance
+during testing that will be used with ``Factories``. Use the same ``Factories::injectMock()`` and ``Factories::reset()``
+static methods like **Services**, but they take an additional preceding parameter for the
+component name:
 
 .. literalinclude:: overview/017.php
-        
-.. note:: 모든 구성 요소 팩토리는 각 테스트 사이에 기본적으로 재설정됩니다. 인스턴스를 유지해야하는 경우 테스트 케이스의 ``$setUpMethods``\ 를 수정합니다.
+
+.. note:: All component Factories are reset by default between each test. Modify your test case's ``$setUpMethods`` if you need instances to persist.
 
 .. _testing-cli-output:
 
@@ -274,41 +282,32 @@ might be helpful. The ``StreamFilterTrait`` helps you capture the output from th
 
 - ``StreamFilterTrait::getStreamFilterBuffer()`` Get the captured data from the buffer.
 - ``StreamFilterTrait::resetStreamFilterBuffer()`` Reset captured data.
-**StreamFilterTrait**\ 은 이러한 헬퍼 메서드의 대체 방법을 제공합니다.
 
-테스트하기 어려운 것들을 테스트해야 할 수도 있습니다. 
-때로는 PHP의 STDOUT 또는 STDERR과 같은 스트림을 캡처하는 것이 도움이 될 수 있습니다. 
-``StreamFilterTrait``\ 은 원하는 스트림의 출력을 캡처하는 데 도움이 됩니다.
-
-**메소드 개요**
-
-- ``StreamFilterTrait::getStreamFilterBuffer()`` : 버퍼에서 캡처한 데이터 가져오기.
-- ``StreamFilterTrait::resetStreamFilterBuffer()`` : 캡처한 데이터 재설정.
-
-
-테스트 사례중 하나에서 이것을 보여주는 예제
+An example demonstrating this inside one of your test cases:
 
 .. literalinclude:: overview/018.php
 
-``StreamFilterTrait``\ 은 자동으로 호출되는 구성자(configurator)가 있습니다. 
-자세한 내용은 :ref:`Testing Traits <testing-overview-traits>`\ 를 참조하세요.
+The ``StreamFilterTrait`` has a configurator that is called automatically.
+See :ref:`Testing Traits <testing-overview-traits>`.
 
-테스트에서 ``setUp()`` 또는 ``tearDown()`` 메소드를 재정의하는 경우, 각각 ``parent::setUp()``\ 과  ``parent::tearDown()`` 메소드를 호출하여 ``StreamFilterTrait``\ 을 구성해야 합니다.
+If you override the ``setUp()`` or ``tearDown()`` methods in your test, then you must call the ``parent::setUp()`` and
+``parent::tearDown()`` methods respectively to configure the ``StreamFilterTrait``.
 
 CITestStreamFilter
 ------------------
 
-**CITestStreamFilter**\ 는 수동/단일 사용을 위한 것입니다.
+**CITestStreamFilter** for manual/single use.
 
-하나의 테스트에서 스트림을 캡처해야하는 경우, StreamFilterTrait trait 대신에 스트림에 필터를 수동으로 추가할 수 있습니다.
+If you need to capture streams in only one test, then instead of using the StreamFilterTrait trait, you can manually
+add a filter to streams.
 
-**메소드 개요**
+**Overview of methods**
 
-- ``CITestStreamFilter::registration()`` : 필터 등록.
-- ``CITestStreamFilter::addOutputFilter()`` : 출력 스트림에 필터 추가.
-- ``CITestStreamFilter::addErrorFilter()`` : 오류 스트림에 필터 추가.
-- ``CITestStreamFilter::removeOutputFilter()`` : 출력 스트림에서 필터 제거.
-- ``CITestStreamFilter::removeErrorFilter()`` : 오류 스트림에서 필터 제거.
+- ``CITestStreamFilter::registration()`` Filter registration.
+- ``CITestStreamFilter::addOutputFilter()`` Adding a filter to the output stream.
+- ``CITestStreamFilter::addErrorFilter()`` Adding a filter to the error stream.
+- ``CITestStreamFilter::removeOutputFilter()`` Removing a filter from the output stream.
+- ``CITestStreamFilter::removeErrorFilter()`` Removing a filter from the error stream.
 
 .. literalinclude:: overview/020.php
 
@@ -322,22 +321,27 @@ PhpStreamWrapper
 
 .. versionadded:: 4.3.0
 
-**PhpStreamWrapper**\ 는 ``CLI::prompt()``, ``CLI::wait()``, ``CLI::input()``\ 와 같은 사용자 입력이 필요한 메서드를 테스트하기 위한 방법을 제공합니다.
+**PhpStreamWrapper** provides a way to write tests for methods that require user input,
+such as ``CLI::prompt()``, ``CLI::wait()``, and ``CLI::input()``.
 
-.. note:: PhpStreamWrapper는 스트림 래퍼 클래스입니다. 
-    PHP의 스트림 래퍼에 대해 알지 못하는 경우, PHP 매뉴얼의 `The streamWrapper class <https://www.php.net/manual/en/class.streamwrapper.php>`_\ 를 참조하십시오.
+.. note:: The PhpStreamWrapper is a stream wrapper class.
+    If you don't know PHP's stream wrapper,
+    see `The streamWrapper class <https://www.php.net/manual/en/class.streamwrapper.php>`_
+    in the PHP maual.
 
-**메소드 개요**
+**Overview of methods**
 
-- ``PhpStreamWrapper::register()`` : - ``PhpStreamWrapper::register()``\ 를 ``php`` 프로토콜에 등록합니다.
-- ``PhpStreamWrapper::restore()`` : php 프로토콜 래퍼를 PHP 내장 래퍼로 복원합니다.
-- ``PhpStreamWrapper::setContent()`` : 입력 데이터를 설정합니다.
+- ``PhpStreamWrapper::register()`` Register the ``PhpStreamWrapper`` to the ``php`` protocol.
+- ``PhpStreamWrapper::restore()`` Restore the php protocol wrapper back to the PHP built-in wrapper.
+- ``PhpStreamWrapper::setContent()`` Set the input data.
 
-.. important:: PhpStreamWrapper는 ``php://stdin``\ 만 테스트하기 위한 것입니다.
-    하지만 등록할 때는 ``php://stdout``, ``php://stderr``, ``php://memory``\ 와 같은 `php protocol <https://www.php.net/manual/en/wrappers.php.php>`_ 스트림을 모두 처리하게 됩니다.
-    따라서 필요할 때만 ``PhpStreamWrapper``\ 를 등록/해제하는 것을 강력하게 권장됩니다.
-    그렇지 않으면 등록된 동안 다른 내장 php 스트림에 방해가 됩니다.
+.. important:: The PhpStreamWrapper is intended for only testing ``php://stdin``.
+    But when you register it, it handles all the `php protocol <https://www.php.net/manual/en/wrappers.php.php>`_ streams,
+    such as ``php://stdout``, ``php://stderr``, ``php://memory``.
+    So it is strongly recommended that ``PhpStreamWrapper`` be registered/unregistered
+    only when needed. Otherwise, it will interfere with other built-in php streams
+    while registered.
 
-테스트 케이스 안에서 이것을 한 예시는 다음과 같습니다. :
+An example demonstrating this inside one of your test cases:
 
 .. literalinclude:: overview/019.php

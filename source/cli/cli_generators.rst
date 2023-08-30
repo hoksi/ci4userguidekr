@@ -1,52 +1,77 @@
 ##############
-CLI 생성기
+CLI Generators
 ##############
 
-CodeIgniter4에는 컨트롤러, 모델, 엔티티 등을 쉽게 생성 할 수있는 생성기가 장착되어 있습니다.
-하나의 명령으로 전체 파일 세트를 스캐폴딩할 수도 있습니다.
+CodeIgniter4 now comes equipped with generators to ease the creation of stock controllers, models, entities,
+etc. You can also scaffold a complete set of files with just one command.
 
 .. contents::
     :local:
     :depth: 2
 
 ************
-소개
+Introduction
 ************
 
-내장된 모든 생성기는 ``Generators`` 그룹 아래에 위치하며, ``php spark list``\ 를 사용하여 나열할 수 있습니다.
-특정 생성기에 대한 전체 설명 및 사용 정보를 보려면 다음 명령을 사용합니다.
+All built-in generators reside under the ``Generators`` group when listed using ``php spark list``.
+To view the full description and usage information on a particular generator, use the command:
 
-.. note:: 생성된 코드가 하위 폴더에 있어야 합니까?
-    예를 들어, 메인 ``Controllers`` 폴더의 ``Admin`` 하위 폴더에 상주할 컨트롤러 클래스를 생성하려면 다음과 같이 하위 폴더를 클래스 이름 앞에 추가하면 됩니다. ``php spark make:controller admin/login``.
-    이 명령은 네임스페이스가 ``App\Controllers\Admin``\ 인 ``Controllers/Admin`` 하위 폴더에 ``Login`` 컨트롤러를 생성합니다.
+.. code-block:: console
 
-.. note:: 모듈 작업? 
-    코드 생성은 루트 네임스페이스를 기본값 ``APP_NAMESPACE``\ 로 설정합니다.
-    모듈 네임스페이스의 다른 곳에 생성된 코드가 필요한 경우 명령에서 ``--namespace`` 옵션을 설정해야 합니다. (예: ``php spark make:model blog --namespace Acme\\Blog``)
+    php spark help <generator_command>
 
-.. warning:: ``--namespace`` 옵션을 설정할 때 제공된 네임스페이스가 ``Config\Autoload``\ 의 ``$psr4`` 배열에 정의되었거나 작곡가 자동 로드 파일에 정의된 유효한 네임스페이스인지 확인하십시오.
-    그렇지 않으면 코드 생성이 중단됩니다.
+where ``<generator_command>`` will be replaced with the command to check.
 
-.. important:: 마이그레이션 파일을 생성하기 위해 ``migrate:create``\ 를 사용하는 것은 더 이상 사용되지 않습니다. 향후 릴리스에서 제거될 예정입니다.
-    대신 ``make:migration``\ 을 사용하세요.
-    또한 더 이상 사용되지 않는 ``session:migration`` 대신 ``make:migration --session``\ 을 사용하세요.
+.. note:: Do you need to have the generated code in a subfolder? Let's say if you want to create a controller
+    class to reside in the ``Admin`` subfolder of the main ``Controllers`` folder, you will just need
+    to prepend the subfolder to the class name, like this: ``php spark make:controller admin/login``. This
+    command will create the ``Login`` controller in the ``Controllers/Admin`` subfolder with
+    a namespace of ``App\Controllers\Admin``.
 
+.. note:: Working on modules? Code generation will set the root namespace to a default of ``APP_NAMESPACE``.
+    Should you need to have the generated code elsewhere in your module namespace, make sure to set
+    the ``--namespace`` option in your command, e.g., ``php spark make:model blog --namespace Acme\\Blog``.
+
+.. warning:: Make sure when setting the ``--namespace`` option that the supplied namespace is a valid
+    namespace defined in your ``$psr4`` array in ``Config\Autoload`` or defined in your composer autoload
+    file. Otherwise, code generation will be interrupted.
+
+.. important:: Since v4.0.5, use of ``migrate:create`` to create migration files has been deprecated. It will be removed in
+    future releases. Please use ``make:migration`` as replacement. Also, please use ``make:migration --session``
+    to use instead of the deprecated ``session:migration``.
+
+*******************
+Built-in Generators
+*******************
+
+CodeIgniter4 ships the following generators by default.
+
+make:cell
+---------
+
+.. versionadded:: 4.3.0
+
+Creates a new Cell file and its view.
+
+Usage:
+======
 ::
 
-    > php spark help <generator_command>
+    make:cell <name> [options]
 
-여기서 ``<generator_command>``\ 는 확인할 명령으로 대체됩니다.
+Argument:
+=========
+* ``name``: The name of the cell class. It should be in PascalCase. **[REQUIRED]**
 
-*******************
-내장된 생성기
-*******************
-
-CodeIgniter4는 기본적으로 다음 생성기를 제공합니다.
+Options:
+========
+* ``--namespace``: Set the root namespace. Defaults to value of ``APP_NAMESPACE``.
+* ``--force``: Set this flag to overwrite existing files on destination.
 
 make:command
 ------------
 
-새로운 spark 명령을 만듭니다.
+Creates a new spark command.
 
 Usage:
 ======
@@ -56,25 +81,21 @@ Usage:
 
 Argument:
 =========
-* ``name``: 명령 클래스의 이름. **[REQUIRED]**
+* ``name``: The name of the command class. **[REQUIRED]**
 
 Options:
 ========
-* ``--command``: spark에서 실행할 명령 이름. 기본값은 ``command:name``.
-* ``--group``: 명령의 그룹/네임스페이스입니다. 기본(basic) 명령의 경우 ``CodeIgniter``, 생성기(generator) 명령의 경우``Generators``\ 가 기본값입니다.
-* ``--type``: 명령 타입, ``basic`` 또는 ``generator``. 기본값은 ``basic``.
-* ``--namespace``: 루트(root) 네임스페이스 설정. 기본값은 상수 ``APP_NAMESPACE``\ 의 값.
-* ``--suffix``: 접미사를 생성된 클래스 이름에 추가합니다.
-* ``--force``: 기존 파일을 덮어 쓰려면 이 플래그를 설정합니다.
-
-.. note:: ``--suffix``\ 를 사용하면 생성된 컨트롤러 이름은 ``ProductController``\ 와 같습니다.
-    이는 :ref:`Auto Routing <controller-auto-routing-improved>`\ 를 사용할 때 컨트롤러 명명 규칙을 위반합니다.(컨트롤러 클래스 이름은 대문자로 시작해야 하며 첫 번째 문자만 대문자일 수 있음)
-    따라서 ``--suffix``\ 는 :ref:`Defined Routes <defined-route-routing>`\ 을 사용할 때 사용할 수 있습니다.
+* ``--command``: The command name to run in spark. Defaults to ``command:name``.
+* ``--group``: The group/namespace of the command. Defaults to ``CodeIgniter`` for basic commands, and ``Generators`` for generator commands.
+* ``--type``: The type of command, whether a ``basic`` command or a ``generator`` command. Defaults to ``basic``.
+* ``--namespace``: Set the root namespace. Defaults to value of ``APP_NAMESPACE``.
+* ``--suffix``: Append the component suffix to the generated class name.
+* ``--force``: Set this flag to overwrite existing files on destination.
 
 make:config
 -----------
 
-새로운 구성(config) 파일을 만듭니다.
+Creates a new config file.
 
 Usage:
 ======
@@ -84,18 +105,18 @@ Usage:
 
 Argument:
 =========
-* ``name``: 구성(config) 클래스의 이름 **[REQUIRED]**
+* ``name``: The name of the config class. **[REQUIRED]**
 
 Options:
 ========
-* ``--namespace``: 루트(root) 네임스페이스 설정. 기본값은 상수 ``APP_NAMESPACE``\ 의 값.
-* ``--suffix``: 접미사를 생성된 클래스 이름에 추가합니다.
-* ``--force``: 기존 파일을 덮어 쓰려면 이 플래그를 설정합니다.
+* ``--namespace``: Set the root namespace. Defaults to value of ``APP_NAMESPACE``.
+* ``--suffix``: Append the component suffix to the generated class name.
+* ``--force``: Set this flag to overwrite existing files on destination.
 
 make:controller
 ---------------
 
-새로운 컨트롤러 파일을 만듭니다.
+Creates a new controller file.
 
 Usage:
 ======
@@ -105,20 +126,27 @@ Usage:
 
 Argument:
 =========
-* ``name``: 컨트롤러 클래스 이름. **[REQUIRED]**
+* ``name``: The name of the controller class. **[REQUIRED]**
 
 Options:
 ========
-* ``--bare``: ``BaseController`` 대신 ``CodeIgniter\Controller``\ 을 확장(extend)합니다.
-* ``--restful``: RESTful resource를 확장. ``controller`` 또는 ``presenter`` 선택. 기본값은 ``controller``.
-* ``--namespace``: 루트(root) 네임스페이스 설정. 기본값은 상수 ``APP_NAMESPACE``\ 의 값.
-* ``--suffix``: 접미사를 생성된 클래스 이름에 추가합니다.
-* ``--force``: 기존 파일을 덮어 쓰려면 이 플래그를 설정합니다.
+* ``--bare``: Extends from ``CodeIgniter\Controller`` instead of ``BaseController``.
+* ``--restful``: Extends from a RESTful resource. Choices are ``controller`` and ``presenter``. Defaults to ``controller``.
+* ``--namespace``: Set the root namespace. Defaults to value of ``APP_NAMESPACE``.
+* ``--suffix``: Append the component suffix to the generated class name.
+* ``--force``: Set this flag to overwrite existing files on destination.
+
+.. note:: If you use ``--suffix``, the generated controller name will be like
+    ``ProductController``. That violates the Controller naming convention
+    when using :ref:`Auto Routing <controller-auto-routing-improved>`
+    (Controller class names MUST start with an uppercase letter and
+    ONLY the first character can be uppercase). So ``--suffix`` can be used
+    when you use :ref:`Defined Routes <defined-route-routing>`.
 
 make:entity
 -----------
 
-새로운 엔티티 파일을 만듭니다.
+Creates a new entity file.
 
 Usage:
 ======
@@ -128,18 +156,18 @@ Usage:
 
 Argument:
 =========
-* ``name``: 엔티티 클래스명. **[REQUIRED]**
+* ``name``: The name of the entity class. **[REQUIRED]**
 
 Options:
 ========
-* ``--namespace``: 루트(root) 네임스페이스 설정. 기본값은 상수 ``APP_NAMESPACE``\ 의 값.
-* ``--suffix``: 접미사를 생성된 클래스 이름에 추가합니다.
-* ``--force``: 기존 파일을 덮어 쓰려면 이 플래그를 설정합니다.
+* ``--namespace``: Set the root namespace. Defaults to value of ``APP_NAMESPACE``.
+* ``--suffix``: Append the component suffix to the generated class name.
+* ``--force``: Set this flag to overwrite existing files on destination.
 
 make:filter
 -----------
 
-새로운 필터 파일을 만듭니다.
+Creates a new filter file.
 
 Usage:
 ======
@@ -149,18 +177,18 @@ Usage:
 
 Argument:
 =========
-* ``name``: 필터 클래스명. **[REQUIRED]**
+* ``name``: The name of the filter class. **[REQUIRED]**
 
 Options:
 ========
-* ``--namespace``: 루트(root) 네임스페이스 설정. 기본값은 상수 ``APP_NAMESPACE``\ 의 값.
-* ``--suffix``: 접미사를 생성된 클래스 이름에 추가합니다.
-* ``--force``: 기존 파일을 덮어 쓰려면 이 플래그를 설정합니다.
+* ``--namespace``: Set the root namespace. Defaults to value of ``APP_NAMESPACE``.
+* ``--suffix``: Append the component suffix to the generated class name.
+* ``--force``: Set this flag to overwrite existing files on destination.
 
 make:model
 ----------
 
-새로운 모델 파일을 생성합니다.
+Creates a new model file.
 
 Usage:
 ======
@@ -170,21 +198,21 @@ Usage:
 
 Argument:
 =========
-* ``name``: 모델 클래스명. **[REQUIRED]**
+* ``name``: The name of the model class. **[REQUIRED]**
 
 Options:
 ========
-* ``--dbgroup``: 사용할 데이터베이스 그룹. 기본값은 ``default``.
-* ``--return``: 반환 유형(``array``, ``object``, ``entity``)을 설정합니다. 기본값은 ``array``.
-* ``--table``: 사용할 테이블명. 기본값은 클래스명의 복수형.
-* ``--namespace``: 루트(root) 네임스페이스 설정. 기본값은 상수 ``APP_NAMESPACE``\ 의 값.
-* ``--suffix``: 접미사를 생성된 클래스 이름에 추가합니다.
-* ``--force``: 기존 파일을 덮어 쓰려면 이 플래그를 설정합니다.
+* ``--dbgroup``: Database group to use. Defaults to ``default``.
+* ``--return``: Set the return type from ``array``, ``object``, or ``entity``. Defaults to ``array``.
+* ``--table``: Supply a different table name. Defaults to the pluralized class name.
+* ``--namespace``: Set the root namespace. Defaults to value of ``APP_NAMESPACE``.
+* ``--suffix``: Append the component suffix to the generated class name.
+* ``--force``: Set this flag to overwrite existing files on destination.
 
 make:seeder
 -----------
 
-새로운 시더 파일을 만듭니다.
+Creates a new seeder file.
 
 Usage:
 ======
@@ -194,18 +222,18 @@ Usage:
 
 Argument:
 =========
-* ``name``: 시더 클래스명. **[REQUIRED]**
+* ``name``: The name of the seeder class. **[REQUIRED]**
 
 Options:
 ========
-* ``--namespace``: 루트(root) 네임스페이스 설정. 기본값은 상수 ``APP_NAMESPACE``\ 의 값.
-* ``--suffix``: 접미사를 생성된 클래스 이름에 추가합니다.
-* ``--force``: 기존 파일을 덮어 쓰려면 이 플래그를 설정합니다.
+* ``--namespace``: Set the root namespace. Defaults to value of ``APP_NAMESPACE``.
+* ``--suffix``: Append the component suffix to the generated class name.
+* ``--force``: Set this flag to overwrite existing files on destination.
 
-migrate:create
+make:migration
 --------------
 
-새로운 마이그레이션 파일을 만듭니다.
+Creates a new migration file.
 
 Usage:
 ======
@@ -215,21 +243,21 @@ Usage:
 
 Argument:
 =========
-* ``name``: 마이그레이션 클래스명. **[REQUIRED]**
+* ``name``: The name of the migration class. **[REQUIRED]**
 
 Options:
 ========
-* ``--session``: 데이터베이스 세션에 대한 마이그레이션 파일을 생성합니다.
-* ``--table``: 데이터베이스 세션에 사용할 테이블 이름을 설정합니다. 기본값은 ``ci_sessions``.
-* ``--dbgroup``: 데이터베이스 세션에 대한 데이터베이스 그룹을 설정합니다. 기본값은 ``default`` group.
-* ``--namespace``: 루트(root) 네임스페이스 설정. 기본값은 상수 ``APP_NAMESPACE``\ 의 값.
-* ``--suffix``: 접미사를 생성된 클래스 이름에 추가합니다.
-* ``--force``: 기존 파일을 덮어 쓰려면 이 플래그를 설정합니다.
+* ``--session``: Generate a migration file for database sessions.
+* ``--table``: Set the table name to use for database sessions. Defaults to ``ci_sessions``.
+* ``--dbgroup``: Set the database group for database sessions. Defaults to ``default`` group.
+* ``--namespace``: Set the root namespace. Defaults to value of ``APP_NAMESPACE``.
+* ``--suffix``: Append the component suffix to the generated class name.
+* ``--force``: Set this flag to overwrite existing files on destination.
 
 make:validation
 ---------------
 
-새 유효성 검사 파일을 만듭니다.
+Creates a new validation file.
 
 Usage:
 ======
@@ -239,43 +267,60 @@ Usage:
 
 Argument:
 =========
-* ``name``: 유효성 검사 클래스 이름. **[REQUIRED]**
+* ``name``: The name of the validation class. **[REQUIRED]**
 
 Options:
 ========
-* ``--namespace``: root namespace. 기본 값은 ``APP_NAMESPACE``.
-* ``--suffix``: 생성된 클래스 이름에 구성 요소 접미사 추가.
-* ``--force``: 기존 파일을 덮어쓰도록 설정.
+* ``--namespace``: Set the root namespace. Defaults to value of ``APP_NAMESPACE``.
+* ``--suffix``: Append the component suffix to the generated class name.
+* ``--force``: Set this flag to overwrite existing files on destination.
 
 ****************************************
-스캐폴딩 코드 세트
+Scaffolding a Complete Set of Stock Code
 ****************************************
 
-개발 단계에서는 *Admin* 그룹 생성과 같은 그룹별 기능을 생성하는 경우가 있습니다.
-이 그룹에는 자체 컨트롤러, 모델, 마이그레이션 파일 또는 엔티티가 포함됩니다.
-각 생성기 명령을 터미널에 하나씩 입력할 수 있지만, 모든것을 제어하는 생성기 명령 하나를 사용하는 것이 좋을 것이라고 생각합니다.
+Sometimes in our development phase we are creating functionalities by groups, such as creating an *Admin* group.
+This group will contain its own controller, model, migration files, or even entities. You may be tempted to type
+each generator command one-by-one in the terminal and wishfully thinking it would be great to have a single generator
+command to rule them all.
 
-CodeIgniter4는 컨트롤러, 모델, 엔티티, 마이그레이션 및 시더 생성기 명령에 대한 전용 래퍼인 ``make:scapold`` 명령을 제공됩니다.
-생성된 모든 클래스의 이름을 지정하는 데 사용할 클래스 이름만 있으면 됩니다.
-또한 각 생성기 명령에 의해 지원하는 **개별 옵션**\ 은 scaffold 명령에 의해 인식됩니다.
+Fret no more! CodeIgniter4 is also shipped with a dedicated ``make:scaffold`` command that is basically a
+wrapper to the controller, model, entity, migration, and seeder generator commands. All you need is the class
+name that will be used to name all the generated classes. Also, **individual options** supported by each
+generator command are recognized by the scaffold command.
 
-터미널에서 다음과 같이 실행
+Running this in your terminal:
 
-::
+.. code-block:: console
 
-    > php spark make:scaffold user
+    php spark make:scaffold user
 
-다음 파일을 생성합니다.
+will create the following files:
 
 (1) **app/Controllers/User.php**
 (2) **app/Models/User.php**
-(3) **app/Database/Migrations/<some date here>_User.php**
+(3) **app/Database/Migrations/<some date here>_User.php** and
 (4) **app/Database/Seeds/User.php**
 
-스케폴딩(scaffolding) 파일에 ``Entity`` 클래스를 포함하려면 ``-return entity``\ 를 명령어에 사용합니다.
+To include an ``Entity`` class in the scaffolded files, just include the ``--return entity`` to the command
+and it will be passed to the model generator.
 
 **************
 GeneratorTrait
 **************
 
-모든 제너레이터 명령은 ``GeneratorTrait``\ 을 사용하여 코드 생성에 사용되는 메소드를 완전히 활용해야 합니다.
+All generator commands must use the ``GeneratorTrait`` to fully utilize its methods that are used in code
+generation.
+
+*************************************************************
+Declaring the Location of a Custom Generator Command Template
+*************************************************************
+
+The default order of lookup for generator templates is (1) the template defined in the **app/Config/Generators.php** file,
+and (2) if not found, the template found at the ``CodeIgniter\Commands\Generators\Views`` namespace.
+
+To declare the template location for your custom generator command, you will need to add it to the **app/Config/Generators.php**
+file. For example, if you have a command ``make:awesome-command`` and your generator template is located within your *app*
+directory **app/Commands/Generators/Views/awesomecommand.tpl.php**, you would update the config file like so:
+
+.. literalinclude:: cli_generators/001.php

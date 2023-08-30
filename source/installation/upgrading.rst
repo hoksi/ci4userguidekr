@@ -1,18 +1,27 @@
 #################################
-이전 버전에서 업그레이드
+Upgrading From a Previous Version
 #################################
 
-업그레이드하려는 버전에 해당하는 업그레이드 정보를 읽으십시오.
+Please read the upgrade notes corresponding to the version you are
+upgrading from.
 
-:doc:`./backward_compatibility_notes`\ 도 참조하세요.
+See also :doc:`./backward_compatibility_notes`.
 
-.. note:: 현재 실행 중인 CodeIgniter의 버전을 모르는 경우, :ref:`디버그 도구 모음 <the-debug-toolbar>`\ 에서 가져오거나 ``\CodeIgniter\CodeIgniter::CI_VERSION`` 상수를 echo로 출력합니다.
+.. note:: If you don't know what version of CodeIgniter you are currently running,
+    you can get it from :ref:`the Debug Toolbar <the-debug-toolbar>`,
+    or simply echo the constant ``\CodeIgniter\CodeIgniter::CI_VERSION``.
 
 .. toctree::
     :titlesonly:
 
     backward_compatibility_notes
 
+    upgrade_440
+    upgrade_438
+    upgrade_437
+    upgrade_436
+    upgrade_435
+    upgrade_434
     upgrade_433
     upgrade_432
     upgrade_431

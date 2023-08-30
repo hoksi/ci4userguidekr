@@ -1,36 +1,47 @@
-############################
-환영합니다.
-############################
+#######################
+Welcome to CodeIgniter4
+#######################
 
-코드이그나이터(CodeIgniter)는 PHP를 사용하여 웹 사이트를 구축하는 사람들을 위한 어플리케이션 개발 프레임워크입니다. 
-풍부한 라이브러리 세트와 이러한 라이브러리에 액세스할 수 있는 간단한 인터페이스 및 논리적 구조를 제공하여 프로젝트에 
-창의적으로 집중할 수 있으며, 코드를 처음부터 작성하는 것보다 적은 양의 코드로 빠르게 프로젝트를 개발할 수 있습니다.
+CodeIgniter is an Application Development Framework - a toolkit - for
+people who build web sites using PHP. Its goal is to enable you to
+develop projects much faster than you could if you were writing code
+from scratch, by providing a rich set of libraries for commonly needed
+tasks, as well as a simple interface and logical structure to access
+these libraries. CodeIgniter lets you creatively focus on your project
+by minimizing the amount of code needed for a given task.
 
-CodeIgniter는 유연하게 유지되므로 여러분이 원하는 방식으로 작업할 수 있으며, 시스템이 원하는 방식으로 작동하도록 
-핵심 로직을 쉽게 확장하거나 완전히 교체할 수 있습니다.
+Where possible, CodeIgniter has been kept as flexible as possible,
+allowing you to work in the way you want, not being forced into working
+any certain way. The framework can have core parts easily extended
+or completely replaced to make the system work the way you need it to.
+In short, CodeIgniter is the malleable framework that tries to provide
+the tools you need while staying out of the way.
 
-*****************************************************
-코드이그나이터(CodeIgniter)가 적합한 경우
-*****************************************************
+*****************************
+Is CodeIgniter Right for You?
+*****************************
 
-코드이그나이터는 이런 프레임워크를 찾는 분들을 위한것입니다.
+CodeIgniter is right for you if:
 
--  설치 공간이 작은 프레임워크
--  뛰어난 성능
--  거의 구성이 필요하지 않는 프레임워크
--  커맨드 라인(command line)을 사용할 필요가 없는 프레임워크
--  제한적인 코딩 규칙을 준수하지 않아도 되는 프레임워크
--  PEAR와 같은 대규모 단일 라이브러리에는 관심이 없음
--  템플릿 언어를 배우도록 강요받고 싶지 않음 (원하는 경우 템플릿 파서를 사용할 수 있습니다.)
--  복잡하지 않고 간단한 솔루션을 선호
--  프레임워크에 대한 명확하고 철저한 문서
+-  You want a framework with a small footprint.
+-  You need exceptional performance.
+-  You want a framework that requires nearly zero configuration.
+-  You want a framework that does not require you to use the command
+   line.
+-  You want a framework that does not require you to adhere to
+   restrictive coding rules.
+-  You are not interested in large-scale monolithic libraries like PEAR.
+-  You do not want to be forced to learn a templating language (although
+   a template parser is optionally available if you desire one).
+-  You eschew complexity, favoring simple solutions.
+-  You need clear, thorough documentation.
 
 .. toctree::
-	:hidden:
-	:titlesonly:
+    :hidden:
+    :titlesonly:
 
-	self
-	requirements
-	credits
-	psr
-	License Agreement <../license>
+    self
+    requirements
+    credits
+    psr
+    License Agreement <../license>

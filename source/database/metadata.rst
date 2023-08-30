@@ -1,121 +1,145 @@
-##############################
-데이터베이스 메타데이터
-##############################
+#################
+Database Metadata
+#################
 
 .. contents::
     :local:
     :depth: 2
 
-*************************
-테이블 메타데이터
-*************************
+**************
+Table MetaData
+**************
 
-이 함수를 사용하면 테이블 정보를 가져올 수 있습니다.
+These functions let you fetch table information.
 
-데이터베이스의 테이블 정보
+List the Tables in Your Database
 ================================
 
 $db->listTables()
 -----------------
 
-연결된 데이터베이스의 모든 테이블 이름이 포함된 배열을 반환합니다.
+Returns an array containing the names of all the tables in the database
+you are currently connected to. Example:
 
 .. literalinclude:: metadata/001.php
-    
-.. note:: 일부 드라이버에는 반환된 배열에 제외된 추가 시스템 테이블이 있습니다.
 
-테이블이 존재하는지 확인
+.. note:: Some drivers have additional system tables that are excluded from this return.
+
+Determine If a Table Exists
 ===========================
 
 $db->tableExists()
 ------------------
 
-때로는 작업을 실행하기 전에 특정 테이블이 존재하는지 확인하는 것이 도움이됩니다. 
-true/false를 반환합니다.
+Sometimes it's helpful to know whether a particular table exists before
+running an operation on it. Returns a boolean true/false. Usage example:
 
 .. literalinclude:: metadata/002.php
 
-.. note:: **table_name**\ 을 찾고있는 테이블 이름으로 바꾸십시오.
+.. note:: Replace *table_name* with the name of the table you are looking for.
 
-*******************
-필드 메타데이터
-*******************
+**************
+Field MetaData
+**************
 
-테이블의 필드 정보
+List the Fields in a Table
 ==========================
 
 $db->getFieldNames()
 --------------------
 
-필드명을 포함한 배열을 반환합니다. 이 쿼리는 두 가지 방법으로 호출할 수 있습니다:
+Returns an array containing the field names. This query can be called
+two ways:
 
-1. $db->getFieldNames()에 테이블 이름을 제공하고 호출합니다.
+1. You can supply the table name and call it from the ``$db->object``:
 
-.. literalinclude:: metadata/003.php
+   .. literalinclude:: metadata/003.php
 
-2. 실행한 쿼리의 결과 객체에서 함수를 호출하여 관련된 필드명을 수집합니다.
+2. You can gather the field names associated with any query you run by
+calling the function from your query result object:
 
 .. literalinclude:: metadata/004.php
 
-필드가 테이블에 존재하는지 확인
+Determine If a Field is Present in a Table
 ==========================================
 
 $db->fieldExists()
 ------------------
 
-때로는 작업을 수행하기 전에 특정 필드가 존재하는지 확인하는 것이 도움이됩니다. 
-true/false를 반환합니다.
+Sometimes it's helpful to know whether a particular field exists before
+performing an action. Returns a boolean true/false. Usage example:
 
 .. literalinclude:: metadata/005.php
 
-.. note:: *field_name*\ 을 찾고있는 열 이름으로 바꾸고 *table_name*\ 을 찾고있는 테이블 이름으로 바꾸십시오.
+.. note:: Replace *field_name* with the name of the column you are looking
+    for, and replace *table_name* with the name of the table you are
+    looking for.
 
-필드 메타데이터 검색
+Retrieve Field Metadata
 =======================
+
+.. _db-metadata-getfielddata:
 
 $db->getFieldData()
 -------------------
 
-필드 정보가 포함된 객체의 배열을 반환합니다.
+Returns an array of objects containing field information.
 
-때로는 필드 이름이나 열 유형, 최대 길이 등과 같은 다른 메타 데이터를 수집하는 것이 도움이됩니다.
+Sometimes it's helpful to gather the field names or other metadata, like
+the column type, max length, etc.
 
-.. note:: 모든 데이터베이스가 메타데이터를 제공하는 것은 아닙니다.
+.. note:: Not all databases provide meta-data.
+
+Usage example:
 
 .. literalinclude:: metadata/006.php
 
-이미 쿼리를 실행한 경우 테이블 이름을 제공하는 대신 결과 객체를 사용할 수 있습니다
+If you have run a query already you can use the result object instead of
+supplying the table name:
 
 .. literalinclude:: metadata/007.php
 
-데이터베이스에서 지원하는 경우이 기능에서 다음 데이터를 사용할 수 있습니다:
+The following data is available from this function if supported by your
+database:
 
--  name - 컬럼명
--  type - 컬럼 타입(type)
--  max_length - 컬럼의 최대 길이
--  primary_key - 열이 기본 키인 경우 정수 ``1``\ (여러 개의 기본 키가 있는 경우에도 정수 ``1``), 그렇지 않으면 정수 ``0`` (이 필드는 MySQL과 SQLite3에서만 사용할 수 있습니다.)
--  nullable - 열이 nullable이면 부울 ``true``, 그렇지 않으면 부울 ``false`` (이 필드는 SQL Server에서 사용할 수 없습니다)
--  default - 기본 값
+-  name - column name
+-  type - the type of the column
+-  max_length - maximum length of the column
+-  primary_key - integer ``1`` if the column is a primary key (all integer ``1``, even if there are multiple primary keys), otherwise integer ``0`` (This field is currently only available for MySQL and SQLite3)
+-  nullable - boolean ``true`` if the column is nullable, otherwise boolean ``false``
+-  default - the default value
 
-테이블의 인덱스 정보
+.. note:: Since v4.4.0, SQLSRV supported ``nullable``.
+
+List the Indexes in a Table
 ===========================
+
+.. _db-metadata-getindexdata:
 
 $db->getIndexData()
 -------------------
 
-인덱스 정보가 포함된 객체의 배열을 반환합니다.
+Returns an array of objects containing index information.
+
+Usage example:
 
 .. literalinclude:: metadata/008.php
 
-키 유형은 사용중인 데이터베이스에 따라 다를수 있습니다.
-예를 들어, MySQL은 테이블과 관련된 각 키에 대해 primary, fulltext, spatial, index, unique 중 하나를 반환합니다.
+The key types may be unique to the database you are using.
+For instance, MySQL will return one of primary, fulltext, spatial, index or unique
+for each key associated with a table.
+
+SQLite3 returns a pseudo index named ``PRIMARY``. But it is a special index, and you can't use it in your SQL commands.
+
+.. _metadata-getforeignkeydata:
 
 $db->getForeignKeyData()
 ------------------------
 
-외래(foreign) 키 정보가 포함된 객체의 배열을 반환합니다.
+Returns an array of objects containing foreign key information.
+
+Usage example:
 
 .. literalinclude:: metadata/009.php
 
-오브젝트 필드는 사용중인 데이터베이스에 다를수 있습니다.
-예를 들어, SQLite3은 열 이름에 대한 데이터를 리턴하지 않지만 복합 외부 키 정의에 대한 *sequence* 추가 필드를 갖습니다.
+Foreign keys use the naming convention ``tableprefix_table_column1_column2_foreign``. Oracle uses a slightly different suffix of ``_fk``.

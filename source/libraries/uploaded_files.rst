@@ -1,45 +1,53 @@
 ###########################
-업로드(upload)된 파일 작업
+Working with Uploaded Files
 ###########################
 
-CodeIgniter는 PHP의 ``$_FILES`` 배열을 직접 사용하는 것보다 훨씬 간단하고 안전한 형식으로 업로드된 파일로 작업합니다.
-이것은 :doc:`파일 클래스 </libraries/files>`\ 를 확장하며, 해당 클래스의 모든 기능을 사용할 수 있습니다.
+CodeIgniter makes working with files uploaded through a form much simpler and more secure than using PHP's ``$_FILES``
+array directly. This extends the :doc:`File class </libraries/files>` and thus gains all of the features of that class.
 
-.. note:: 이 클래스는 CodeIgniter v3.x의 파일 업로드 클래스와 동일하지 않으며, 몇 가지 작은 기능으로 업로드된 파일에 대한 원시 인터페이스를 제공합니다.
+.. note:: This is not the same as the File Uploading class in CodeIgniter v3.x. This provides a raw
+    interface to the uploaded files with a few small features.
 
 .. contents::
     :local:
     :depth: 2
 
-*****************
-일반적인 프로세스
-*****************
+***********
+The Process
+***********
 
-파일 업로드에는 다음과 같은 일반적인 프로세스가 포함됩니다.
+Uploading a file involves the following general process:
 
-- 사용자가 파일을 선택하여 업로드할 수 있는 업로드 양식(form)이 표시됩니다.
-- 양식(form)이 제출(submit)되면 지정한 대상에 파일이 업로드됩니다.
-- 그 과정에서 파일의 유효성이 검사되어 설정한 기본 설정에 따라 업로드가 허용되는지 확인합니다.
-- 업로드가 완료되면 사용자에게 성공 메시지가 표시됩니다.
+-  An upload form is displayed, allowing a user to select a file and
+   upload it.
+-  When the form is submitted, the file is uploaded to the destination
+   you specify.
+-  Along the way, the file is validated to make sure it is allowed to be
+   uploaded based on the preferences you set.
+-  Once uploaded, the user will be shown a success message.
 
-이 프로세스를 보여주기 위해 간단한 자습서를 제공합니다.
+To demonstrate this process here is brief tutorial. Afterward you'll
+find reference information.
 
-업로드 양식(form) 만들기
-=========================
+Creating the Upload Form
+========================
 
-텍스트 편집기를 사용하여 **upload_form.php** 파일을 만듭니다. 여기에 아래의 코드를 넣고 **app/Views/** 디렉터리에 저장합니다.
+Using a text editor, create a form called **upload_form.php**. In it, place
+this code and save it to your **app/Views/** directory:
 
 .. literalinclude:: uploaded_files/001.php
 
-파일 업로드에는 멀티파트(multipart) 형식이 필요하므로 폼(form) 헬퍼의 ``form_open_multipart()`` 함수를 사용합니다.
-오류 메시지를 표시할 수 있도록 하기 위해 ``$errors`` 변수를 사용합니다.
+You'll notice we are using a form helper to create the opening form tag.
+File uploads require a multipart form, so the helper creates the proper
+syntax for you. You'll also notice we have an ``$errors`` variable. This is
+so we can show error messages in the event the user does something
+wrong.
 
-성공 페이지
+The Success Page
 ================
 
-텍스트 편집기를 사용하여 **upload_success.php** 파일을 만듭니다. 여기에 아래의 코드를 넣고 **app/Views/** 디렉터리에 저장합니다.
-
-::
+Using a text editor, create a form called **upload_success.php**. In it,
+place this code and save it to your **app/Views/** directory::
 
     <!DOCTYPE html>
     <html lang="en">
@@ -61,329 +69,321 @@ CodeIgniter는 PHP의 ``$_FILES`` 배열을 직접 사용하는 것보다 훨씬
     </body>
     </html>
 
-컨트롤러
+The Controller
 ==============
 
-텍스트 편집기를 사용하여 **Upload.php** 파일을 만듭니다. 여기에 아래의 코드를 넣고 **app/Controllers/** 디렉터리에 저장합니다.
+Using a text editor, create a controller called **Upload.php**. In it, place
+this code and save it to your **app/Controllers/** directory:
 
 .. literalinclude:: uploaded_files/002.php
 
-.. note:: 파일 업로드 HTML 필드의 값이 존재하지 않고 전역 변수 ``$_FILES``\ 에 저장되기 때문에 :ref:`rules-for-file-uploads`\ 만 업로드 파일의 유효성을 검사(:doc:`validation`)하는 데 사용할 수 있습니다.
-    ``required`` 규칙도 사용할 수 없으므로 ``uploaded``\ 을 대신 사용하십시오.
+.. note:: Since the value of a file upload HTML field doesn't exist, and is stored in the ``$_FILES`` global,
+    only :ref:`rules-for-file-uploads` can be used to validate upload file with :doc:`validation`.
+    The rule ``required`` also can't be used, so use ``uploaded`` instead.
 
-라우트
+The Routes
 ==========
 
-텍스트 편집기를 사용하여 **app/Config/Routes.php**\ 를 엽니다. 거기에 다음 두 경로를 추가하십시오.
+Using a text editor, open **app/Config/Routes.php**. In it, add the following two routes:
 
 .. literalinclude:: uploaded_files/021.php
 
-업로드 디렉토리
+The Upload Directory
 ====================
 
-업로드된 파일은 **writable/uploads/** 디렉토리에 저장됩니다.
+The uploaded files are stored in the **writable/uploads/** directory.
 
-업로드!!
-=========
+Try it!
+=======
 
-업로드하려면 다음과 유사한 URL을 사용하여 사이트를 방문합니다.
-
-::
+To try your form, visit your site using a URL similar to this one::
 
     example.com/index.php/upload/
 
-업로드 양식(form)이 표시되어야 합니다. 이미지 파일(**jpg**, **gif**, **png** 또는 **webp**)을 업로드해 보세요. 컨트롤러의 경로가 정확하면 작동해야 합니다.
+You should see an upload form. Try uploading an image file (either a
+**jpg**, **gif**, **png**, or **webp**). If the path in your controller is correct it should
+work.
 
 .. _uploaded-files-accessing-files:
 
 ***************
-파일 접근
+Accessing Files
 ***************
 
 All Files
 =========
 
-파일을 업로드하면 슈퍼 글로벌 ``$_FILES``\ 을 통해 PHP에서 업로드된 파일에 액세스할 수 있습니다.
-이 배열은 한 번에 업로드된 여러 파일을 작업할 때 몇 가지 중요한 단점이 있으며, 많은 개발자가 알지 못하는 잠재적인 보안 결함이 있습니다.
-CodeIgniter는 공통 인터페이스뒤에서 파일 사용을 표준화하여 이러한 상황을 모두 지원합니다.
+When you upload files they can be accessed natively in PHP through the ``$_FILES`` superglobal. This array has some
+major shortcomings when working with multiple files uploaded at once, and has potential security flaws many developers
+are not aware of. CodeIgniter helps with both of these situations by standardizing your usage of files behind a
+common interface.
 
-업로드된 파일은 ``IncomingRequest`` 인스턴스를 통해 액세스됩니다.
-이 요청을 통해 업로드된 모든 파일을 검색하려면 ``getFiles()``\ 를 사용하십시오.
-``CodeIgniter\HTTP\Files\UploadedFile``\ 의 인스턴스로 표시되는 파일 배열을 반환합니다.
+Files are accessed through the current ``IncomingRequest`` instance. To retrieve all files that were uploaded with this
+request, use ``getFiles()``. This will return an array of files represented by instances of ``CodeIgniter\HTTP\Files\UploadedFile``:
 
 .. literalinclude:: uploaded_files/003.php
 
-물론, 파일 입력의 이름을 지정하는 방법은 여러 가지가 있으며 가장 간단한 것 이외의 것은 이상한 결과를 만들 수 있습니다.
-사용자가 원하는 방식으로 배열이 반환됩니다. 가장 간단한 사용법으로 단일 파일은 다음과 같이 제출됩니다.
+Of course, there are multiple ways to name the file input, and anything but the simplest can create strange results.
+The array returns in a manner that you would expect. With the simplest usage, a single file might be submitted like::
 
-::
+    <input type="file" name="avatar">
 
-	<input type="file" name="avatar">
+Which would return a simple array like::
 
-다음과 같은 간단한 배열을 반환합니다.
+    [
+        'avatar' => // UploadedFile instance,
+    ];
 
-::
+.. note:: The UploadedFile instance corresponds to ``$_FILES``. Even if a user just clicks the submit button and does not upload any file, the instance will still exist. You can check that the file was actually uploaded by the ``isValid()`` method in UploadedFile. See :ref:`verify-a-file`.
 
-	[
-		'avatar' => // UploadedFile instance,
-	];
+If you used an array notation for the name, the input would look something like::
 
-.. note:: 여기의 파일은 ``$_FILES``\ 에 해당합니다. 사용자가 양식(form)에 파일을 업로드하지 않고 제출(submit) 버튼을 클릭하여도 파일($_FILES)은 계속 존재합니다. userfile의 ``isValid()`` 메소드로 파일이 실제로 업로드 되었는지 확인할 수 있습니다. 자세한 내용은 :ref:`verify-a-file`\ 을 참조하세요.
+    <input type="file" name="my-form[details][avatar]">
 
-이름에 배열 표기법을 사용한 경우 입력은 다음과 같습니다.
+The array returned by ``getFiles()`` would look more like this::
 
-::
+    [
+         'my-form' => [
+            'details' => [
+                'avatar' => // UploadedFile instance
+            ],
+        ],
+    ]
 
-	<input type="file" name="my-form[details][avatar]">
 
-``getFiles()``\ 에 의해 반환된 배열은 다음과 같습니다.
+In some cases, you may specify an array of files to upload::
 
-::
+    Upload an avatar: <input type="file" name="my-form[details][avatars][]">
+    Upload an avatar: <input type="file" name="my-form[details][avatars][]">
 
-	[
-		'my-form' => [
-			'details' => [
-				'avatar' => // UploadedFile instance
-			],
-		],
-	]
+In this case, the returned array of files would be more like::
 
-경우에 따라 업로드할 파일 배열을 지정할 수 있습니다.
-
-::
-
-	Upload an avatar: <input type="file" name="my-form[details][avatars][]">
-	Upload an avatar: <input type="file" name="my-form[details][avatars][]">
-
-이 경우 반환 된 파일 배열은
-
-::
-
-	[
-		'my-form' => [
-			'details' => [
-				'avatar' => [
-					0 => /* UploadedFile instance */,
-					1 => /* UploadedFile instance */
+    [
+        'my-form' => [
+            'details' => [
+                'avatar' => [
+                    0 => // UploadedFile instance,
+                    1 => // UploadedFile instance,
                 ],
-			],
-		],
-	]
+            ],
+        ],
+    ]
 
-단일 파일
+Single File
 ===========
 
-단일 파일에 액세스해야 하는 경우 ``getFile()``\ 을 사용하여 파일 인스턴스를 직접 검색 할 수 있습니다. 
-``CodeIgniter\HTTP\Files\UploadedFile``\ 의 인스턴스를 반환합니다.
+If you just need to access a single file, you can use ``getFile()`` to retrieve the file instance directly. This will return an instance of ``CodeIgniter\HTTP\Files\UploadedFile``:
 
-가장 간단한 사용법
--------------------
+Simplest usage
+--------------
 
-가장 간단한 사용법으로 단일 파일은 다음과 같이 제출(submit)될 수 있습니다.
+With the simplest usage, a single file might be submitted like::
 
-::
+    <input type="file" name="userfile">
 
-	<input type="file" name="userfile">
-
-다음과 같은 간단한 파일 인스턴스를 반환합니다.
+Which would return a simple file instance like:
 
 .. literalinclude:: uploaded_files/004.php
 
-배열 표기법
+Array notation
 --------------
 
-이름에 배열 표기법을 사용한 경우 입력은 다음과 같습니다.
+If you used an array notation for the name, the input would look something like::
 
-::
+    <input type="file" name="my-form[details][avatar]">
 
-	<input type="file" name="my-form[details][avatar]">
-
-파일 인스턴스를 얻으려면
+For get the file instance:
 
 .. literalinclude:: uploaded_files/005.php
 
-다중 파일
+Multiple files
 ==============
-
-HTML에서
 
 ::
 
     <input type="file" name="images[]" multiple>
 
-컨트롤러에서
+In controller:
 
 .. literalinclude:: uploaded_files/006.php
 
-여기서 ``images``\ 는 다중 폼(form) 필드의 이름입니다.
+where the ``images`` is a loop from the form field name.
 
-이름이 같은 파일이 여러 개 있으면 ``getFile()``\ 을 사용하여 모든 파일을 개별적으로 검색할 수 있습니다.
+If there are multiple files with the same name you can use ``getFile()`` to retrieve every file individually.
 
-컨트롤러에서
+In controller:
 
 .. literalinclude:: uploaded_files/007.php
 
-``getFileMultiple()``\ 을 사용하여 같은 이름으로  업로드된 파일의 배열을 얻는 것이 더 쉬울 수 있습니다.
+You might find it easier to use ``getFileMultiple()``, to get an array of uploaded files with the same name:
 
 .. literalinclude:: uploaded_files/008.php
 
+Another example::
 
-다른 예제
+    Upload an avatar: <input type="file" name="my-form[details][avatars][]">
+    Upload an avatar: <input type="file" name="my-form[details][avatars][]">
 
-::
-
-	Upload an avatar: <input type="file" name="my-form[details][avatars][]">
-	Upload an avatar: <input type="file" name="my-form[details][avatars][]">
-
-컨트롤러에서
+In controller:
 
 .. literalinclude:: uploaded_files/009.php
 
-.. note:: ``getFiles()``\ 를 사용하는 것이 더 적절합니다.
+.. note:: Using ``getFiles()`` is more appropriate.
 
 *********************
-파일 작업
+Working with the File
 *********************
 
-UploadedFile 인스턴스를 검색한 후에는 파일에 대한 정보를 안전한 방법으로 검색하고 파일을 새 위치로 옮길 수 있습니다.
+Once you've retrieved the UploadedFile instance, you can retrieve information about the file in safe ways, as well as
+move the file to a new location.
 
 .. _verify-a-file:
 
-파일 확인
+Verify a File
 =============
 
-``isValid()`` 메소드를 호출하여 파일이 실제로 HTTP를 통해 오류없이 업로드되었는지 확인할 수 있습니다.
+You can check that a file was actually uploaded via HTTP with no errors by calling the ``isValid()`` method:
 
 .. literalinclude:: uploaded_files/010.php
 
-이 예제에서 볼 수 있듯이 파일에 업로드 오류가 있는 경우 ``getError()``\ 와 ``getErrorString()`` 메소드를 사용하여 오류 코드(정수)와 오류 메시지를 검색할 수 있습니다.
-이 방법을 통해 다음과 같은 오류를 발견할 수 있습니다.
+As seen in this example, if a file had an upload error, you can retrieve the error code (an integer) and the error
+message with the ``getError()`` and ``getErrorString()`` methods. The following errors can be discovered through
+this method:
 
-* 파일이 ini 지시문의 upload_max_filesize를 초과합니다.
-* 파일이 폼에 정의된 업로드 한도를 초과합니다.
-* 파일이 부분적으로 업로드되었습니다.
-* 파일이 업로드되지 않았습니다.
-* 파일을 디스크에 쓸 수 없습니다.
-* 파일을 업로드할 수 없습니다 : 임시 디렉토리가 없습니다.
-* PHP 확장자가 포함되어 파일 업로드가 중지되었습니다.
+* The file exceeds your ``upload_max_filesize`` ini directive.
+* The file exceeds the upload limit defined in your form.
+* The file was only partially uploaded.
+* No file was uploaded.
+* The file could not be written on disk.
+* File could not be uploaded: missing temporary directory.
+* File upload was stopped by a PHP extension.
 
-파일 이름
+File Names
 ==========
 
 getName()
 ---------
 
-``getName()`` 메소드를 사용하여 클라이언트가 제공한 원래 파일 이름을 검색 할 수 있습니다. 
-이것은 일반적으로 클라이언트가 전송한 파일 이름이므로 신뢰할 수 없습니다. 
-파일이 이동된 경우 이동된 파일의 최종 이름을 반환합니다.
+You can retrieve the original filename provided by the client with the ``getName()`` method. This will typically be the
+filename sent by the client, and should not be trusted. If the file has been moved, this will return the final name of
+the moved file:
 
 .. literalinclude:: uploaded_files/011.php
 
 getClientName()
 ---------------
 
-파일이 이동된 경우에도 클라이언트가 전송한대로 업로드된 파일의 원래 이름을 반환합니다.
+Always returns the original name of the uploaded file as sent by the client, even if the file has been moved:
 
 .. literalinclude:: uploaded_files/012.php
 
 getTempName()
 -------------
 
-업로드중에 생성된 임시 파일의 전체 경로를 얻으려면 ``getTempName()`` 메소드를 사용합니다.
+To get the full path of the temp file that was created during the upload, you can use the ``getTempName()`` method:
 
 .. literalinclude:: uploaded_files/013.php
 
-파일의 다른 정보
-================
+Other File Info
+===============
 
 getClientExtension()
 --------------------
 
-업로드된 파일 이름을 기준으로 원본 파일 확장자를 반환합니다.
-신뢰할 수 없습니다.
-신뢰할 수 있는 확장자를 원한다면 ``guessExtension()``\ 을 사용하십시오.
+Returns the original file extension, based on the file name that was uploaded:
 
 .. literalinclude:: uploaded_files/014.php
+
+.. warning:: This is NOT a trusted source. For a trusted version, use ``guessExtension()`` instead.
 
 getClientMimeType()
 -------------------
 
-클라이언트가 제공한 파일의 MIME 유형 (MIM 유형)을 리턴합니다.
-신뢰할 수 없는 MIME 유형을 반환합니다.
-신뢰할 수 있는 MIME 유형을 원한다면 ``getMimeType()``\ 을 사용하십시오.
+Returns the mime type (mime type) of the file as provided by the client. This is NOT a trusted value. For a trusted
+version, use ``getMimeType()`` instead:
 
 .. literalinclude:: uploaded_files/015.php
 
-파일 이동
-=========
+getClientPath()
+---------------
 
-원본 파일 이름
------------------
+.. versionadded:: 4.4.0
 
-각 파일은 적절하게 이름이 지정된 ``move()`` 메소드를 사용하여 새 위치로 이동할 수 있습니다.
-첫 번째 매개 변수로 디렉토리와 함께 사용하여 파일명을 전달하여 이동시킵니다.
+Returns the `webkit relative path <https://developer.mozilla.org/en-US/docs/Web/API/File/webkitRelativePath>`_ of the uploaded file when the client has uploaded files via directory upload.  
+In PHP versions below 8.1, this returns ``null``
+
+.. literalinclude:: uploaded_files/023.php
+
+Moving Files
+============
+
+with Original Filename
+----------------------
+
+Each file can be moved to its new location with the aptly named ``move()`` method. This takes the directory to move
+the file to as the first parameter:
 
 .. literalinclude:: uploaded_files/016.php
 
-기본적으로 원래 파일 이름이 사용됩니다.
+By default, the original filename was used.
 
-새 파일 이름
---------------
+with New Filename
+-----------------
 
-두 번째 매개변수로 새 파일 이름을 지정할 수 있습니다.
+You can specify a new filename by passing it as the second parameter:
 
 .. literalinclude:: uploaded_files/017.php
 
-기존 파일 덮어쓰기
+Overwriting Existing File
 -------------------------
 
-기본적으로 대상 파일이 이미 존재하는 경우, 새 파일 이름이 자동으로 지정됩니다.
-예를 들어, 디렉토리에 이미 **image_name.jpg** 파일이 있는 경우, 파일 이름은 자동으로 **image_name_1.jpg**\ 가 됩니다.
+By default, if the destination file already exists, a new filename will be used.
+For example, if **image_name.jpg** already exists in the directory, then the
+filename will be **image_name_1.jpg** automatically.
 
-세 번째 매개변수로 ``true``\ 를 전달하여 기존 파일을 덮어쓸 수 있습니다.
+You can overwrite the existing file by passing ``true``
+as the third parameter:
 
 .. literalinclude:: uploaded_files/022.php
 
-파일이 이동했는지 확인하기
----------------------------
+Check if the File Moved
+-----------------------
 
-파일이 제거되면 임시 파일이 삭제됩니다.
-부울을 반환하는 ``hasMoved()`` 메소드로 파일이 이동했는지 확인할 수 있습니다.
+Once the file has been removed the temporary file is deleted. You can check if a file has been moved already with
+the ``hasMoved()`` method, which returns a boolean:
 
 .. literalinclude:: uploaded_files/018.php
 
-파일 이동이 실패할 경우
-------------------------
+When Moving Fails
+-----------------
 
-다음과 같은 경우 업로드된 파일을 ``HTTP/Exception``\ 이 발생하며 이동하지 못할 수 있습니다.
+Moving an uploaded file can fail, with an HTTPException, under several circumstances:
 
-- 파일이 이미 이동되었습니다
-- 파일이 성공적으로 업로드되지 않았습니다
-- 파일 이동 작업이 실패합니다 (예 : 부적절한 권한)
+- the file has already been moved
+- the file did not upload successfully
+- the file move operation fails (e.g., improper permissions)
 
-파일 저장
+Store Files
 ===========
 
-각 파일은 ``store()`` 메소드를 사용하여 새 위치로 이동할 수 있습니다.
+Each file can be moved to its new location with the aptly named ``store()`` method.
 
-가장 간단한 사용법으로 단일 파일이 다음과 같이 제출(submit)될 수 있습니다.
+With the simplest usage, a single file might be submitted like::
 
-::
+    <input type="file" name="userfile">
 
-	<input type="file" name="userfile">
-
-기본적으로 업로드 파일은 쓰기 가능한 업로드 디렉토리에 저장됩니다.
-YYYYMMDD 폴더와 같은 임의의 파일 이름이 생성되고 파일 경로를 반환합니다.
+By default, upload files are saved in **writable/uploads** directory. The **YYYYMMDD** folder
+and random file name will be created. Returns a file path:
 
 .. literalinclude:: uploaded_files/019.php
 
-첫 번째 매개 변수로 파일이 이동할 디렉토리를 지정할 수 있습니다. 
-새 파일 이름은 두 번째 매개 변수로 전달합니다.
+You can specify a directory to move the file to as the first parameter. A new filename by
+passing it as the second parameter:
 
 .. literalinclude:: uploaded_files/020.php
 
-다음과 같은 경우 업로드된 파일을 ``HTTP/Exception``\ 이 발생하며 이동하지 못할 수 있습니다.
+Moving an uploaded file can fail, with an ``HTTPException``, under several circumstances:
 
-- 파일이 이미 이동되었습니다
-- 파일이 성공적으로 업로드되지 않았습니다
-- 파일 이동 작업이 실패합니다 (예 : 부적절한 권한)
+- the file has already been moved
+- the file did not upload successfully
+- the file move operation fails (e.g., improper permissions)

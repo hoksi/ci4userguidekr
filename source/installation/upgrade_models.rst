@@ -1,54 +1,54 @@
-모델 업그레이드
-################
+Upgrade Models
+##############
 
 .. contents::
     :local:
     :depth: 2
 
-관련 문서
+Documentations
 ==============
 
-- `CodeIgniter 3.X 모델 설명서 <http://codeigniter.com/userguide3/general/models.html>`_
-- :doc:`CodeIgniter 4.X 모델 설명서 </models/model>`
+- `Model Documentation CodeIgniter 3.X <http://codeigniter.com/userguide3/general/models.html>`_
+- :doc:`Model Documentation CodeIgniter 4.X </models/model>`
 
-무엇이 바뀌었습니까?
+What has been changed
 =====================
 
-- CI4 모델은 자동 데이터베이스 연결, 기본 CRUD, 모델 내 검증, 자동 페이지화 등 기능이 CI3 보다 훨씬 뛰어납니다.
-- CodeIgniter 4에 네임스페이스가 추가되었으므로 네임스페이스를 지원하도록 모델을 변경해야 합니다.
+- The CI4 model has much more functionality, including automatic database connection, basic CRUD, in-model validation, and automatic pagination.
+- Since namespaces has been added to CodeIgniter 4, the models must be changed to support namespaces.
 
-업그레이드 가이드
-=================
+Upgrade Guide
+=============
 
-1. 먼저 모든 모델 파일을 **app/Models** 폴더로 옮깁니다.
-2. <?php 태그 바로 뒤에 ``namespace App\Models;``\ 를 추가합니다.
-3. ``namespace App\Models;`` 아래에 ``use CodeIgniter\Model;``\ 을 추가합니다.
-4. ``extends CI_Model``\ 을 ``extends Model``\ 로 바꿉니다.
-5. CI3의 ``$this->load->model('x');`` 대신 `$this->x = new X();``\ 를 사용하여 구성 요소에 대한 이름 지정 규칙을 지정하거나 :php:func:`model()` 함수를 사용하여 ``$this->x = model('X');``\ 로 지정합니다.
+1. First, move all model files to the folder **app/Models**.
+2. Add this line just after the opening php tag: ``namespace App\Models;``.
+3. Below the ``namespace App\Models;`` line add this line: ``use CodeIgniter\Model;``.
+4. Replace ``extends CI_Model`` with ``extends Model``.
+5. Instead of CI3's ``$this->load->model('x');``, you would now use ``$this->x = new X();``, following namespaced conventions for your component. Alternatively, you can use the :php:func:`model()` function: ``$this->x = model('X');``.
 
-모델 구조에서 하위 디렉터리를 사용하는 경우 그에 따라 네임스페이스를 변경해야합니다.
-예: 버전 3 모델 **application/models/users/user_contact.php**\ 의 네임스페이스는 ``namespace App\Models\Users;``\ 여야 하며 버전 4의 모델 경로는 **app/Models/Users/UserContact.php**\ 입니다.
+If you use sub-directories in your model structure you have to change the namespace according to that.
+Example: You have a version 3 model located in **application/models/users/user_contact.php** the namespace has to be ``namespace App\Models\Users;`` and the model path in the version 4 should look like this: **app/Models/Users/UserContact.php**
 
-CI4의 새 모델에는 많은 기능을 제공하는 기본 메소드가 있습니다. 예를 들어,``find($id)`` 메소드. 이를 통해 기본 키가 ``$id``\ 인 데이터를 검색할 수 있습니다.
-데이터 삽입도 이전보다 쉽습니다. CI4에는 ``insert($data)`` 메소드가 있습니다. 선택적으로 이러한 기본 제공 메소드를 사용하고 코드를 새 메소드로 마이그레이션할 수 있습니다.
+The new Model in CI4 has a lot of built-in methods. For example, the ``find($id)`` method. With this you can find data where the primary key is equal to ``$id``.
+Inserting data is also easier than before. In CI4 there is an ``insert($data)`` method. You can optionally make use of all those built-in methods and migrate your code to the new methods.
 
-이러한 메소드에 대한 자세한 정보는 :doc:`../models/model`\ 에서 찾을 수 있습니다.
+You can find more information to those methods in :doc:`../models/model`.
 
-코드 예
+Code Example
 ============
 
 CodeIgniter Version 3.x
 ------------------------
 
-Path: **application/models**
+Path: **application/models**:
 
 .. literalinclude:: upgrade_models/ci3sample/001.php
 
 CodeIgniter Version 4.x
 -----------------------
 
-Path: **app/Models**
+Path: **app/Models**:
 
 .. literalinclude:: upgrade_models/001.php
 
-데이터를 삽입을 위해 CI4 이후 부터는 모델에 ``insert()`` 메소드가 기본 제공되므로 ``$model->insert()`` 메서드를 구현하지 않고 직접 호출하면 됩니다.
+To insert data you can just directly call the ``$model->insert()`` method because this method is built-in since CI4.
